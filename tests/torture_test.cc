@@ -399,7 +399,8 @@ __lua_type(lua_State *L, FuzzedDataProvider *fdp)
 	       type == LUA_TSTRING        ||
 	       type == LUA_TTABLE         ||
 	       type == LUA_TTHREAD        ||
-	       type == LUA_TUSERDATA);
+	       type == LUA_TUSERDATA      ||
+	       type == LUA_TNONE);
 	assert(lua_gettop(L) == top);
 }
 

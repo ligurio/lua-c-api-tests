@@ -166,7 +166,7 @@ metrics_increment_num_error_samples(struct metrics *metrics)
 	metrics->total_num_with_errors++;
 }
 
-static void
+UNUSED static void
 profiler_cb(lua_State *L, void *data, size_t *size)
 {
 	(void)L;

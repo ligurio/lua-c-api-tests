@@ -54,7 +54,11 @@ LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 	test_data.fdp = &fdp;
 
 	const char *mode = "t";
+#if LUA_VERSION_NUM == 501
+	int res = lua_load(L, Reader, &test_data, "libFuzzer");
+#else /* Lua 5.3+ */
 	int res = lua_load(L, Reader, &test_data, "libFuzzer", mode);
+#endif /* LUA_VERSION_NUM */
 	if (res == LUA_OK) {
 		lua_pcall(L, 0, 0, 0);
 	}

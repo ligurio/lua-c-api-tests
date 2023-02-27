@@ -1,0 +1,28 @@
+diff --git a/makefile b/makefile
+index ee56c67..d43a965 100644
+--- a/makefile
++++ b/makefile
+@@ -41,7 +41,7 @@ CWARNSC= -Wdeclaration-after-statement \
+ 	-Wold-style-definition \
+ 
+ 
+-CWARNS= $(CWARNSCPP) $(CWARNSC) $(CWARNGCC)
++CWARNS= $(CWARNSCPP) $(CWARNSC)
+ 
+ # Some useful compiler options for internal tests:
+ # -DLUAI_ASSERT turns on all assertions inside Lua.
+@@ -73,11 +73,11 @@ LOCAL = $(TESTS) $(CWARNS)
+ # enable Linux goodies
+ MYCFLAGS= $(LOCAL) -std=c99 -DLUA_USE_LINUX -DLUA_USE_READLINE
+ MYLDFLAGS= $(LOCAL) -Wl,-E
+-MYLIBS= -ldl -lreadline
++MYLIBS= -ldl -lreadline $(LDFLAGS)
+ 
+ 
+-CC= gcc
+-CFLAGS= -Wall -O2 $(MYCFLAGS) -fno-stack-protector -fno-common -march=native
++CC?= gcc
++CFLAGS= -Wall -O2 $(MYCFLAGS) -fno-stack-protector -fno-common -march=native $(CFLAGS)
+ AR= ar rc
+ RANLIB= ranlib
+ RM= rm -f

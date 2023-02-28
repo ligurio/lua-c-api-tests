@@ -1,0 +1,58 @@
+name: Testing
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  # Update of a developer branch cancels the previously scheduled workflow
+  # run for this branch. However, the 'main' branch and tag workflow runs
+  # are never canceled.
+  #
+  # We use a trick here: define the concurrency group as 'workflow run ID' +
+  # 'workflow run attempt' because it is a unique combination for any run.
+  # So it effectively discards grouping.
+  #
+  # Important: we cannot use `github.sha` as a unique identifier because
+  # pushing a tag may cancel a run that works on a branch push event.
+  group: ${{ (
+    github.ref == 'refs/heads/main' ||
+    startsWith(github.ref, 'refs/tags/')) &&
+    format('{0}-{1}', github.run_id, github.run_attempt) ||
+    format('{0}-{1}', github.workflow, github.ref) }}
+  cancel-in-progress: true
+
+jobs:
+  testing:
+    if: |
+      github.event_name == 'push' ||
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name != github.repository
+    strategy:
+      matrix:
+        LUA:
+          - "lua"
+          - "luajit"
+      fail-fast: false
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup common packages
+        run: sudo apt install -y clang-14
+
+      - name: Running CMake (PUC Rio Lua -current)
+        run: cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DUSE_LUA=ON -S . -B build
+        if: ${{ matrix.LUA == 'lua' }}
+
+      - name: Running CMake (LuaJIT -current)
+        run: cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DUSE_LUAJIT=ON -S . -B build
+        if: ${{ matrix.LUA == 'luajit' }}
+
+      - name: Building
+        run: cmake --build build --parallel $(nproc)
+
+      - name: Testing
+        run: cmake --build build --target test
+        env:
+          CTEST_OUTPUT_ON_FAILURE: 1

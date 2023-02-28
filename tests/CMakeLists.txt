@@ -63,6 +63,7 @@ function(create_test)
 endfunction()
 
 list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_bufflen_test")
+list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_buffsub_test")
 
 file(GLOB_RECURSE tests ${CMAKE_CURRENT_SOURCE_DIR} *.c)
 foreach(path ${tests})

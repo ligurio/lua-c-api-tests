@@ -5,6 +5,16 @@ macro(build_luajit LJ_VERSION)
     set(CFLAGS "-fsanitize=fuzzer-no-link")
     set(LDFLAGS "-fsanitize=fuzzer-no-link")
 
+    if (ENABLE_ASAN)
+        set(CFLAGS "-fsanitize=fuzzer-no-link,address")
+        set(LDFLAGS "-fsanitize=fuzzer-no-link,address")
+    endif (ENABLE_ASAN)
+
+    if (ENABLE_UBSAN)
+        set(CFLAGS "-fsanitize=fuzzer-no-link,undefined")
+        set(LDFLAGS "-fsanitize=fuzzer-no-link,undefined")
+    endif (ENABLE_UBSAN)
+
     include(ExternalProject)
 
     ExternalProject_Add(patched-luajit-${LJ_VERSION}

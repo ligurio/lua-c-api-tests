@@ -7,6 +7,16 @@ macro(build_lua LUA_VERSION)
     set(CFLAGS "-fsanitize=fuzzer-no-link")
     set(LDFLAGS "-fsanitize=fuzzer-no-link")
 
+    if (ENABLE_ASAN)
+        set(CFLAGS "-fsanitize=fuzzer-no-link,address -fsanitize=pointer-subtract -fsanitize=pointer-compare")
+        set(LDFLAGS "-fsanitize=fuzzer-no-link,address")
+    endif (ENABLE_ASAN)
+
+    if (ENABLE_UBSAN)
+        set(CFLAGS "-fsanitize=fuzzer-no-link,undefined")
+        set(LDFLAGS "-fsanitize=fuzzer-no-link,undefined")
+    endif (ENABLE_UBSAN)
+
     include(ExternalProject)
 
     ExternalProject_Add(patched-lua-${LUA_VERSION}

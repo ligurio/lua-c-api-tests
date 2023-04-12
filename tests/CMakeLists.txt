@@ -78,3 +78,6 @@ foreach(path ${tests})
   endif ()
   create_test(PREFIX ${HEAD})
 endforeach()
+
+include(ProtobufMutator)
+add_subdirectory(luaL_loadbuffer_proto)

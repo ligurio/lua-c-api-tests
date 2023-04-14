@@ -33,11 +33,6 @@ endif ()
 
 message(STATUS "Found ${LUA_VERSION_STRING}")
 
-find_package(LLVM REQUIRED CONFIG)
-if(${LLVM_PACKAGE_VERSION} VERSION_LESS 5.0.0)
-  message(FATAL_ERROR "LLVM 5.0.0 or newer is required")
-endif()
-
 if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
    NOT CMAKE_C_COMPILER_ID STREQUAL "Clang")
   message(FATAL_ERROR

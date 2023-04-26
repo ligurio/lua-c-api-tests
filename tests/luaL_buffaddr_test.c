@@ -14,11 +14,11 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 		return 0;
 
 	luaL_Buffer buf;
-	luaL_buffinitsize(L, &buf, size);
-	luaL_addlstring(&buf, (const char *)data, size);
+	char *s = luaL_buffinitsize(L, &buf, size);
+	memcpy(s, data, size);
+	luaL_pushresultsize(&buf, size);
 	if (luaL_buffaddr(&buf) == NULL)
 		return 0;
-	luaL_pushresultsize(&buf, size);
 
 	lua_settop(L, 0);
 	lua_close(L);

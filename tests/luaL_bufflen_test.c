@@ -18,12 +18,12 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 		return -1;
 
 	luaL_Buffer buf;
-	luaL_buffinitsize(L, &buf, size);
-	luaL_addlstring(&buf, (const char *)data, size);
-
-	assert(luaL_bufflen(&buf) == size);
+	char *s = luaL_buffinitsize(L, &buf, size);
+	memcpy(s, data, size);
 
 	luaL_pushresultsize(&buf, size);
+
+	assert(luaL_bufflen(&buf) == size);
 
 	lua_settop(L, 0);
 	lua_close(L);

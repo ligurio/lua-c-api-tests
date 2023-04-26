@@ -2,7 +2,7 @@ macro(build_luajit LJ_VERSION)
     set(LJ_SOURCE_DIR ${PROJECT_BINARY_DIR}/luajit-${LJ_VERSION}/source)
     set(LJ_BINARY_DIR ${PROJECT_BINARY_DIR}/luajit-${LJ_VERSION}/work)
 
-    set(CFLAGS "-fsanitize=fuzzer-no-link")
+    set(CFLAGS "-DLUAI_ASSERT=1 -DLUA_USE_APICHECK=1 -fsanitize=fuzzer-no-link")
     set(LDFLAGS "-fsanitize=fuzzer-no-link")
 
     if (ENABLE_ASAN)

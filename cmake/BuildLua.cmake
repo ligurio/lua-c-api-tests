@@ -4,7 +4,7 @@ macro(build_lua LUA_VERSION)
 
     set(LUA_PATCH_PATH ${PROJECT_SOURCE_DIR}/patches/puc-rio-lua.patch)
 
-    set(CFLAGS "-fsanitize=fuzzer-no-link")
+    set(CFLAGS "-DLUAI_ASSERT=1 -DLUA_USE_APICHECK=1 -fsanitize=fuzzer-no-link")
     set(LDFLAGS "-fsanitize=fuzzer-no-link")
 
     if (ENABLE_ASAN)

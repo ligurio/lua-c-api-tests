@@ -12,6 +12,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 	if (L == NULL)
 		return 0;
 
+	luaL_openlibs(L);
+
 	size_t str_len = size + 1;
 	char *str = calloc(str_len, sizeof(char));
 	if (str == NULL)

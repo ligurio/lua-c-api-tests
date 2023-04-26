@@ -14,6 +14,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 	if (L == NULL)
 		return 0;
 
+	luaL_openlibs(L);
+
 	const char *mode = "bt";
 	luaL_loadbufferx(L, (const char *)data, size, "fuzz", mode);
 	lua_pcall(L, 0, 0, 0);

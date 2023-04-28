@@ -43,13 +43,13 @@ DEFINE_PROTO_FUZZER(const lua_grammar::Block &message)
 
 	luaL_openlibs(L);
 
-	/*
-	 * See https://luajit.org/running.html.
-	 */
+#ifdef LUAJIT
+	/* See https://luajit.org/running.html. */
 	luaL_dostring(L, "jit.opt.start('hotloop=1')");
 	luaL_dostring(L, "jit.opt.start('hotexit=1')");
 	luaL_dostring(L, "jit.opt.start('recunroll=1')");
 	luaL_dostring(L, "jit.opt.start('callunroll=1')");
+#endif /* LUAJIT */
 
 	if (luaL_loadbuffer(L, code.c_str(), code.size(), "fuzz") != LUA_OK) {
 		report_error(L, "luaL_loadbuffer()");

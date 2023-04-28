@@ -75,6 +75,7 @@ function(create_test)
   endif (USE_LUAJIT)
 endfunction()
 
+list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_addgsub_test")
 list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_bufflen_test")
 list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_buffsub_test")
 list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_buffaddr_test")

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include <lua.h>
+#include <lualib.h>
 #include <lauxlib.h>
 
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)

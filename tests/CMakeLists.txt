@@ -60,6 +60,10 @@ function(create_test)
       ENVIRONMENT "ASAN_OPTIONS='detect_invalid_pointer_pairs=2'"
     )
   endif (USE_LUA)
+
+  if (USE_LUAJIT)
+    target_compile_definitions(${FUZZ_PREFIX} PUBLIC LUAJIT)
+  endif (USE_LUAJIT)
 endfunction()
 
 list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_bufflen_test")

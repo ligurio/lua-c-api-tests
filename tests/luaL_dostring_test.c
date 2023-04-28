@@ -22,6 +22,13 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 	memcpy(str, data, size);
 	str[size] = '\0';
 
+#ifdef LUAJIT
+	/* See https://luajit.org/running.html. */
+	luaL_dostring(L, "jit.opt.start('hotloop=1')");
+	luaL_dostring(L, "jit.opt.start('hotexit=1')");
+	luaL_dostring(L, "jit.opt.start('recunroll=1')");
+	luaL_dostring(L, "jit.opt.start('callunroll=1')");
+#endif /* LUAJIT */
 	luaL_dostring(L, str);
 
 	free(str);

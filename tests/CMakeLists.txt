@@ -42,17 +42,18 @@ function(create_test)
   cmake_parse_arguments(
     FUZZ
     ""
-    "PREFIX"
+    "FILENAME"
     ""
     ${ARGN}
   )
-  add_executable(${FUZZ_PREFIX} ${FUZZ_PREFIX}.c)
-  target_link_libraries(${FUZZ_PREFIX} PUBLIC fuzzer_config ${LUA_LIBRARIES} ${LDFLAGS})
-  target_include_directories(${FUZZ_PREFIX} PRIVATE ${LUA_INCLUDE_DIR})
-  target_compile_options(${FUZZ_PREFIX} PRIVATE -Wall -Wextra -Wpedantic -Wno-unused-parameter -g)
-  add_dependencies(${FUZZ_PREFIX} ${LUA_TARGET})
-  add_test(NAME ${FUZZ_PREFIX}
-           COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${FUZZ_PREFIX}
+  get_filename_component(test_name ${FUZZ_FILENAME} NAME_WE)
+  add_executable(${test_name} ${FUZZ_FILENAME})
+  target_link_libraries(${test_name} PUBLIC fuzzer_config ${LUA_LIBRARIES} ${LDFLAGS})
+  target_include_directories(${test_name} PRIVATE ${LUA_INCLUDE_DIR})
+  target_compile_options(${test_name} PRIVATE -Wall -Wextra -Wpedantic -Wno-unused-parameter -g)
+  add_dependencies(${test_name} ${LUA_TARGET})
+  add_test(NAME ${test_name}
+           COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${test_name}
                    -use_value_profile=1
                    -report_slow_units=5
                    -reload=1
@@ -61,16 +62,16 @@ function(create_test)
                    -print_final_stats=1
                    -mutate_depth=20
                    -max_total_time=10
-                   -artifact_prefix=${FUZZ_PREFIX}
+                   -artifact_prefix=${test_name}
   )
   if (USE_LUA)
-    set_tests_properties(${FUZZ_PREFIX} PROPERTIES
+    set_tests_properties(${test_name} PROPERTIES
       ENVIRONMENT "ASAN_OPTIONS='detect_invalid_pointer_pairs=2'"
     )
   endif (USE_LUA)
 
   if (USE_LUAJIT)
-    target_compile_definitions(${FUZZ_PREFIX} PUBLIC LUAJIT)
+    target_compile_definitions(${test_name} PUBLIC LUAJIT)
   endif (USE_LUAJIT)
 endfunction()
 
@@ -80,15 +81,13 @@ list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_buffaddr_test")
 list(APPEND LUAJIT_BLACKLIST_TESTS "lua_load_test")
 list(APPEND LUAJIT_BLACKLIST_TESTS "lua_stringtonumber_test")
 
-file(GLOB_RECURSE tests ${CMAKE_CURRENT_SOURCE_DIR} *.c)
-foreach(path ${tests})
-  get_filename_component(test_name ${path} NAME)
-  string(REPLACE ".c" ";" NAME ${test_name})
-  list(GET NAME 0 HEAD)
-  if (USE_LUAJIT AND (${HEAD} IN_LIST LUAJIT_BLACKLIST_TESTS))
+file(GLOB tests LIST_DIRECTORIES false ${CMAKE_CURRENT_SOURCE_DIR} *.c *.cc)
+foreach(filename ${tests})
+  get_filename_component(test_name ${filename} NAME_WE)
+  if (USE_LUAJIT AND (${test_name} IN_LIST LUAJIT_BLACKLIST_TESTS))
     continue()
   endif ()
-  create_test(PREFIX ${HEAD})
+  create_test(FILENAME ${filename})
 endforeach()
 
 include(ProtobufMutator)

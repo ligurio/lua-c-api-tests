@@ -13,6 +13,7 @@ LuaJIT).
 ### Building
 
 ```sh
+git clone --jobs $(nproc) --recursive https://github.com/ligurio/lua-c-api-tests
 CC=clang CXX=clang++ cmake -S . -B build -DUSE_LUA=ON [-DUSE_LUAJIT=ON]
 cmake --build build --parallel
 ```
@@ -31,6 +32,7 @@ CMake options:
 
 ```sh
 cmake --build build --target test
+cd build && ctest -R luaL_gsub_test --verbose
 ```
 
 ### Update a seed corpus

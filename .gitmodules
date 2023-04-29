@@ -1,0 +1,3 @@
+[submodule "corpus"]
+	path = corpus
+	url = https://github.com/ligurio/lua-c-api-corpus

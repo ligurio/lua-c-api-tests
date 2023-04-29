@@ -31,6 +31,7 @@ add_dependencies(${test_name}
                  ${LPM_LIBRARIES}
                  lua_grammar-proto)
 
+string(REPLACE "_test" "" test_prefix ${test_name})
 add_test(NAME ${test_name}
          COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${test_name}
                  -use_value_profile=1
@@ -42,4 +43,6 @@ add_test(NAME ${test_name}
                  -mutate_depth=20
                  -max_total_time=10
                  -artifact_prefix=${test_name}
+                 -dict=${PROJECT_SOURCE_DIR}/corpus/${test_prefix}.dict
+                 ${PROJECT_SOURCE_DIR}/corpus/${test_prefix}
 )

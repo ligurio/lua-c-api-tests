@@ -1,3 +1,10 @@
+<table>
+  <tr>
+    <th>PUC Rio Lua</th>
+    <td><a href="https://bugs.chromium.org/p/oss-fuzz/issues/list?sort=-opened&can=1&q=proj:lua"><img src="https://oss-fuzz-build-logs.storage.googleapis.com/badges/lua.svg"></a></td>
+  </tr>
+</table>
+
 # Lua C API tests
 
 is a set of fuzzing tests for C implementations of Lua runtime (PUC Rio Lua and

@@ -5,15 +5,26 @@ macro(build_luajit LJ_VERSION)
     set(CFLAGS "-DLUAI_ASSERT=1 -DLUA_USE_APICHECK=1 -fsanitize=fuzzer-no-link")
     set(LDFLAGS "-fsanitize=fuzzer-no-link")
 
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(CFLAGS "${CFLAGS} ${CMAKE_C_FLAGS_DEBUG}")
+        set(LDFLAGS "${LDFLAGS} ${CMAKE_C_FLAGS_DEBUG}")
+    endif (CMAKE_BUILD_TYPE STREQUAL "Debug")
+
     if (ENABLE_ASAN)
-        set(CFLAGS "${CFLAGS} -fsanitize=fuzzer-no-link,address")
-        set(LDFLAGS "${LDFLAGS} -fsanitize=fuzzer-no-link,address")
+        set(CFLAGS "${CFLAGS} -fsanitize=address")
+        set(LDFLAGS "${LDFLAGS} -fsanitize=address")
     endif (ENABLE_ASAN)
 
     if (ENABLE_UBSAN)
-        set(CFLAGS "${CFLAGS} -fsanitize=fuzzer-no-link,undefined")
-        set(LDFLAGS "${LDFLAGS} -fsanitize=fuzzer-no-link,undefined")
+        set(CFLAGS "${CFLAGS} -fsanitize=undefined")
+        set(LDFLAGS "${LDFLAGS} -fsanitize=undefined")
     endif (ENABLE_UBSAN)
+
+    if (ENABLE_COV)
+        set(CFLAGS "${CFLAGS} -fprofile-instr-generate -fcoverage-mapping")
+        set(LDFLAGS "${LDFLAGS} -fprofile-instr-generate -fcoverage-mapping")
+    endif (ENABLE_COV)
+
 
     include(ExternalProject)
 

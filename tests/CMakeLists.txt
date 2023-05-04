@@ -22,13 +22,21 @@ target_link_libraries(
         >
 )
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(LDFLAGS "${LDFLAGS} ${CMAKE_C_FLAGS_DEBUG}")
+endif (CMAKE_BUILD_TYPE STREQUAL "Debug")
+
 if (ENABLE_ASAN)
-  set(LDFLAGS "-fsanitize=address")
+  set(LDFLAGS "${LDFLAGS} -fsanitize=address")
 endif (ENABLE_ASAN)
 
 if (ENABLE_UBSAN)
-  set(LDFLAGS "-fsanitize=undefined")
+  set(LDFLAGS "${LDFLAGS} -fsanitize=undefined")
 endif (ENABLE_UBSAN)
+
+if (ENABLE_COV)
+  set(LDFLAGS "${LDFLAGS} -fprofile-instr-generate -fcoverage-mapping")
+endif (ENABLE_COV)
 
 function(create_test)
   cmake_parse_arguments(

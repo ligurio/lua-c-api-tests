@@ -22,9 +22,9 @@ target_link_libraries(
         >
 )
 
-if (ENABLE_DEBUG)
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(LDFLAGS "${LDFLAGS} -g")
-endif (ENABLE_DEBUG)
+endif (CMAKE_BUILD_TYPE)
 
 if (ENABLE_ASAN)
   set(LDFLAGS "${LDFLAGS} -fsanitize=address")

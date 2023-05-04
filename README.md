@@ -25,6 +25,7 @@ CMake options:
 `master` for PUC Rio Lua and `v2.1` for LuaJIT.
 - `ENABLE_ASAN` enables AddressSanitizer.
 - `ENABLE_UBSAN` enables UndefinedBehaviorSanitizer.
+- `ENABLE_COV` enables coverage instrumentation.
 
 ### Running
 

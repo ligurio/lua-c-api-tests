@@ -5,10 +5,10 @@ macro(build_luajit LJ_VERSION)
     set(CFLAGS "-DLUAI_ASSERT=1 -DLUA_USE_APICHECK=1 -fsanitize=fuzzer-no-link")
     set(LDFLAGS "-fsanitize=fuzzer-no-link")
 
-    if (ENABLE_DEBUG)
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(CFLAGS "${CFLAGS} -g")
         set(LDFLAGS "${LDFLAGS} -g")
-    endif (ENABLE_DEBUG)
+    endif (CMAKE_BUILD_TYPE)
 
     if (ENABLE_ASAN)
         set(CFLAGS "${CFLAGS} -fsanitize=address")

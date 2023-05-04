@@ -10,7 +10,7 @@ macro(build_lua LUA_VERSION)
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(CFLAGS "${CFLAGS} ${CMAKE_C_FLAGS_DEBUG}")
         set(LDFLAGS "${LDFLAGS} ${CMAKE_C_FLAGS_DEBUG}")
-    endif (CMAKE_BUILD_TYPE)
+    endif (CMAKE_BUILD_TYPE STREQUAL "Debug")
 
     if (ENABLE_ASAN)
         set(CFLAGS "${CFLAGS} -fsanitize=address -fsanitize=pointer-subtract -fsanitize=pointer-compare")

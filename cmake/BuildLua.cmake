@@ -7,15 +7,26 @@ macro(build_lua LUA_VERSION)
     set(CFLAGS "-DLUAI_ASSERT=1 -DLUA_USE_APICHECK=1 -fsanitize=fuzzer-no-link")
     set(LDFLAGS "-fsanitize=fuzzer-no-link")
 
+    if (ENABLE_DEBUG)
+        set(CFLAGS "${CFLAGS} -g")
+        set(LDFLAGS "${LDFLAGS} -g")
+    endif (ENABLE_DEBUG)
+
     if (ENABLE_ASAN)
-        set(CFLAGS "${CFLAGS} -fsanitize=fuzzer-no-link,address -fsanitize=pointer-subtract -fsanitize=pointer-compare")
-        set(LDFLAGS "${LDFLAGS} -fsanitize=fuzzer-no-link,address")
+        set(CFLAGS "${CFLAGS} -fsanitize=address -fsanitize=pointer-subtract -fsanitize=pointer-compare")
+        set(LDFLAGS "${LDFLAGS} -fsanitize=address")
     endif (ENABLE_ASAN)
 
     if (ENABLE_UBSAN)
-        set(CFLAGS "${CFLAGS} -fsanitize=fuzzer-no-link,undefined")
-        set(LDFLAGS "${LDFLAGS} -fsanitize=fuzzer-no-link,undefined")
+        set(CFLAGS "${CFLAGS} -fsanitize=undefined")
+        set(LDFLAGS "${LDFLAGS} -fsanitize=undefined")
     endif (ENABLE_UBSAN)
+
+    if (ENABLE_COV)
+        set(CFLAGS "${CFLAGS} -fprofile-instr-generate -fcoverage-mapping")
+        set(LDFLAGS "${LDFLAGS} -fprofile-instr-generate -fcoverage-mapping")
+    endif (ENABLE_COV)
+
 
     include(ExternalProject)
 

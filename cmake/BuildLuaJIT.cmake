@@ -6,8 +6,8 @@ macro(build_luajit LJ_VERSION)
     set(LDFLAGS "-fsanitize=fuzzer-no-link")
 
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(CFLAGS "${CFLAGS} -g")
-        set(LDFLAGS "${LDFLAGS} -g")
+        set(CFLAGS "${CFLAGS} ${CMAKE_C_FLAGS_DEBUG}")
+        set(LDFLAGS "${LDFLAGS} ${CMAKE_C_FLAGS_DEBUG}")
     endif (CMAKE_BUILD_TYPE)
 
     if (ENABLE_ASAN)

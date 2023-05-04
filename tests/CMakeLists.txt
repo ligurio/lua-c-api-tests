@@ -23,7 +23,7 @@ target_link_libraries(
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-  set(LDFLAGS "${LDFLAGS} -g")
+  set(LDFLAGS "${LDFLAGS} ${CMAKE_C_FLAGS_DEBUG}")
 endif (CMAKE_BUILD_TYPE)
 
 if (ENABLE_ASAN)

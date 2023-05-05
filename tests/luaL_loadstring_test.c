@@ -33,11 +33,12 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 #endif /* LUAJIT */
 
 	if (luaL_loadstring(L, str) != LUA_OK) {
-		return 0;
+		goto end;
 	}
 
 	lua_pcall(L, 0, 0, 0);
 
+end:
 	free(str);
 	lua_settop(L, 0);
 	lua_close(L);

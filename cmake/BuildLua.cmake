@@ -34,7 +34,7 @@ macro(build_lua LUA_VERSION)
         GIT_REPOSITORY https://github.com/lua/lua
         GIT_TAG ${LUA_VERSION}
         GIT_PROGRESS TRUE
-        GIT_SHALLOW TRUE
+        GIT_SHALLOW FALSE
 
         SOURCE_DIR ${LUA_SOURCE_DIR}
         BINARY_DIR ${LUA_BINARY_DIR}

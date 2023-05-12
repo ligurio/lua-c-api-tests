@@ -32,7 +32,7 @@ macro(build_luajit LJ_VERSION)
         GIT_REPOSITORY https://github.com/LuaJIT/LuaJIT
         GIT_TAG ${LJ_VERSION}
         GIT_PROGRESS TRUE
-        GIT_SHALLOW TRUE
+        GIT_SHALLOW FALSE
 
         SOURCE_DIR ${LJ_SOURCE_DIR}
         BINARY_DIR ${LJ_BINARY_DIR}/luajit-${LJ_VERSION}

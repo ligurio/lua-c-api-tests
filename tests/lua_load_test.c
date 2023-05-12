@@ -22,7 +22,7 @@ Reader(lua_State *L, void *data, size_t *size)
 	free(buf);
 
 	buf = malloc(test_data->sz);
-	fread(buf, test_data->sz, 1, test_data->fd);
+	*size = fread(buf, test_data->sz, 1, test_data->fd);
 
 	return buf;
 }

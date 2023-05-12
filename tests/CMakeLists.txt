@@ -62,7 +62,7 @@ function(create_test)
                    -print_pcs=1
                    -print_final_stats=1
                    -mutate_depth=20
-                   -max_total_time=10
+                   -runs=5
                    -artifact_prefix=${test_name}
                    -dict=${PROJECT_SOURCE_DIR}/corpus/${test_prefix}.dict
                    ${PROJECT_SOURCE_DIR}/corpus/${test_prefix}

@@ -44,4 +44,4 @@ cd build && ctest -R luaL_gsub_test --verbose
 
 ### License
 
-ISC License, Sergey Bronnikov
+ISC License, [Sergey Bronnikov](https://bronevichok.ru/)

@@ -26,10 +26,9 @@ LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 	if (L == NULL)
 		return 0;
 
-	size_t max_length = fdp.ConsumeIntegralInRange<size_t>(1, INT8_MAX);
-	auto str1 = fdp.ConsumeRandomLengthString(max_length);
-	auto str2 = fdp.ConsumeRandomLengthString(max_length);
-	auto str3 = fdp.ConsumeRandomLengthString(max_length);
+	auto str1 = fdp.ConsumeRandomLengthString(size);
+	auto str2 = fdp.ConsumeRandomLengthString(size);
+	auto str3 = fdp.ConsumeRandomLengthString(size);
 	const char *c_str1 = str1.c_str();
 	const char *c_str2 = str2.c_str();
 	const char *c_str3 = str3.c_str();

@@ -28,9 +28,9 @@ LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 		return 0;
 
 	luaL_Buffer buf;
-	size_t buf_size = fdp.ConsumeIntegralInRange<int8_t>(0, INT8_MAX);
+	auto str = fdp.ConsumeRandomLengthString(size);
+	size_t buf_size = str.length() + 1;
 	char *s = luaL_buffinitsize(L, &buf, buf_size);
-	auto str = fdp.ConsumeRandomLengthString(buf_size);
 	memcpy(s, str.c_str(), buf_size);
 	luaL_pushresultsize(&buf, buf_size);
 	int8_t n = fdp.ConsumeIntegralInRange<int8_t>(0, buf_size);

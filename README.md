@@ -2,6 +2,7 @@
   <tr>
     <th>PUC Rio Lua</th>
     <td><a href="https://bugs.chromium.org/p/oss-fuzz/issues/list?sort=-opened&can=1&q=proj:lua"><img src="https://oss-fuzz-build-logs.storage.googleapis.com/badges/lua.svg"></a></td>
+    <td><a href="https://github.com/ispras/oss-sydr-fuzz/tree/master/projects/lua"><img src="https://img.shields.io/static/v1?label=oss-sydr-fuzz&message=fuzzing&color=brightgreen"></a></td>
   </tr>
 </table>
 

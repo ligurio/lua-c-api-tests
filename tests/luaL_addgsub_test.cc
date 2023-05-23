@@ -28,10 +28,8 @@ LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 
 	luaL_Buffer buf;
 	auto str = fdp.ConsumeRandomLengthString(size);
-	size_t buf_size = str.length();
-	char *s = luaL_buffinitsize(L, &buf, buf_size);
-	memcpy(s, str.c_str(), buf_size);
-	luaL_pushresultsize(&buf, buf_size);
+	luaL_buffinit(L, &buf);
+	luaL_addstring(&buf, str.c_str());
 
 	auto str1 = fdp.ConsumeRandomLengthString(size);
 	auto str2 = fdp.ConsumeRandomLengthString(size);
@@ -44,6 +42,7 @@ LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 	    strlen(c_str3) == 0)
 		return -1;
 	luaL_addgsub(&buf, c_str1, c_str2, c_str3);
+	luaL_pushresult(&buf);
 
 	lua_settop(L, 0);
 	lua_close(L);

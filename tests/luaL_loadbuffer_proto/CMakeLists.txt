@@ -24,6 +24,7 @@ target_link_libraries(${test_name}
                       lua_grammar-proto
                       ${LPM_LIBRARIES}
                       ${LUA_LIBRARIES}
+                      ${LDFLAGS}
                       fuzzer_config)
 
 add_dependencies(${test_name}

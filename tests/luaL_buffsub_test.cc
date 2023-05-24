@@ -33,7 +33,7 @@ LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 	char *s = luaL_buffinitsize(L, &buf, buf_size);
 	memcpy(s, str.c_str(), buf_size);
 	luaL_pushresultsize(&buf, buf_size);
-	int8_t n = fdp.ConsumeIntegralInRange<int8_t>(0, buf_size);
+	uint8_t n = fdp.ConsumeIntegralInRange<uint8_t>(0, buf_size);
 	luaL_buffsub(&buf, n);
 
 	assert(luaL_bufflen(&buf) == buf_size - n);

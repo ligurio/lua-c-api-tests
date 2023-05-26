@@ -43,12 +43,13 @@ function(create_test)
     FUZZ
     ""
     "FILENAME"
-    ""
+    "SOURCES;LIBRARIES"
     ${ARGN}
   )
   get_filename_component(test_name ${FUZZ_FILENAME} NAME_WE)
-  add_executable(${test_name} ${FUZZ_FILENAME})
-  target_link_libraries(${test_name} PUBLIC fuzzer_config ${LUA_LIBRARIES} ${LDFLAGS})
+  add_executable(${test_name} ${FUZZ_SOURCES})
+
+  target_link_libraries(${test_name} PUBLIC fuzzer_config ${FUZZ_LIBRARIES} ${LUA_LIBRARIES} ${LDFLAGS})
   target_include_directories(${test_name} PRIVATE ${LUA_INCLUDE_DIR})
   target_compile_options(${test_name} PRIVATE -Wall -Wextra -Wpedantic -Wno-unused-parameter -g)
   add_dependencies(${test_name} ${LUA_TARGET})
@@ -91,7 +92,9 @@ foreach(filename ${tests})
   if (USE_LUAJIT AND (${test_name} IN_LIST LUAJIT_BLACKLIST_TESTS))
     continue()
   endif ()
-  create_test(FILENAME ${filename})
+  create_test(FILENAME ${test_name}
+              SOURCES ${filename}
+              LIBRARIES "")
 endforeach()
 
 include(ProtobufMutator)

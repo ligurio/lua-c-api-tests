@@ -24,7 +24,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 	luaL_dostring(L, "jit.opt.start('callunroll=1')");
 #endif /* LUAJIT */
 
-	const char *mode = "bt";
+	const char *mode = "t";
 	int res = luaL_loadbufferx(L, (const char *)data, size, "fuzz", mode);
 	if (res != LUA_OK)
 		return 0;

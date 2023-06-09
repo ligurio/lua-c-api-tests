@@ -5,6 +5,8 @@ macro(build_luajit LJ_VERSION)
     set(CFLAGS "-DLUA_USE_ASSERT=1 -DLUA_USE_APICHECK=1 -fsanitize=fuzzer-no-link")
     set(LDFLAGS "-fsanitize=fuzzer-no-link")
 
+    set(LUAJIT_PATCH_PATH ${PROJECT_SOURCE_DIR}/patches/luajit-v2.1.patch)
+
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(CFLAGS "${CFLAGS} ${CMAKE_C_FLAGS_DEBUG}")
         set(LDFLAGS "${LDFLAGS} ${CMAKE_C_FLAGS_DEBUG}")
@@ -12,6 +14,8 @@ macro(build_luajit LJ_VERSION)
 
     if (ENABLE_ASAN)
         set(CFLAGS "${CFLAGS} -fsanitize=address")
+        set(CFLAGS "${CFLAGS} -DLUAJIT_USE_ASAN")
+        set(CFLAGS "${CFLAGS} -DLUAJIT_USE_SYSMALLOC=1")
         set(LDFLAGS "${LDFLAGS} -fsanitize=address")
     endif (ENABLE_ASAN)
 
@@ -40,6 +44,7 @@ macro(build_luajit LJ_VERSION)
         TMP_DIR ${LJ_BINARY_DIR}/tmp
         STAMP_DIR ${LJ_BINARY_DIR}/stamp
 
+        PATCH_COMMAND cd <SOURCE_DIR> && patch -p1 -i ${LUAJIT_PATCH_PATH}
         CONFIGURE_COMMAND ""
         BUILD_COMMAND cd <SOURCE_DIR> && make -j CC=${CMAKE_C_COMPILER} CFLAGS=${CFLAGS} LDFLAGS=${LDFLAGS}
         INSTALL_COMMAND ""

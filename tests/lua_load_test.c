@@ -45,9 +45,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 
 	const char *mode = "t";
 	int res = lua_load(L, Reader, &test_data, "libFuzzer", mode);
-	if (res != LUA_OK)
-		return 0;
-	lua_pcall(L, 0, 0, 0);
+	if (res == LUA_OK) {
+		lua_pcall(L, 0, 0, 0);
+	}
 
 	if (test_data.fd != NULL)
 		fclose(test_data.fd);

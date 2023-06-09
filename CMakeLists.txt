@@ -80,4 +80,5 @@ endif()
 enable_testing()
 
 add_subdirectory(extra)
+add_subdirectory(libluamut)
 add_subdirectory(tests)

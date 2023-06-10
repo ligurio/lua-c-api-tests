@@ -87,9 +87,9 @@ list(APPEND LUAJIT_BLACKLIST_TESTS "lua_load_test")
 list(APPEND LUAJIT_BLACKLIST_TESTS "lua_stringtonumber_test")
 
 # https://github.com/ligurio/lua-c-api-tests/issues/19
-list(APPEND BLACKLIST_TESTS "luaL_dostring")
-list(APPEND BLACKLIST_TESTS "luaL_loadbuffer")
-list(APPEND BLACKLIST_TESTS "luaL_loadstring")
+list(APPEND BLACKLIST_TESTS "luaL_dostring_test")
+list(APPEND BLACKLIST_TESTS "luaL_loadbuffer_test")
+list(APPEND BLACKLIST_TESTS "luaL_loadstring_test")
 
 file(GLOB tests LIST_DIRECTORIES false ${CMAKE_CURRENT_SOURCE_DIR} *.c *.cc)
 foreach(filename ${tests})

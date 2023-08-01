@@ -34,8 +34,11 @@ LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 	const char *c_str3 = str3.c_str();
 	if (strlen(c_str1) == 0 ||
 	    strlen(c_str2) == 0 ||
-	    strlen(c_str3) == 0)
+	    strlen(c_str3) == 0) {
+		lua_settop(L, 0);
+		lua_close(L);
 		return -1;
+	}
 	luaL_gsub(L, c_str1, c_str2, c_str3);
 
 	lua_settop(L, 0);

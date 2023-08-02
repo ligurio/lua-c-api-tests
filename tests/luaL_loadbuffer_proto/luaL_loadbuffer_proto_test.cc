@@ -6,6 +6,8 @@ extern "C"
 #ifdef LUAJIT
 #include "luajit.h"
 #endif /* LUAJIT */
+#include <signal.h>
+#include <unistd.h>
 }
 
 #include "lua_grammar.pb.h"
@@ -182,11 +184,21 @@ report_error(lua_State *L, const std::string &prefix)
 	std::cerr << prefix << " error: " << err_str << std::endl;
 }
 
+void
+sig_handler(int signo, siginfo_t *info, void *context)
+{
+	print_metrics(&metrics);
+}
+
 __attribute__((constructor))
 static void
 setup(void)
 {
 	metrics = {};
+	struct sigaction act = {};
+	act.sa_flags = SA_SIGINFO;
+	act.sa_sigaction = &sig_handler;
+	sigaction(SIGUSR1, &act, NULL);
 }
 
 __attribute__((destructor))

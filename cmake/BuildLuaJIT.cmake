@@ -32,8 +32,38 @@ macro(build_luajit LJ_VERSION)
     endif (ENABLE_ASAN)
 
     if (ENABLE_UBSAN)
-        set(CFLAGS "${CFLAGS} -fsanitize=undefined")
-        set(LDFLAGS "${LDFLAGS} -fsanitize=undefined")
+        string(JOIN "," NO_SANITIZE_FLAGS
+            # lj_str.c
+            implicit-integer-sign-change
+            # lj_opt_fold.c
+            implicit-unsigned-integer-truncation
+            # lj_parse.c
+            alignment
+            # lj_tab.c
+            float-cast-overflow
+            # lj_gc.c
+            function
+            # lj_buf.c
+            shift
+            # lj_obj.h
+            unsigned-integer-overflow
+            # lj_prng.c
+            unsigned-shift-base
+            # lj_parse.c
+            pointer-overflow
+            # The object size sanitizer has no effect at -O0.
+            object-size
+            # lj_parse.c
+            null
+            # lj_vmmath.c
+            float-divide-by-zero
+            integer-divide-by-zero
+        )
+        set(UBSAN_FLAGS "-fsanitize=undefined")
+        set(UBSAN_FLAGS "-fno-sanitize-recover=undefined")
+        set(UBSAN_FLAGS "-fno-sanitize=${NO_SANITIZE_FLAGS}")
+        set(CFLAGS "${CFLAGS} ${UBSAN_FLAGS}")
+        set(LDFLAGS "${LDFLAGS} ${UBSAN_FLAGS}")
     endif (ENABLE_UBSAN)
 
     if (ENABLE_COV)
@@ -61,6 +91,7 @@ macro(build_luajit LJ_VERSION)
         BUILD_COMMAND cd <SOURCE_DIR> && make -j CC=${CMAKE_C_COMPILER}
                                                  CFLAGS=${CFLAGS}
                                                  LDFLAGS=${LDFLAGS}
+                                                 HOST_CFLAGS=-fno-sanitize=undefined
                                                  -C src
                                                  libluajit.a
         INSTALL_COMMAND ""

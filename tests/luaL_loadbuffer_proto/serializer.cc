@@ -401,7 +401,9 @@ PROTO_TOSTRING(LastStatement, laststat)
 			laststat.explist());
 		break;
 	case LastStatType::kBreak:
-		laststat_str = "break";
+		if (GetContext().break_is_possible()) {
+			laststat_str = "break";
+		}
 		break;
 	default:
 		/* Chosen as default in order to decrease number of 'break's. */
@@ -410,7 +412,7 @@ PROTO_TOSTRING(LastStatement, laststat)
 		break;
 	}
 
-	if (laststat.has_semicolon())
+	if (!laststat_str.empty() && laststat.has_semicolon())
 		laststat_str += "; ";
 
 	return laststat_str;
@@ -418,6 +420,10 @@ PROTO_TOSTRING(LastStatement, laststat)
 
 NESTED_PROTO_TOSTRING(ReturnOptionalExpressionList, explist, LastStatement)
 {
+	if (!GetContext().return_is_possible()) {
+		return "";
+	}
+
 	std::string explist_str = "return";
 	if (explist.has_explist()) {
 		explist_str += " " + ExpressionListToString(explist.explist());

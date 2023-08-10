@@ -2,7 +2,8 @@ macro(build_luajit LJ_VERSION)
     set(LJ_SOURCE_DIR ${PROJECT_BINARY_DIR}/luajit-${LJ_VERSION}/source)
     set(LJ_BINARY_DIR ${PROJECT_BINARY_DIR}/luajit-${LJ_VERSION}/work)
 
-    set(CFLAGS "-DLUA_USE_ASSERT=1 -DLUA_USE_APICHECK=1 -fsanitize=fuzzer-no-link")
+    set(CFLAGS ${CMAKE_C_FLAGS})
+    set(CFLAGS "${CFLAGS} -DLUA_USE_ASSERT=1 -DLUA_USE_APICHECK=1 -fsanitize=fuzzer-no-link")
     set(LDFLAGS "-fsanitize=fuzzer-no-link")
 
     set(LUAJIT_PATCH_PATH ${PROJECT_SOURCE_DIR}/patches/luajit-v2.1.patch)

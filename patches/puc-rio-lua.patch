@@ -22,7 +22,7 @@ index ee56c67..d43a965 100644
 -CC= gcc
 -CFLAGS= -Wall -O2 $(MYCFLAGS) -fno-stack-protector -fno-common -march=native
 +CC?= gcc
-+CFLAGS= -Wall -O2 $(MYCFLAGS) -fno-stack-protector -fno-common -march=native $(CFLAGS)
++CFLAGS+= -Wall -O2 $(MYCFLAGS) -fno-stack-protector -fno-common -march=native
  AR= ar rc
  RANLIB= ranlib
  RM= rm -f

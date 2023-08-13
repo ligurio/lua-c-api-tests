@@ -45,7 +45,9 @@ macro(build_lua LUA_VERSION)
 
         PATCH_COMMAND cd <SOURCE_DIR> && patch -p1 -i ${LUA_PATCH_PATH}
         CONFIGURE_COMMAND ""
-        BUILD_COMMAND cd <SOURCE_DIR> && make -j CC=${CMAKE_C_COMPILER} CFLAGS=${CFLAGS} LDFLAGS=${LDFLAGS}
+        BUILD_COMMAND cd <SOURCE_DIR> && make -j CC=${CMAKE_C_COMPILER}
+                                                 CFLAGS=${CFLAGS}
+                                                 LDFLAGS=${LDFLAGS}
         INSTALL_COMMAND ""
         UPDATE_DISCONNECTED ON
 

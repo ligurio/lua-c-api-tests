@@ -25,10 +25,10 @@ macro(build_luajit LJ_VERSION)
     endif (ENABLE_LUAJIT_RANDOM_RA)
 
     if (ENABLE_ASAN)
-        set(CFLAGS "${CFLAGS} -fsanitize=address")
+        set(CFLAGS "${CFLAGS} -fsanitize=${ASAN_TYPE}")
         set(CFLAGS "${CFLAGS} -DLUAJIT_USE_ASAN")
         set(CFLAGS "${CFLAGS} -DLUAJIT_USE_SYSMALLOC=1")
-        set(LDFLAGS "${LDFLAGS} -fsanitize=address")
+        set(LDFLAGS "${LDFLAGS} -fsanitize=${ASAN_TYPE}")
     endif (ENABLE_ASAN)
 
     if (ENABLE_UBSAN)

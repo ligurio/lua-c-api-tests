@@ -32,7 +32,8 @@ CMake options:
 `master` for PUC Rio Lua and `v2.1` for LuaJIT.
 - `ENABLE_LUAJIT_RANDOM_RA` enables randomness in a register allocation. Option
 is LuaJIT-specific.
-- `ENABLE_ASAN` enables AddressSanitizer.
+- `ENABLE_ASAN` enables HardwareAddressSanitizer on AArch64 and
+  AddressSanitizer on other architectures.
 - `ENABLE_UBSAN` enables UndefinedBehaviorSanitizer.
 - `ENABLE_COV` enables coverage instrumentation.
 - `ENABLE_LUA_ASSERT` enables all assertions inside Lua source code.

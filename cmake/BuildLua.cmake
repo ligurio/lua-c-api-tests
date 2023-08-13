@@ -23,8 +23,8 @@ macro(build_lua LUA_VERSION)
     endif (CMAKE_BUILD_TYPE STREQUAL "Debug")
 
     if (ENABLE_ASAN)
-        set(CFLAGS "${CFLAGS} -fsanitize=address -fsanitize=pointer-subtract -fsanitize=pointer-compare")
-        set(LDFLAGS "${LDFLAGS} -fsanitize=address")
+        set(CFLAGS "${CFLAGS} -fsanitize=${ASAN_TYPE} -fsanitize=pointer-subtract -fsanitize=pointer-compare")
+        set(LDFLAGS "${LDFLAGS} -fsanitize=${ASAN_TYPE}")
     endif (ENABLE_ASAN)
 
     if (ENABLE_UBSAN)

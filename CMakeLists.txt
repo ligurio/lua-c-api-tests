@@ -9,7 +9,7 @@ find_program(SHELL sh)
 
 option(USE_LUA "Use PUC Rio Lua library" OFF)
 option(USE_LUAJIT "Use LuaJIT library" OFF)
-option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
+option(ENABLE_ASAN "Enable [Hardware]AddressSanitizer" OFF)
 option(ENABLE_UBSAN "Enable UndefinedBehaviorSanitizer" OFF)
 option(ENABLE_COV "Enable coverage instrumentation" OFF)
 option(ENABLE_LUA_ASSERT "Enable all assertions inside Lua source code" ON)
@@ -70,5 +70,18 @@ if(ENABLE_COV)
 endif()
 
 enable_testing()
+
+set(ASAN_TYPE "address")
+# https://android.googlesource.com/platform/external/swiftshader/+/refs/heads/master/CMakeLists.txt#45
+if (CMAKE_SYSTEM_PROCESSOR MATCHES "arm" OR
+    CMAKE_SYSTEM_PROCESSOR MATCHES "aarch")
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(ASAN_TYPE "hwaddress")
+    endif ()
+endif ()
+if (CMAKE_OSX_ARCHITECTURES AND
+    CMAKE_OSX_ARCHITECTURES MATCHES "arm64")
+    set(ASAN_TYPE "hwaddress")
+endif ()
 
 add_subdirectory(tests)

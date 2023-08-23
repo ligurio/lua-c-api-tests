@@ -1,6 +1,6 @@
 # Usage:
 # $ LUA_FUZZER_VERBOSE=1 luaL_loadbuffer_proto_test 2>&1 | tee log.txt
-# $ awk errors.awk < log.txt
+# $ awk -f errors.awk < log.txt
 
 BEGIN { matched = 0
         err_pat["attempt to index"] = 0

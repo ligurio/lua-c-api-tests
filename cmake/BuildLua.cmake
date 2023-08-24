@@ -62,6 +62,7 @@ macro(build_lua LUA_VERSION)
         BUILD_COMMAND cd <SOURCE_DIR> && make -j CC=${CMAKE_C_COMPILER}
                                                  CFLAGS=${CFLAGS}
                                                  LDFLAGS=${LDFLAGS}
+                                                 a
         INSTALL_COMMAND ""
         UPDATE_DISCONNECTED ON
 

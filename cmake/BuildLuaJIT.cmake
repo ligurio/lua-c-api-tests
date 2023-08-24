@@ -57,6 +57,8 @@ macro(build_luajit LJ_VERSION)
         BUILD_COMMAND cd <SOURCE_DIR> && make -j CC=${CMAKE_C_COMPILER}
                                                  CFLAGS=${CFLAGS}
                                                  LDFLAGS=${LDFLAGS}
+                                                 -C src
+                                                 libluajit.a
         INSTALL_COMMAND ""
         UPDATE_DISCONNECTED ON
 

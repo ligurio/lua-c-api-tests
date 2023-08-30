@@ -20,6 +20,10 @@ macro(build_luajit LJ_VERSION)
         set(LDFLAGS "${LDFLAGS} ${CMAKE_C_FLAGS_DEBUG}")
     endif (CMAKE_BUILD_TYPE STREQUAL "Debug")
 
+    if (ENABLE_LUAJIT_RANDOM_RA)
+        set(CFLAGS "${CFLAGS} -DLUAJIT_RANDOM_RA")
+    endif (ENABLE_LUAJIT_RANDOM_RA)
+
     if (ENABLE_ASAN)
         set(CFLAGS "${CFLAGS} -fsanitize=address")
         set(CFLAGS "${CFLAGS} -DLUAJIT_USE_ASAN")

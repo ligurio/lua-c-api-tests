@@ -30,6 +30,8 @@ CMake options:
 - `USE_LUAJIT` enables building LuaJIT.
 - `LUA_VERSION` could be a Git branch, tag or commit. By default `LUA_VERSION` is
 `master` for PUC Rio Lua and `v2.1` for LuaJIT.
+- `ENABLE_LUAJIT_RANDOM_RA` enables randomness in a register allocation. Option
+is LuaJIT-specific.
 - `ENABLE_ASAN` enables AddressSanitizer.
 - `ENABLE_UBSAN` enables UndefinedBehaviorSanitizer.
 - `ENABLE_COV` enables coverage instrumentation.

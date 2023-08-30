@@ -12,10 +12,15 @@ option(ENABLE_UBSAN "Enable UndefinedBehaviorSanitizer" OFF)
 option(ENABLE_COV "Enable coverage instrumentation" OFF)
 option(ENABLE_LUA_ASSERT "Enable all assertions inside Lua source code" ON)
 option(ENABLE_LUA_APICHECK "Enable consistency checks on the C API" ON)
+option(ENABLE_LUAJIT_RANDOM_RA "Enable randomness in a register allocation" OFF)
 option(OSS_FUZZ "Enable support of OSS Fuzz" OFF)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 set(CMAKE_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_INCLUDE_PATH})
+
+if (ENABLE_LUAJIT_RANDOM_RA AND NOT USE_LUAJIT)
+  message(FATAL_ERROR "Option ENABLE_LUAJIT_RANDOM_RA is LuaJIT-specific.")
+endif (ENABLE_LUAJIT_RANDOM_RA AND NOT USE_LUAJIT)
 
 if (USE_LUA AND NOT LUA_VERSION)
   set(LUA_VERSION "master")

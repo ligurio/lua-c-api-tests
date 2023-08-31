@@ -59,6 +59,9 @@ macro(build_lua LUA_VERSION)
 
     include(ExternalProject)
 
+    set(LUA_LIBRARIES ${PROJECT_BINARY_DIR}/lua-${LUA_VERSION}/source/liblua.a)
+    set(LUA_EXECUTABLE ${LUA_SOURCE_DIR}/lua)
+
     ExternalProject_Add(patched-lua-${LUA_VERSION}
         GIT_REPOSITORY https://github.com/lua/lua
         GIT_TAG ${LUA_VERSION}
@@ -77,14 +80,12 @@ macro(build_lua LUA_VERSION)
         BUILD_COMMAND cd <SOURCE_DIR> && make -j CC=${CMAKE_C_COMPILER}
                                                  CFLAGS=${CFLAGS}
                                                  LDFLAGS=${LDFLAGS}
-                                                 a
         INSTALL_COMMAND ""
 
-        BUILD_BYPRODUCTS ${PROJECT_BINARY_DIR}/lua-${LUA_VERSION}/source/liblua.a
+        BUILD_BYPRODUCTS ${LUA_LIBRARIES} ${LUA_EXECUTABLE}
     )
 
     set(LUA_INCLUDE_DIR ${PROJECT_BINARY_DIR}/lua-${LUA_VERSION}/source/)
-    set(LUA_LIBRARIES ${PROJECT_BINARY_DIR}/lua-${LUA_VERSION}/source/liblua.a)
     set(LUA_VERSION_STRING "PUC Rio Lua ${LUA_VERSION}")
     set(LUA_TARGET patched-lua-${LUA_VERSION})
 

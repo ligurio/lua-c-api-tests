@@ -17,6 +17,7 @@ option(ENABLE_LUA_APICHECK "Enable consistency checks on the C API" ON)
 option(ENABLE_LUAJIT_RANDOM_RA "Enable randomness in a register allocation" OFF)
 option(OSS_FUZZ "Enable support of OSS Fuzz" OFF)
 option(ENABLE_BUILD_PROTOBUF "Enable building Protobuf library" ON)
+option(ENABLE_BONUS_TESTS "Enable bonus tests" OFF)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 set(CMAKE_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_INCLUDE_PATH})

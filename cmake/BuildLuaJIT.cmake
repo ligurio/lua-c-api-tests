@@ -74,6 +74,9 @@ macro(build_luajit LJ_VERSION)
 
     include(ExternalProject)
 
+    set(LUA_LIBRARIES ${LJ_SOURCE_DIR}/src/libluajit.a)
+    set(LUA_EXECUTABLE ${LJ_SOURCE_DIR}/src/luajit)
+
     ExternalProject_Add(patched-luajit-${LJ_VERSION}
         GIT_REPOSITORY https://github.com/LuaJIT/LuaJIT
         GIT_TAG ${LJ_VERSION}
@@ -94,15 +97,13 @@ macro(build_luajit LJ_VERSION)
                                                  LDFLAGS=${LDFLAGS}
                                                  HOST_CFLAGS=-fno-sanitize=undefined
                                                  -C src
-                                                 libluajit.a
         INSTALL_COMMAND ""
 
-        BUILD_BYPRODUCTS ${LJ_SOURCE_DIR}/src/libluajit.a
+        BUILD_BYPRODUCTS ${LUA_LIBRARIES} ${LUA_EXECUTABLE}
     )
 
     set(LUA_SOURCE_DIR ${LJ_SOURCE_DIR})
     set(LUA_INCLUDE_DIR ${LJ_SOURCE_DIR}/src/)
-    set(LUA_LIBRARIES ${LJ_SOURCE_DIR}/src/libluajit.a)
     set(LUA_VERSION_STRING "LuaJIT ${LJ_VERSION}")
     set(LUA_TARGET patched-luajit-${LJ_VERSION})
 

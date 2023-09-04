@@ -33,6 +33,8 @@ CMake options:
 - `ENABLE_ASAN` enables AddressSanitizer.
 - `ENABLE_UBSAN` enables UndefinedBehaviorSanitizer.
 - `ENABLE_COV` enables coverage instrumentation.
+- `ENABLE_LUA_ASSERT` enables all assertions inside Lua source code.
+- `ENABLE_LUA_APICHECK` enables consistency checks on the C API.
 - `OSS_FUZZ` enables support of OSS Fuzz.
 
 ### Running

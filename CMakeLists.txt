@@ -10,6 +10,8 @@ option(USE_LUAJIT "Use LuaJIT library" OFF)
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 option(ENABLE_UBSAN "Enable UndefinedBehaviorSanitizer" OFF)
 option(ENABLE_COV "Enable coverage instrumentation" OFF)
+option(ENABLE_LUA_ASSERT "Enable all assertions inside Lua source code" ON)
+option(ENABLE_LUA_APICHECK "Enable consistency checks on the C API" ON)
 option(OSS_FUZZ "Enable support of OSS Fuzz" OFF)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})

@@ -54,17 +54,19 @@ function(create_test)
   target_compile_options(${test_name} PRIVATE -Wall -Wextra -Wpedantic -Wno-unused-parameter -g)
   add_dependencies(${test_name} ${LUA_TARGET})
   string(REPLACE "_test" "" test_prefix ${test_name})
+  string(JOIN ";" LIBFUZZER_OPTS
+    -use_value_profile=1
+    -report_slow_units=5
+    -reload=1
+    -reduce_inputs=1
+    -print_pcs=1
+    -print_final_stats=1
+    -mutate_depth=20
+    -runs=5
+    -artifact_prefix=${test_name}_
+  )
   add_test(NAME ${test_name}
-           COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${test_name}
-                   -use_value_profile=1
-                   -report_slow_units=5
-                   -reload=1
-                   -reduce_inputs=1
-                   -print_pcs=1
-                   -print_final_stats=1
-                   -mutate_depth=20
-                   -runs=5
-                   -artifact_prefix=${test_name}_
+           COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${test_name} ${LIBFUZZER_OPTS}
   )
   if (USE_LUA)
     set_tests_properties(${test_name} PROPERTIES

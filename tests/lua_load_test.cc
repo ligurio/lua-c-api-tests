@@ -1,3 +1,9 @@
+/*
+ * SPDX-License-Identifier: ISC
+ *
+ * Copyright 2023, Sergey Bronnikov.
+ */
+
 #include <assert.h>
 #include <string.h>
 

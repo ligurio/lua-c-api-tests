@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright 2023, Sergey Bronnikov.
+ * Copyright 2022, Tarantool AUTHORS.
+ */
+
 extern "C"
 {
 #include "lua.h"

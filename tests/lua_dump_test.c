@@ -6,6 +6,8 @@
 
 #include <assert.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <lua.h>
 #include <lauxlib.h>
@@ -36,13 +38,25 @@ LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 	lua_State *L = luaL_newstate();
 	assert(L != NULL);
 
-	lua_pushlstring(L, (const char *)data, size);
+	size_t str_len = size + 1;
+	char *str = calloc(str_len, sizeof(char));
+	if (str == NULL)
+		return 0;
+	memcpy(str, data, size);
+	str[size] = '\0';
+
+	if (luaL_loadstring(L, str) != LUA_OK) {
+		goto end;
+	}
+
 #if LUA_VERSION_NUM < 503
 	lua_dump(L, Writer, NULL);
 #else /* Lua 5.3+ */
 	lua_dump(L, Writer, NULL, 0);
 #endif /* LUA_VERSION_NUM */
 
+end:
+	free(str);
 	lua_settop(L, 0);
 	lua_close(L);
 

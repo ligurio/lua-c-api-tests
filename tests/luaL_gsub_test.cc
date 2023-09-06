@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
@@ -39,7 +40,10 @@ LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 		lua_close(L);
 		return -1;
 	}
+	int top = lua_gettop(L);
 	luaL_gsub(L, c_str1, c_str2, c_str3);
+	/* [-0, +1, m] */
+	assert(lua_gettop(L) == top + 1);
 
 	lua_settop(L, 0);
 	lua_close(L);

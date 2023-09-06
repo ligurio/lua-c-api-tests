@@ -42,14 +42,31 @@ jobs:
           submodules: recursive
 
       - name: Setup common packages
-        run: sudo apt install -y clang-14
+        run: |
+          sudo apt install -y clang-14 \
+                              autoconf \
+                              binutils \
+                              cmake \
+                              liblzma-dev \
+                              libprotobuf-dev \
+                              libtool \
+                              libz-dev \
+                              ninja-build \
+                              pkg-config \
+                              protobuf-compiler
 
       - name: Running CMake (PUC Rio Lua -current)
-        run: cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DUSE_LUA=ON -S . -B build
+        run: |
+          cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+                -DUSE_LUA=ON -DENABLE_BUILD_PROTOBUF=OFF \
+                -G Ninja -S . -B build
         if: ${{ matrix.LUA == 'lua' }}
 
       - name: Running CMake (LuaJIT -current)
-        run: cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DUSE_LUAJIT=ON -S . -B build
+        run: |
+          cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+                -DUSE_LUAJIT=ON -DENABLE_BUILD_PROTOBUF=OFF \
+                -G Ninja -S . -B build
         if: ${{ matrix.LUA == 'luajit' }}
 
       - name: Building

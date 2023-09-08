@@ -14,6 +14,7 @@ option(ENABLE_LUA_ASSERT "Enable all assertions inside Lua source code" ON)
 option(ENABLE_LUA_APICHECK "Enable consistency checks on the C API" ON)
 option(ENABLE_LUAJIT_RANDOM_RA "Enable randomness in a register allocation" OFF)
 option(OSS_FUZZ "Enable support of OSS Fuzz" OFF)
+option(ENABLE_BUILD_PROTOBUF "Enable building Protobuf library" ON)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 set(CMAKE_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_INCLUDE_PATH})
@@ -52,6 +53,11 @@ if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
       " $ cmake --build build --parallel\n"
       "\n")
 endif()
+
+find_package(Protobuf)
+if (NOT Protobuf_FOUND)
+    set(ENABLE_BUILD_PROTOBUF ON)
+endif (NOT Protobuf_FOUND)
 
 enable_testing()
 

@@ -32,7 +32,7 @@ extern "C" {
 
 #define ARRAY_SIZE(arr)     (sizeof(arr) / sizeof((arr)[0]))
 
-int max_str_len = 1;
+static int max_str_len = 1;
 
 static int
 cfunction(lua_State *L) {
@@ -111,7 +111,7 @@ static void
 __lua_concat(lua_State *L, FuzzedDataProvider *fdp)
 {
 	int top = lua_gettop(L);
-	uint8_t n = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	uint8_t n = fdp->ConsumeIntegralInRange<uint8_t>(0, top);
 	for (int i = 1; i <= n; i++) {
 		int t = lua_type(L, -i);
 		if (t != LUA_TNUMBER &&
@@ -438,8 +438,8 @@ __lua_getupvalue(lua_State *L, FuzzedDataProvider *fdp)
 	assert(lua_gettop(L) == top || lua_gettop(L) == top + 1);
 }
 
-/* [-0, +0, -] */
 /* void *lua_touserdata(lua_State *L, int index); */
+/* [-0, +0, -] */
 static void
 __lua_touserdata(lua_State *L, FuzzedDataProvider *fdp)
 {
@@ -512,10 +512,13 @@ __lua_next(lua_State *L, FuzzedDataProvider *fdp)
 static void
 __lua_getinfo(lua_State *L, FuzzedDataProvider *fdp)
 {
+	int top = lua_gettop(L);
 	lua_Debug ar;
 	lua_pushcfunction(L, cfunction);
-	/* XXX: Choose 'what' mode randomly. */
-	lua_getinfo(L, ">", &ar);
+	const char *what = ">nSltufL";
+	lua_getinfo(L, what, &ar);
+	assert(lua_gettop(L) >= top - 1 &&
+	       lua_gettop(L) <= top + 2);
 }
 
 /* int lua_getstack(lua_State *L, int level, lua_Debug *ar); */
@@ -524,8 +527,7 @@ static void
 __lua_getstack(lua_State *L, FuzzedDataProvider *fdp)
 {
 	int top = lua_gettop(L);
-	int max_stack_depth = 10;
-	int level = fdp->ConsumeIntegralInRange<uint8_t>(1, max_stack_depth);
+	int level = fdp->ConsumeIntegral<int8_t>();
 	lua_Debug ar;
 	lua_getstack(L, level, &ar);
 	assert(lua_gettop(L) == top);
@@ -596,7 +598,7 @@ __lua_typename(lua_State *L, FuzzedDataProvider *fdp)
 	assert(lua_gettop(L) == top);
 }
 
-int gc_mode[] = {
+static int gc_mode[] = {
 	LUA_GCCOLLECT,
 	LUA_GCCOUNT,
 	LUA_GCCOUNTB,
@@ -605,6 +607,12 @@ int gc_mode[] = {
 	LUA_GCSETSTEPMUL,
 	LUA_GCSTEP,
 	LUA_GCSTOP,
+#if LUA_VERSION_NUM > 51
+	LUA_GCISRUNNING,
+#elif LUA_VERSION_NUM > 53
+	LUA_GCGEN,
+	LUA_GCINC,
+#endif /* LUA_VERSION_NUM */
 };
 
 /* int lua_gc(lua_State *L, int what, int data); */
@@ -618,7 +626,8 @@ __lua_gc(lua_State *L, FuzzedDataProvider *fdp)
 	assert(lua_gettop(L) == top);
 }
 
-int hook_mode[] = {
+static int hook_mode[] = {
+	0, /* Additional branch in Lua. */
 	LUA_MASKCALL,
 	LUA_MASKCOUNT,
 	LUA_MASKLINE,
@@ -701,7 +710,6 @@ __lua_rawset(lua_State *L, FuzzedDataProvider *fdp)
 		return;
 	uint8_t index = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
 	if (!lua_istable(L, index))
-	/* if (lua_type(L, index) != LUA_TTABLE) */
 		return;
 	uint8_t key = fdp->ConsumeIntegral<uint8_t>();
 	uint8_t value = fdp->ConsumeIntegral<uint8_t>();
@@ -742,6 +750,426 @@ __lua_rawgeti(lua_State *L, FuzzedDataProvider *fdp)
 	assert(lua_gettop(L) == top + 1);
 }
 
+/* int lua_lessthan(lua_State *L, int index1, int index2); */
+/* [-0, +0, e] */
+#if LUA_VERSION_NUM == 501
+static void
+__lua_lessthan(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	uint8_t index1 = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	uint8_t index2 = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	if ((lua_type(L, index1) != LUA_TNUMBER  ||
+	     lua_type(L, index1) != LUA_TBOOLEAN ||
+	     lua_type(L, index1) != LUA_TSTRING) &&
+	    (lua_type(L, index2) != LUA_TNUMBER  ||
+	     lua_type(L, index2) != LUA_TBOOLEAN ||
+	     lua_type(L, index2) != LUA_TSTRING))
+		return;
+	int rc = lua_lessthan(L, index1, index2);
+	assert(rc == 0 || rc == 1);
+}
+#endif /* LUA_VERSION_NUM */
+
+/* size_t lua_objlen(lua_State *L, int index); */
+/* [-0, +0, -] */
+#if LUA_VERSION_NUM < 503
+static void
+__lua_objlen(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	uint8_t index = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+#if LUA_VERSION_NUM == 501
+	lua_objlen(L, index);
+#else
+	lua_rawlen(L, index);
+#endif /* LUA_VERSION_NUM */
+	assert(lua_gettop(L) == top);
+}
+#endif /* LUA_VERSION_NUM */
+
+#if LUA_VERSION_NUM > 501
+static int cmp_op[] = {
+	LUA_OPEQ,
+	LUA_OPLE,
+	LUA_OPLT,
+};
+#endif /* LUA_VERSION_NUM */
+
+/* int lua_compare(lua_State *L, int index1, int index2, int op); */
+/* [-0, +0, e] */
+#if LUA_VERSION_NUM > 501
+static void
+__lua_compare(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	uint8_t index1 = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	uint8_t index2 = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	if ((lua_type(L, index1) != LUA_TNUMBER) ||
+	    (lua_type(L, index2) != LUA_TNUMBER))
+		return;
+	int op_idx = fdp->ConsumeIntegralInRange<uint8_t>(0, ARRAY_SIZE(cmp_op) - 1);
+	int rc = lua_compare(L, index1, index2, cmp_op[op_idx]);
+	assert(rc == 0 || rc == 1);
+	assert(lua_gettop(L) == top);
+}
+#endif /* LUA_VERSION_NUM */
+
+/* size_t lua_rawlen(lua_State *L, int index); */
+/* [-0, +0, –] */
+#if LUA_VERSION_NUM > 501
+static void
+__lua_rawlen(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	uint8_t index = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	lua_rawlen(L, index);
+	assert(lua_gettop(L) == top);
+}
+#endif /* LUA_VERSION_NUM */
+
+/* void lua_getfenv(lua_State *L, int index); */
+/* [-0, +1, -] */
+#if LUA_VERSION_NUM == 501
+static void
+__lua_getfenv(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	uint8_t index = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	lua_getfenv(L, index);
+	assert(lua_gettop(L) == top + 1);
+}
+#endif /* LUA_VERSION_NUM */
+
+/* int lua_setfenv(lua_State *L, int index); */
+/* [-1, +0, -] */
+#if LUA_VERSION_NUM == 501
+static void
+__lua_setfenv(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	uint8_t index = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	if (!lua_istable(L, -1))
+		return;
+	lua_setfenv(L, index);
+	assert(lua_gettop(L) == top - 1);
+}
+#endif /* LUA_VERSION_NUM */
+
+/* int lua_absindex(lua_State *L, int idx); */
+/* [-0, +0, –] */
+#if LUA_VERSION_NUM > 501
+static void
+__lua_absindex(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	uint8_t index = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	int idx = lua_absindex(L, index);
+	assert(idx > 0);
+	assert(lua_gettop(L) == top);
+}
+#endif /* LUA_VERSION_NUM */
+
+#if LUA_VERSION_NUM > 501
+static int arith_op[] = {
+	LUA_OPADD,
+	LUA_OPSUB,
+	LUA_OPMUL,
+	LUA_OPDIV,
+	LUA_OPMOD,
+	LUA_OPPOW,
+	LUA_OPUNM,
+#if LUA_VERSION_NUM > 502
+	LUA_OPBNOT,
+	LUA_OPBAND,
+	LUA_OPBOR,
+	LUA_OPBXOR,
+	LUA_OPSHL,
+	LUA_OPSHR,
+#endif /* LUA_VERSION_NUM */
+};
+#endif /* LUA_VERSION_NUM */
+
+/* void lua_arith(lua_State *L, int op); */
+/* [-(2|1), +1, e] */
+#if LUA_VERSION_NUM > 501
+static void
+__lua_arith(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	if ((lua_type(L, 1) != LUA_TNUMBER) ||
+	    (lua_type(L, 2) != LUA_TNUMBER))
+		return;
+	int op_idx = fdp->ConsumeIntegralInRange<uint8_t>(0, ARRAY_SIZE(arith_op) - 1);
+	int op = arith_op[op_idx];
+
+	/* Handle division by zero. */
+	lua_pushnumber(L, 0);
+	if ((op == LUA_OPMOD ||
+	     op == LUA_OPDIV) && lua_rawequal(L, 2, -1))
+		return;
+	lua_pop(L, 1);
+
+	lua_arith(L, op);
+	/* XXX: Wrong number of elements. */
+	assert(lua_gettop(L) <= top - 1 + 1);
+}
+#endif /* LUA_VERSION_NUM */
+
+/* int lua_isyieldable(lua_State *L); */
+/* [-0, +0, –] */
+#if LUA_VERSION_NUM > 502
+static void
+__lua_isyieldable(lua_State *L, FuzzedDataProvider *fdp)
+{
+	(void)fdp;
+	int rc = lua_isyieldable(L);
+	assert(rc == 0 || rc == 1);
+}
+#endif /* LUA_VERSION_NUM */
+
+/* int lua_cpcall(lua_State *L, lua_CFunction func, void *ud); */
+/* [-0, +(0|1), -] */
+#if LUA_VERSION_NUM == 501
+static void
+__lua_cpcall(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	int rc = lua_cpcall(L, cfunction, NULL);
+	assert(rc == 0);
+	assert(lua_gettop(L) - top <= 1);
+}
+#endif /* LUA_VERSION_NUM */
+
+/* void lua_gettable(lua_State *L, int index); */
+/* [-1, +1, e] */
+static void
+__lua_gettable(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	uint8_t index = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	if (!lua_istable(L, index))
+		return;
+	uint8_t key = fdp->ConsumeIntegral<uint8_t>();
+	lua_pushnumber(L, key);
+	lua_gettable(L, index);
+	/* XXX: Wrong number of elements. */
+	/* assert(lua_gettop(L) == top); */
+}
+
+/* void lua_seti(lua_State *L, int index, lua_Integer n); */
+/* [-1, +0, e] */
+#if LUA_VERSION_NUM > 502
+static void
+__lua_seti(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	uint8_t index = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	if (!lua_istable(L, index))
+		return;
+	int n = fdp->ConsumeIntegral<uint8_t>();
+	__lua_pushnumber(L, fdp);
+	lua_seti(L, index, n);
+	/* XXX: Wrong number of elements. */
+	/* assert(lua_gettop(L) == top - 1); */
+}
+#endif /* LUA_VERSION_NUM */
+
+/* int lua_geti(lua_State *L, int index, lua_Integer i); */
+/* [-0, +1, e] */
+#if LUA_VERSION_NUM > 502
+static void
+__lua_geti(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	uint8_t index = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	if (!lua_istable(L, index))
+		return;
+	int i = fdp->ConsumeIntegral<uint8_t>();
+	lua_geti(L, index, i);
+	assert(lua_gettop(L) == top + 1);
+}
+#endif /* LUA_VERSION_NUM */
+
+/* void lua_register(lua_State *L, const char *name, lua_CFunction f); */
+/* [-0, +0, e] */
+static void
+__lua_register(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	lua_register(L, "cfunction", cfunction);
+	assert(lua_gettop(L) == top);
+}
+
+/* void lua_setfield(lua_State *L, int index, const char *k); */
+/* [-1, +0, e] */
+static void
+__lua_setfield(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	uint8_t index = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	if (lua_type(L, index) != LUA_TTABLE)
+		return;
+	auto k = fdp->ConsumeRemainingBytesAsString();
+	lua_setfield(L, index, k.c_str());
+	assert(lua_gettop(L) == top - 1);
+}
+
+/* lua_CFunction lua_tocfunction(lua_State *L, int index); */
+/* [-0, +0, -] */
+static void
+__lua_tocfunction(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	uint8_t index = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	lua_tocfunction(L, index);
+	assert(lua_gettop(L) == top);
+}
+
+/* void lua_settable(lua_State *L, int index); */
+/* [-2, +0, e] */
+static void
+__lua_settable(lua_State *L, FuzzedDataProvider *fdp)
+{
+	/* XXX */
+}
+
+/* void lua_getfield(lua_State *L, int index, const char *k); */
+/* [-0, +1, e] */
+static void
+__lua_getfield(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	uint8_t index = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	if (lua_type(L, index) != LUA_TTABLE)
+		return;
+	auto k = fdp->ConsumeRemainingBytesAsString();
+	lua_getfield(L, index, k.c_str());
+	assert(lua_gettop(L) == top + 1);
+}
+
+/* void *lua_newuserdata(lua_State *L, size_t size); */
+/* [-0, +1, m] */
+static void
+__lua_newuserdata(lua_State *L, FuzzedDataProvider *fdp)
+{
+	uint8_t size = fdp->ConsumeIntegral<uint8_t>();
+	lua_newuserdata(L, size);
+}
+
+/* lua_State *lua_tothread(lua_State *L, int index); */
+/* [-0, +0, -] */
+static void
+__lua_tothread(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	uint8_t index = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	lua_tothread(L, index);
+	assert(lua_gettop(L) == top);
+}
+
+/* void *lua_upvalueid(lua_State *L, int funcindex, int n); */
+/* [-0, +0, –] */
+static void
+__lua_upvalueid(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	if (fdp->remaining_bytes() == 0)
+		return;
+	int funcindex = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	if (lua_type(L, funcindex) != LUA_TFUNCTION)
+		return;
+	int n = fdp->ConsumeIntegral<uint8_t>();
+	void *p = lua_upvalueid(L, funcindex, n);
+	assert(p);
+	assert(lua_gettop(L) == top);
+}
+
+/* int lua_rawequal(lua_State *L, int index1, int index2); */
+/* [-0, +0, –] */
+static void
+__lua_rawequal(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	if (top < 2)
+		return;
+	uint8_t index1 = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	uint8_t index2 = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	lua_rawequal(L, index1, index2);
+	assert(lua_gettop(L) == top);
+}
+
+/* void luaL_traceback(lua_State *L, lua_State *L1, const char *msg, int level); */
+/* [-0, +1, m] */
+static void
+__luaL_traceback(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	auto buf = fdp->ConsumeRandomLengthString(max_str_len);
+	luaL_traceback(L, L, buf.c_str(), 1);
+	assert(lua_gettop(L) == top + 1);
+}
+
+/* const char *luaL_tolstring(lua_State *L, int idx, size_t *len); */
+/* [-0, +1, e] */
+static void
+__luaL_tolstring(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	auto idx = fdp->ConsumeIntegralInRange(1, top);
+#if LUA_VERSION_NUM < 503
+	lua_tolstring(L, idx, NULL);
+#else
+	luaL_tolstring(L, idx, NULL);
+#endif /* LUA_VERSION_NUM */
+	/* XXX: Wrong number of elements. */
+	/* assert(lua_gettop(L) == top + 1); */
+}
+
+/* void lua_copy(lua_State *L, int fromidx, int toidx); */
+/* [-0, +0, –] */
+static void
+__lua_copy(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	uint8_t fromidx = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	uint8_t toidx = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	if (fromidx == toidx)
+		return;
+	lua_copy(L, fromidx, toidx);
+	assert(lua_gettop(L) == top);
+}
+
+/* void luaL_checkversion(lua_State *L); */
+/* [-0, +0, v] */
+#if LUA_VERSION_NUM > 501
+static void
+__luaL_checkversion(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	luaL_checkversion(L);
+	assert(top == lua_gettop(L));
+}
+#endif /* LUA_VERSION_NUM */
+
+/* size_t lua_stringtonumber(lua_State *L, const char *s); */
+/* [-0, +1, –] */
+#if LUA_VERSION_NUM > 502
+static void
+__lua_stringtonumber(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	auto str = fdp->ConsumeRandomLengthString(max_str_len);
+	size_t sz = lua_stringtonumber(L, str.c_str());
+	if (sz == 0) {
+		assert(lua_gettop(L) == top);
+	} else {
+		assert(lua_gettop(L) == top + 1);
+		assert(lua_isnumber(L, -1) == 1);
+	}
+}
+#endif /* LUA_VERSION_NUM */
+
 typedef void
 (*lua_func)(lua_State *L, FuzzedDataProvider *fdp);
 
@@ -778,7 +1206,7 @@ __lua_createtable(lua_State *L, FuzzedDataProvider *fdp)
 	assert(lua_gettop(L) != 0);
 }
 
-lua_func func[] = {
+static lua_func func[] = {
 	&__lua_checkstack,
 	&__lua_concat,
 	&__lua_createtable,
@@ -790,6 +1218,7 @@ lua_func func[] = {
 	&__lua_getinfo,
 	&__lua_getmetatable,
 	&__lua_getstack,
+	&__lua_gettable,
 	&__lua_gettop,
 	&__lua_getupvalue,
 	&__lua_insert,
@@ -837,6 +1266,40 @@ lua_func func[] = {
 	&__lua_touserdata,
 	&__lua_type,
 	&__lua_typename,
+	&__lua_upvalueid,
+	&__lua_tothread,
+	&__lua_tocfunction,
+	&__lua_newuserdata,
+	&__lua_setfield,
+	&__lua_getfield,
+	&__lua_register,
+	&__lua_settable,
+	&__lua_rawequal,
+	&__luaL_traceback,
+	&__luaL_tolstring,
+#if LUA_VERSION_NUM == 501
+	&__lua_cpcall,
+	&__lua_getfenv,
+	&__lua_lessthan,
+	&__lua_objlen,
+	&__lua_setfenv,
+#endif /* LUA_VERSION_NUM */
+#if LUA_VERSION_NUM > 501
+	&__lua_absindex,
+	&__lua_compare,
+	&__lua_rawlen,
+	&__lua_arith,
+	&__luaL_checkversion,
+#endif /* LUA_VERSION_NUM */
+#if LUA_VERSION_NUM > 502
+	&__lua_geti,
+	&__lua_isyieldable,
+	&__lua_seti,
+	&__lua_stringtonumber,
+#endif /* LUA_VERSION_NUM */
+#if LUA_VERSION_NUM > 503
+	&__lua_copy,
+#endif /* LUA_VERSION_NUM */
 };
 
 extern "C" int

@@ -38,6 +38,8 @@ is LuaJIT-specific.
 - `ENABLE_LUA_ASSERT` enables all assertions inside Lua source code.
 - `ENABLE_LUA_APICHECK` enables consistency checks on the C API.
 - `OSS_FUZZ` enables support of OSS Fuzz.
+- `ENABLE_BUILD_PROTOBUF` enables building Protobuf library, otherwise system
+  library is used.
 
 ### Running
 

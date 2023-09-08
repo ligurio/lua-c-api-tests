@@ -19,8 +19,11 @@ foreach(lib ${LPM_LIBRARIES})
   add_dependencies(${lib} ${LPM_TARGET})
 endforeach(lib)
 
-include(SetProtobufDirs)
-SetProtobufDirs()
+if (ENABLE_BUILD_PROTOBUF)
+   include(SetProtobufDirs)
+   SetProtobufDirs()
+   message(STATUS "Build Protobuf library automatically")
+endif (ENABLE_BUILD_PROTOBUF)
 
 include (ExternalProject)
 ExternalProject_Add(${LPM_TARGET}
@@ -35,7 +38,7 @@ ExternalProject_Add(${LPM_TARGET}
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON
         -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
         -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
-        -DLIB_PROTO_MUTATOR_DOWNLOAD_PROTOBUF=ON
+        -DLIB_PROTO_MUTATOR_DOWNLOAD_PROTOBUF=${ENABLE_BUILD_PROTOBUF}
         -DLIB_PROTO_MUTATOR_TESTING=OFF
         -DLIB_PROTO_MUTATOR_WITH_ASAN=${ENABLE_ASAN}
   BUILD_BYPRODUCTS ${LPM_BUILD_BYPRODUCTS} ${PROTOBUF_BUILD_BYPRODUCTS}

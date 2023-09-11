@@ -45,7 +45,9 @@ is LuaJIT-specific.
 
 ```sh
 cmake --build build --target test
-cd build && ctest -R luaL_gsub_test --verbose
+cd build && RUNS=100000 ctest -R luaL_gsub_test --verbose
+<snipped>
+1: Done 100000 runs in 5 second(s)
 ```
 
 ### References

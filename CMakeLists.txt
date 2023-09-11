@@ -5,6 +5,8 @@ project(lua-c-api-tests
   VERSION "1.0.0"
 )
 
+find_program(SHELL sh)
+
 option(USE_LUA "Use PUC Rio Lua library" OFF)
 option(USE_LUAJIT "Use LuaJIT library" OFF)
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)

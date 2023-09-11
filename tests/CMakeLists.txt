@@ -38,6 +38,8 @@ if (ENABLE_COV)
   set(LDFLAGS "${LDFLAGS} -fprofile-instr-generate -fcoverage-mapping")
 endif (ENABLE_COV)
 
+set(DEFAULT_RUNS_NUMBER 5)
+
 function(create_test)
   cmake_parse_arguments(
     FUZZ
@@ -54,7 +56,7 @@ function(create_test)
   target_compile_options(${test_name} PRIVATE -Wall -Wextra -Wpedantic -Wno-unused-parameter -g)
   add_dependencies(${test_name} ${LUA_TARGET})
   string(REPLACE "_test" "" test_prefix ${test_name})
-  string(JOIN ";" LIBFUZZER_OPTS
+  string(JOIN " " LIBFUZZER_OPTS
     -use_value_profile=1
     -report_slow_units=5
     -reload=1
@@ -62,11 +64,11 @@ function(create_test)
     -print_pcs=1
     -print_final_stats=1
     -mutate_depth=20
-    -runs=5
+    -runs=$\{RUNS:-${DEFAULT_RUNS_NUMBER}\}
     -artifact_prefix=${test_name}_
   )
   add_test(NAME ${test_name}
-           COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${test_name} ${LIBFUZZER_OPTS}
+           COMMAND ${SHELL} -c "$<TARGET_FILE:${test_name}> ${LIBFUZZER_OPTS}"
   )
   if (USE_LUA)
     set_tests_properties(${test_name} PROPERTIES

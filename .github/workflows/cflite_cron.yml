@@ -1,0 +1,65 @@
+name: Testing in ClusterFuzzLite (Scheduled)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'  # Once a day at midnight.
+
+permissions: read-all
+
+jobs:
+
+# Code Coverage Report Generation ("coverage").
+# Code coverage report generation is a helper function that can be used when
+# batch fuzzing is enabled. This mode uses the corpus developed during batch
+# fuzzing to generate an HTML coverage report that shows which parts of your code
+# are covered by fuzzing.
+
+  Coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build fuzzing tests
+        id: build
+        uses: google/clusterfuzzlite/actions/build_fuzzers@v1
+        with:
+          sanitizer: coverage
+      - name: Run fuzzing tests
+        id: run
+        uses: google/clusterfuzzlite/actions/run_fuzzers@v1
+        with:
+          fuzz-seconds: 600
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          minimize-crashes: true
+          mode: 'coverage'
+          parallel-fuzzing: true
+          report-unreproducible-crashes: true
+          storage-repo-branch-coverage: gh-pages
+          storage-repo-branch: master
+          storage-repo: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/ligurio/lua-c-api-corpus
+
+# Corpus Pruning ("prune").
+# Over time, redundant testcases will get introduced into your fuzzer's corpuses
+# during batch fuzzing. Corpus pruning is a helper function that minimizes the
+# corpuses by removing corpus files (testcases) that do not increase the fuzzer's
+# code coverage.
+
+  Pruning:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build Fuzzers
+        id: build
+        uses: google/clusterfuzzlite/actions/build_fuzzers@v1
+      - name: Run Fuzzers
+        id: run
+        uses: google/clusterfuzzlite/actions/run_fuzzers@v1
+        with:
+          fuzz-seconds: 1800
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          minimize-crashes: true
+          mode: 'prune'
+          output-sarif: true
+          parallel-fuzzing: true
+          report-unreproducible-crashes: true
+          storage-repo-branch-coverage: gh-pages
+          storage-repo-branch: master
+          storage-repo: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/ligurio/lua-c-api-corpus

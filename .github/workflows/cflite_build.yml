@@ -1,0 +1,25 @@
+name: Testing in ClusterFuzzLite (CI)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+permissions: read-all
+
+jobs:
+  luajit:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        sanitizer: [address]
+    steps:
+      - name: Build fuzzing tests (${{ matrix.sanitizer }})
+        id: build
+        uses: google/clusterfuzzlite/actions/build_fuzzers@v1
+        with:
+          language: c++
+          sanitizer: ${{ matrix.sanitizer }}
+          upload-build: true

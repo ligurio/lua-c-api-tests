@@ -1,0 +1,63 @@
+# Code Change Fuzzing ("code-change").
+# The core way to use ClusterFuzzLite is to fuzz code changes that were
+# introduced in a pull request/code review or commit. Code change fuzzing
+# allows ClusterFuzzLite to find bugs before they are commited into your
+# code and while they are easiest to fix.
+
+name: Testing in ClusterFuzzLite (PR)
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, labeled]
+
+concurrency:
+  # Update of a developer branch cancels the previously scheduled workflow
+  # run for this branch. However, the 'master' branch, and
+  # tag workflow runs are never canceled.
+  #
+  # We use a trick here: define the concurrency group as 'workflow run ID' +
+  # 'workflow run attempt' because it is a unique combination for any run.
+  # So it effectively discards grouping.
+  #
+  # Important: we cannot use `github.sha` as a unique identifier because
+  # pushing a tag may cancel a run that works on a branch push event.
+  group: ${{ (
+    github.ref == 'refs/heads/master' ||
+    startsWith(github.ref, 'refs/tags/')) &&
+    format('{0}-{1}', github.run_id, github.run_attempt) ||
+    format('{0}-{1}', github.workflow, github.ref) }}
+  cancel-in-progress: true
+
+permissions: read-all
+
+jobs:
+  luajit:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        sanitizer: [address]
+    steps:
+      - name: Build fuzzing tests (${{ matrix.sanitizer }})
+        id: build
+        uses: google/clusterfuzzlite/actions/build_fuzzers@v1
+        with:
+          language: c++
+          sanitizer: ${{ matrix.sanitizer }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          storage-repo: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/ligurio/lua-c-api-corpus
+          storage-repo-branch-coverage: gh-pages
+      - name: Run fuzzing tests (${{ matrix.sanitizer }})
+        id: run
+        uses: google/clusterfuzzlite/actions/run_fuzzers@v1
+        with:
+          fuzz-seconds: 120
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          minimize-crashes: true
+          mode: 'code-change'
+          output-sarif: true
+          report-unreproducible-crashes: true
+          sanitizer: ${{ matrix.sanitizer }}
+          storage-repo-branch-coverage: gh-pages
+          storage-repo-branch: master
+          storage-repo: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/ligurio/lua-c-api-corpus

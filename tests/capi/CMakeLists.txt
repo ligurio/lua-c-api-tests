@@ -134,3 +134,6 @@ endforeach()
 
 include(ProtobufMutator)
 add_subdirectory(luaL_loadbuffer_proto)
+if(USE_LUAJIT)
+  add_subdirectory(ffi_cdef_proto)
+endif ()

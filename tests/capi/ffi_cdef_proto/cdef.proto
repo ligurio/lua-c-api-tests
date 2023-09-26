@@ -1,0 +1,498 @@
+/*
+ * SPDX-License-Identifier: ISC
+ *
+ * Copyright 2023-2024, Sergey Bronnikov
+ */
+
+syntax = "proto2";
+package cdef;
+
+/*
+ * Identifier,
+ * https://en.cppreference.com/w/c/language/identifier
+ */
+message Identifier {
+	required string name = 1;
+	required int32 num = 2;
+}
+
+message IdentifiersList {
+	repeated Identifier identifiers = 1;
+}
+
+message Parameter {
+	required Identifier name = 1;
+	/* FIXME */
+}
+
+message Parameters {
+	repeated Parameter parameters = 1;
+}
+
+/*
+ * Either the single keyword void or a comma-separated list of
+ * parameters, which may end with an ellipsis parameter.
+ */
+message ParametersList {
+	oneof parameters_list_oneof {
+		int32 keyword_void = 1;
+		Parameters parameters = 2;
+	}
+	optional int32 ellipsis = 3;
+}
+
+message Specifier {
+	oneof specifier_oneof {
+		TypeSpecifier type_specifier = 1;
+		StorageClassSpecifier storage_class_specifier = 2;
+		FunctionSpecifier function_specifier = 3;
+		AlignmentSpecifier alignment_specifier = 4;
+	};
+}
+
+message SpecifiersList {
+	repeated Specifier specifiers_list = 1;
+}
+
+message Qualifier {
+	oneof qualifier_oneof {
+		TypeQualifier type_qualifier = 1;
+	};
+}
+
+message QualifiersList {
+	repeated Qualifier qualifiers_list = 1;
+}
+
+/*
+ * Bit-fields declaration,
+ * https://en.cppreference.com/w/c/language/bit_field
+ * https://en.cppreference.com/w/cpp/language/bit_field
+ */
+message Bitfield {
+	optional Identifier name = 1;
+	required uint32 width = 2;
+}
+
+/*
+ * Function declaration,
+ * https://en.cppreference.com/w/c/language/function_declaration
+ *
+ * Syntax:
+ * noptr-declarator ( parameter-list ) attr-spec-seq (optional)
+ * noptr-declarator ( identifier-list ) attr-spec-seq (optional)
+ * noptr-declarator ( ) attr-spec-seq (optional)
+ *
+ * noptr-declarator is any valid declarator, but if it begins
+ * with *, &, or &&, it has to be surrounded by parentheses.
+ */
+message FunctionDeclarator {
+	/* FIXME: Replace Declarator with noptr-Declarator. */
+	required Declarator noptr_declarator = 1;
+	oneof parentheses_content_oneof {
+		ParametersList parameters_list = 2;
+		IdentifiersList identifiers_list = 3;
+		/* FIXME: Nope. */
+	}
+	optional AttrSpecSeq attr_spec_seq = 4;
+}
+
+/*
+ * Pointer declaration,
+ * https://en.cppreference.com/w/c/language/pointer
+ *
+ * Syntax:
+ * * attr-spec-seq (optional) qualifiers (optional) declarator
+ */
+message PointerDeclarator {
+	optional AttrSpecSeq attr_spec_seq = 1;
+	optional QualifiersList qualifiers_list = 2;
+	required Declarator declarator = 3;
+}
+
+/*
+ * Array declaration,
+ * https://en.cppreference.com/w/c/language/array
+ *
+ * Syntax:
+ * [ static (optional) qualifiers (optional) expression (optional) ] attr-spec-seq (optional)
+ * [ qualifiers (optional) static (optional) expression (optional) ] attr-spec-seq (optional)
+ * [ qualifiers (optional) * ] attr-spec-seq (optional)
+ */
+message ArrayDeclarator {
+	optional int32 keyword_static = 1;
+	optional QualifiersList qualifiers_list = 2;
+	/* FIXME: expression is not a constant number. */
+	optional uint32 expression = 3;
+	optional AttrSpecSeq attr_spec_seq = 4;
+}
+
+/*
+ * Function specifiers.
+ */
+message FunctionSpecifier {
+	/* See https://en.cppreference.com/w/cpp/language/inline. */
+	optional int32 keyword_inline = 1;
+	/* See https://en.cppreference.com/w/c/language/_Noreturn. */
+	optional int32 keyword_noreturn = 2;
+}
+
+/*
+ * Storage-class specifiers,
+ * https://en.cppreference.com/w/c/language/storage_duration
+ */
+message StorageClassSpecifier {
+	oneof storage_class_specifier_oneof {
+		int32 storage_class_typedef = 1;
+		int32 storage_class_constexpr = 2;
+		int32 storage_class_auto = 3;
+		int32 storage_class_register = 4;
+		int32 storage_class_static = 5;
+		int32 storage_class_extern = 6;
+		/* thread_local (since C23) */
+		int32 storage_class_thread_local_1 = 7;
+		/* _Thread_local (until C23) */
+		int32 storage_class_thread_local_2 = 8;
+    }
+}
+
+/*
+ * typeof operators (since C23),
+ * https://en.cppreference.com/w/c/language/typeof
+ */
+message TypeOfOperator {
+	/* FIXME: Not implemented. */
+}
+
+/*
+ * Enumerations,
+ * https://en.cppreference.com/w/c/language/enum
+ */
+message EnumType {
+	required Identifier enum_name = 1;
+	repeated Identifier constant = 2;
+}
+
+/*
+ * Static assertion (since C11),
+ * see https://en.cppreference.com/w/c/language/_Static_assert.
+ */
+message StaticAssertion {
+	oneof static_assert_oneof {
+		uint32 static_assert_1 = 1;
+		uint32 static_assert_2 = 2;
+	}
+	required uint32 expression = 3;
+	optional string message = 4;
+}
+
+/*
+ * https://en.cppreference.com/w/c/language/struct
+ *
+ * Any number of variable declarations, bit-field declarations,
+ * and static assert declarations. Members of incomplete type and
+ * members of function type are not allowed (except for
+ * the flexible array member described below).
+ */
+message StructDeclaration {
+	oneof struct_decl_oneof {
+		/* FIXME: Multiple bit-fields. */
+		Bitfield bit_field = 1;
+		/* FIXME: variable declarations. */
+		StaticAssertion static_assertion = 2;
+	}
+}
+
+message StructDeclarationList {
+	repeated StructDeclaration struct_declaration_list = 1;
+}
+
+/*
+ * Union declaration,
+ * https://en.cppreference.com/w/c/language/union
+ *
+ * Syntax:
+ * union attr-spec-seq (optional) name (optional) { struct-declaration-list }
+ * union attr-spec-seq (optional) name
+ */
+message UnionType {
+	optional AttrSpecSeq attr_spec_seq = 1;
+	optional Identifier name = 2;
+	required StructDeclarationList struct_declaration_list = 3;
+}
+
+/*
+ * Struct declaration,
+ * https://en.cppreference.com/w/c/language/struct
+ *
+ * Syntax:
+ * struct attr-spec-seq (optional) name (optional) { struct-declaration-list }
+ * struct attr-spec-seq (optional) name
+ */
+message StructType {
+	optional AttrSpecSeq attr_spec_seq = 1;
+	optional Identifier name = 2;
+	required StructDeclarationList struct_declaration_list = 3;
+}
+
+/*
+ * Typedef declaration,
+ * https://en.cppreference.com/w/c/language/typedef
+ *
+ * The typedef declaration provides a way to declare an identifier
+ * as a type alias, to be used to replace a possibly complex type
+ * name.
+ */
+message TypedefType {
+	/* FIXME: Not implemented. */
+}
+
+/* FIXME: Unused. */
+message PredefinedTypeDef {
+	oneof typedef_oneof {
+		/* Subset of stdint.h. */
+		int32 typedef_int8_t = 1;
+		int32 typedef_int16_t = 2;
+		int32 typedef_int32_t = 3;
+		int32 typedef_int64_t = 4;
+		int32 typedef_intptr_t = 5;
+		int32 typedef_uint8_t = 6;
+		int32 typedef_uint16_t = 7;
+		int32 typedef_uint32_t = 8;
+		int32 typedef_uint64_t = 9;
+		int32 typedef_uintptr_t = 10;
+		/* From POSIX. */
+		int32 typedef_ssize_t = 11;
+		/* From stddef.h. */
+		int32 typedef_ptrdiff_t = 12;
+		int32 typedef_size_t = 13;
+		int32 typedef_wchar_t = 14;
+		/* Vararg handling. */
+		int32 typedef_va_list = 15;
+		int32 typedef___builtin_va_list = 16;
+		int32 typedef___gnuc_va_list = 17;
+	}
+}
+
+/*
+ * Arithmetic types,
+ * https://en.cppreference.com/w/c/language/arithmetic_types
+ */
+message ArithmeticType {
+	oneof arithmetic_oneof {
+		/* Boolean type. */
+		int32 type_bool_1 = 1; /* bool */
+		int32 type_bool_2 = 2; /* _Bool */
+		/* Character types. */
+		int32 type_signed_char = 3;
+		int32 type_unsigned_char = 4;
+		int32 type_char = 5;
+		/* Integer types. */
+		int32 type_short_int_1 = 6; /* short int */
+		int32 type_short_int_2 = 7; /* short */
+		int32 type_short_int_3 = 8; /* signed */
+		int32 type_unsigned_short_int_1 = 9;  /* unsigned short int */
+		int32 type_unsigned_short_int_2 = 10; /* unsigned short  */
+		int32 type_int_1 = 11; /* int */
+		int32 type_int_2 = 12; /* signed int */
+		int32 type_unsigned_int_1 = 13; /* unsigned int */
+		int32 type_unsigned_int_2 = 14; /* unsigned */
+		int32 type_long_int_1 = 15; /* long int */
+		int32 type_long_int_2 = 16; /* long */
+		int32 type_unsigned_long_int_1 = 17; /* unsigned long int */
+		int32 type_unsigned_long_int_2 = 18; /* unsigned long */
+		int32 type_long_long_int_1 = 19; /* long long int */
+		int32 type_long_long_int_2 = 20; /* long long */
+		int32 type_unsigned_long_long_int_1 = 21; /* unsigned long long int */
+		int32 type_unsigned_long_long_int_2 = 22; /* unsigned long long */
+		int32 type_bit_int = 23; /* _BitInt */
+		int32 type_unsigned_bit_int = 24; /* unsigned _BitInt */
+		/* Real floating types. */
+		int32 type_float = 25;
+		int32 type_double = 26;
+		int32 type_long_double = 27;
+		int32 type_Decimal32 = 28;
+		int32 type_Decimal64 = 29;
+		int32 type_Decimal128 = 30;
+		/* Complex floating types. */
+		int32 type_float_complex = 31;
+		int32 type_double_complex = 32;
+		int32 type_long_double_complex = 33;
+		/* Imaginary floating types. */
+		int32 type_float_imaginary = 34;
+		int32 type_double_imaginary = 35;
+		int32 type_long_double_imaginary = 36;
+	}
+}
+
+/*
+ * Atomic types,
+ * https://en.cppreference.com/w/c/language/atomic
+ */
+message AtomicType {
+	required int32 atomic_type = 1;
+}
+
+/*
+ * Type specifiers,
+ * https://en.cppreference.com/w/c/language/declarations
+ */
+message TypeSpecifier {
+	oneof type_specifier_oneof {
+		int32 void_type = 1;
+		ArithmeticType arithmetic_type = 2;
+		AtomicType atomic_type = 3;
+		TypedefType typedef_type = 4;
+		StructType struct_type = 5;
+		UnionType union_type = 6;
+		EnumType enum_type = 7;
+		TypeOfOperator typeof_operator = 8;
+	}
+}
+
+message TypeQualifier {
+	optional int32 keyword_const = 1;
+	optional int32 keyword_volatile = 2;
+	optional int32 keyword_restrict = 3;
+	optional int32 keyword_atomic = 4;
+}
+
+/*
+ * Alignment specifier,
+ * https://en.cppreference.com/w/c/language/_Alignas
+ * https://en.cppreference.com/w/cpp/language/alignas
+ */
+message AlignmentSpecifier {
+	optional int32 alignment_specifier_Alignas = 1;
+}
+
+message DeclaratorAttr {
+	required Identifier name = 1;
+	optional AttrSpecSeq attr_spec_seq = 2;
+}
+
+message DeclaratorParentheses {
+	required Declarator declarator = 1;
+}
+
+/*
+ * Declarations,
+ * https://en.cppreference.com/w/c/language/declarations
+ *
+ * Syntax:
+ * identifier attr-spec-seq (optional)
+ * ( declarator )
+ * * attr-spec-seq (optional) qualifiers (optional) declarator
+ * noptr-declarator [ static (optional) qualifiers (optional) expression ]
+ * noptr-declarator [ qualifiers (optional) * ]
+ * noptr-declarator ( parameters-or-identifiers )
+ */
+message Declarator {
+	/* FIXME: noptr_declarator. */
+	oneof declarator_oneof {
+		DeclaratorAttr declarator_attr = 1;
+		DeclaratorParentheses declarator_parentheses= 2;
+		PointerDeclarator pointer_declarator = 3;
+		ArrayDeclarator array_declarator = 4;
+		FunctionDeclarator function_declarator = 5;
+	}
+}
+
+/*
+ * Initialization,
+ * https://en.cppreference.com/w/c/language/initialization
+ */
+message Initializer {
+	/* FIXME: Not implemented. */
+}
+
+/*
+ * Declarations,
+ * https://en.cppreference.com/w/c/language/declarations
+ */
+message DeclaratorsAndInitializers {
+	repeated Declarator declarators = 1;
+	repeated Initializer initializers = 2;
+}
+
+/*
+ * Declarations,
+ * https://en.cppreference.com/w/c/language/declarations
+ */
+message SpecifierAndQualifier {
+	optional QualifiersList qualifiers_list = 1;
+	optional SpecifiersList specifiers_list = 2;
+}
+
+/*
+ * Declarations,
+ * https://en.cppreference.com/w/c/language/declarations
+ */
+message SpecifiersAndQualifiersList {
+	repeated SpecifierAndQualifier specifiers_and_qualifiers_list = 1;
+}
+
+/*
+ * Attribute specifier sequence (since C23),
+ * https://en.cppreference.com/w/c/language/attributes
+ *
+ * Only the following attributes are defined by the C standard.
+ * Every standard attribute whose name is of form attr can be
+ * also spelled as __attr__ and its meaning is not changed.
+ */
+message AttrSpecSeq {
+	optional int32 keyword_deprecated = 1;
+	optional int32 keyword_deprecated_reason = 2;
+	optional int32 keyword_fallthrough = 3;
+	optional int32 keyword_nodiscard = 4;
+	optional int32 keyword_nodiscard_reason = 5;
+	optional int32 keyword_maybe_unused = 6;
+	optional int32 keyword_noreturn_1 = 7;
+	optional int32 keyword_noreturn_2 = 8;
+	optional int32 keyword_unsequenced = 9;
+	optional int32 keyword_reproducible = 10;
+}
+
+/*
+ * Declarations,
+ * https://en.cppreference.com/w/c/language/declarations
+ *
+ * Syntax:
+ * specifiers-and-qualifiers declarators-and-initializers (optional) ;
+ * attr-spec-seq specifiers-and-qualifiers declarators-and-initializers ;
+ * attr-spec-seq ;
+ */
+message Declaration {
+	/*
+	 * Simple declaration. Introduces one or more identifiers
+	 * which denotes objects, functions, struct/union/enum tags,
+	 * typedefs, or enumeration constants.
+	 */
+	optional SpecifiersAndQualifiersList specifiers_and_qualifiers_list= 1;
+
+	/*
+	 * Comma-separated list of declarators (each declarator
+	 * provides additional type information and/or the identifier
+	 * to declare). Declarators may be accompanied by initializers.
+	 * The enum, struct, and union declarations may omit declarators,
+	 * in which case they only introduce the enumeration constants
+	 * and/or tags.
+	 */
+	optional DeclaratorsAndInitializers declarators_and_initializers = 2;
+
+	/*
+	 * Attribute declaration. Does not declares any identifier,
+	 * and has implementation-defined meaning if the meaning
+	 * is not specified by the standard.
+	 */
+	/* FIXME: list of attributes */
+	optional AttrSpecSeq attr_spec_seq = 3;
+}
+
+/*
+ * Declarations,
+ * https://en.cppreference.com/w/c/language/declarations
+ */
+message Declarations {
+	repeated Declaration declarations = 1;
+}

@@ -6,11 +6,6 @@ macro(build_lua LUA_VERSION)
 
     set(CFLAGS ${CMAKE_C_FLAGS})
     if (ENABLE_LUA_ASSERT)
-        # See https://marc.info/?l=lua-l&m=169289729129364&w=2
-        message(WARNING "Option ENABLE_LUA_ASSERT is disabled")
-        set(ENABLE_LUA_ASSERT OFF)
-    endif (ENABLE_LUA_ASSERT)
-    if (ENABLE_LUA_ASSERT)
         set(CFLAGS "${CFLAGS} -DLUAI_ASSERT")
     endif (ENABLE_LUA_ASSERT)
     if (ENABLE_LUA_APICHECK)

@@ -65,6 +65,7 @@ const std::set<std::string> KReservedLuaKeywords {
 const std::string kCounterNamePrefix = "counter_";
 const std::string kNumberWrapperName = "always_number";
 const std::string kBinOpWrapperName = "only_numbers_cmp";
+const std::string kNotNaNAndNilWrapperName = "not_nan_and_nil";
 
 PROTO_TOSTRING(Block, block);
 PROTO_TOSTRING(Chunk, chunk);
@@ -163,6 +164,17 @@ NumberWrappedExpressionToString(const Expression &expr)
 	retval += ExpressionToString(expr);
 	retval += ")";
 
+	return retval;
+}
+
+std::string
+AllowedIndexExpressionToString(const Expression &expr)
+{
+	std::string retval;
+	retval += kNotNaNAndNilWrapperName;
+	retval += "(";
+	retval += ExpressionToString(expr);
+	retval += ")";
 	return retval;
 }
 
@@ -1100,8 +1112,9 @@ PROTO_TOSTRING(Field, field)
 
 NESTED_PROTO_TOSTRING(ExpressionAssignment, assignment, Field)
 {
+	/* Prevent error 'table index is nil' and 'table index is NaN'. */
 	std::string assignment_str = "[ " +
-		ExpressionToString(assignment.key()) + " ]";
+		AllowedIndexExpressionToString(assignment.key()) + " ]";
 	assignment_str += " = " + ExpressionToString(assignment.value());
 	return assignment_str;
 }

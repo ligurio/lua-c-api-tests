@@ -36,8 +36,10 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 	luaL_openlibs(L);
 
 	FILE *fd = fmemopen((void *)data, size, "r");
-	if (fd == NULL)
+	if (fd == NULL) {
+		lua_close(L);
 		return 0;
+	}
 
 	dt test_data;
 	test_data.fd = fd;

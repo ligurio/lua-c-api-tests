@@ -14,7 +14,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 	if (L == NULL)
 		return 0;
 
-	char *buf = calloc(size + 1, sizeof(char));
+	char *buf = malloc(size + 1);
 	if (buf == NULL)
 		return 0;
 	memcpy(buf, data, size);

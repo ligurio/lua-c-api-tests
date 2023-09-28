@@ -38,8 +38,7 @@ LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 	lua_State *L = luaL_newstate();
 	assert(L != NULL);
 
-	size_t str_len = size + 1;
-	char *str = calloc(str_len, sizeof(char));
+	char *str = malloc(size + 1);
 	if (str == NULL)
 		return 0;
 	memcpy(str, data, size);

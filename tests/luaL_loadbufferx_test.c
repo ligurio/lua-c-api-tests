@@ -2,9 +2,9 @@
 #include <stdlib.h> /* malloc, free */
 #include <string.h> /* memcpy */
 
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
 
 /*
  * The main purpose of the test is testing Lua frontend (lexer, parser).

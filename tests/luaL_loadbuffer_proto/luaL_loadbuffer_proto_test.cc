@@ -1,8 +1,11 @@
 extern "C"
 {
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
+#ifdef LUAJIT
+#include "luajit.h"
+#endif /* LUAJIT */
 }
 
 #include "lua_grammar.pb.h"

@@ -9,8 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <lua.h>
-#include <lauxlib.h>
+#include "lua.h"
+#include "lauxlib.h"
 
 static int
 Writer(struct lua_State *L, const void *p, size_t size, void  *ud)

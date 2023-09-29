@@ -40,6 +40,17 @@ endif (ENABLE_COV)
 
 set(DEFAULT_RUNS_NUMBER 5)
 
+string(JOIN " " LIBFUZZER_OPTS
+  -mutate_depth=20
+  -print_final_stats=1
+  -print_pcs=1
+  -reduce_inputs=1
+  -reload=1
+  -report_slow_units=5
+  -runs=$\{RUNS:-${DEFAULT_RUNS_NUMBER}\}
+  -use_value_profile=1
+)
+
 function(create_test)
   cmake_parse_arguments(
     FUZZ
@@ -56,17 +67,7 @@ function(create_test)
   target_compile_options(${test_name} PRIVATE -Wall -Wextra -Wpedantic -Wno-unused-parameter -g)
   add_dependencies(${test_name} ${LUA_TARGET})
   string(REPLACE "_test" "" test_prefix ${test_name})
-  string(JOIN " " LIBFUZZER_OPTS
-    -use_value_profile=1
-    -report_slow_units=5
-    -reload=1
-    -reduce_inputs=1
-    -print_pcs=1
-    -print_final_stats=1
-    -mutate_depth=20
-    -runs=$\{RUNS:-${DEFAULT_RUNS_NUMBER}\}
-    -artifact_prefix=${test_name}_
-  )
+  set(LIBFUZZER_OPTS "${LIBFUZZER_OPTS} -artifact_prefix=${test_name}_")
   add_test(NAME ${test_name}
            COMMAND ${SHELL} -c "$<TARGET_FILE:${test_name}> ${LIBFUZZER_OPTS}"
   )

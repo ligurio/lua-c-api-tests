@@ -21,6 +21,8 @@ option(ENABLE_BUILD_PROTOBUF "Enable building Protobuf library" ON)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 set(CMAKE_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_INCLUDE_PATH})
 
+include(SetBuildParallelLevel)
+
 if (ENABLE_LUAJIT_RANDOM_RA AND NOT USE_LUAJIT)
   message(FATAL_ERROR "Option ENABLE_LUAJIT_RANDOM_RA is LuaJIT-specific.")
 endif (ENABLE_LUAJIT_RANDOM_RA AND NOT USE_LUAJIT)
@@ -60,6 +62,8 @@ find_package(Protobuf)
 if (NOT Protobuf_FOUND)
     set(ENABLE_BUILD_PROTOBUF ON)
 endif (NOT Protobuf_FOUND)
+
+SetBuildParallelLevel(CMAKE_BUILD_PARALLEL_LEVEL)
 
 enable_testing()
 

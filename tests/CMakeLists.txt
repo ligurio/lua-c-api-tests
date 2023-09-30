@@ -97,6 +97,8 @@ list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_buffsub_test")
 list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_buffaddr_test")
 list(APPEND LUAJIT_BLACKLIST_TESTS "lua_load_test")
 list(APPEND LUAJIT_BLACKLIST_TESTS "lua_stringtonumber_test")
+# See https://github.com/ligurio/lua-c-api-tests/issues/56
+list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_loadbufferx_test")
 
 # https://github.com/ligurio/lua-c-api-tests/issues/19
 list(APPEND BLACKLIST_TESTS "luaL_dostring_test")

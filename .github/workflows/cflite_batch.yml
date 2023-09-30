@@ -8,9 +8,6 @@ name: Testing in ClusterFuzzLite (Batch)
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
   schedule:
     - cron: '0 0/8 * * *'  # Every 8th hour.
 

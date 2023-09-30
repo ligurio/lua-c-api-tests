@@ -166,6 +166,15 @@ metrics_increment_num_error_samples(struct metrics *metrics)
 	metrics->total_num_with_errors++;
 }
 
+static void
+profiler_cb(lua_State *L, void *data, size_t *size)
+{
+	(void)L;
+	(void)data;
+	(void)size;
+	/* Do nothing. */
+}
+
 /**
  * Get an error message from the stack, and report it to std::cerr.
  * Remove the message from the stack.
@@ -261,6 +270,31 @@ DEFINE_PROTO_FUZZER(const lua_grammar::Block &message)
 	luaL_dostring(L, "jit.opt.start('hotexit=1')");
 	luaL_dostring(L, "jit.opt.start('recunroll=1')");
 	luaL_dostring(L, "jit.opt.start('callunroll=1')");
+
+	/*
+	 * The `mode` argument is a string holding options:
+	 * f - Profile with precision down to the function level.
+	 * l - Profile with precision down to the line level.
+	 * i<number> - Sampling interval in milliseconds (default 10ms).
+	 */
+	char mode[] = "fli15";
+	size_t depth = 5;
+	int len = 5;
+
+	/* Start profiler. */
+	luaJIT_profile_start(L, mode, (luaJIT_profile_callback)profiler_cb, NULL);
+
+	/*
+	 * Function allows taking stack dumps in an efficient manner, returns a
+	 * string with a stack dump for the thread (coroutine), formatted according
+	 * to the fmt argument:
+	 *   p - Preserve the full path for module names.
+	 *   f - Dump the function name if it can be derived.
+	 *   F - Ditto, but dump module:name.
+	 *   l - Dump module:line.
+	 *   Z - Zap the following characters for the last dumped frame.
+	 */
+	luaJIT_profile_dumpstack(L, "pfFlz", len, &depth);
 #endif /* LUAJIT */
 
 	if (luaL_loadbuffer(L, code.c_str(), code.size(), "fuzz") != LUA_OK) {
@@ -282,7 +316,10 @@ end:
 	metrics_increment_num_samples(&metrics);
 #ifdef LUAJIT
 	disable_lj_metrics(L, &metrics);
+	/* Stop profiler. */
+	luaJIT_profile_stop(L);
 #endif /* LUAJIT */
+
 	lua_settop(L, 0);
 	lua_close(L);
 }

@@ -47,6 +47,7 @@ string(JOIN " " LIBFUZZER_OPTS
   -reduce_inputs=1
   -reload=1
   -report_slow_units=5
+  -workers=${CMAKE_BUILD_PARALLEL_LEVEL}
   -runs=$\{RUNS:-${DEFAULT_RUNS_NUMBER}\}
   -use_value_profile=1
 )

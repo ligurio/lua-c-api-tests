@@ -42,7 +42,7 @@ jobs:
         id: build
         uses: google/clusterfuzzlite/actions/build_fuzzers@v1
         with:
-          language: c++
+          language: c
           sanitizer: ${{ matrix.sanitizer }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           storage-repo: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/ligurio/lua-c-api-corpus

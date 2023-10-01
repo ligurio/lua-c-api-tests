@@ -34,7 +34,7 @@ jobs:
           parallel-fuzzing: true
           report-unreproducible-crashes: true
           storage-repo-branch-coverage: gh-pages
-          storage-repo-branch: master
+          storage-repo-branch: cfl
           storage-repo: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/ligurio/lua-c-api-corpus
 
 # Corpus Pruning ("prune").
@@ -61,5 +61,5 @@ jobs:
           parallel-fuzzing: true
           report-unreproducible-crashes: true
           storage-repo-branch-coverage: gh-pages
-          storage-repo-branch: master
+          storage-repo-branch: cfl
           storage-repo: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/ligurio/lua-c-api-corpus

@@ -4,7 +4,7 @@ macro(build_lua LUA_VERSION)
 
     set(LUA_PATCH_PATH ${PROJECT_SOURCE_DIR}/patches/puc-rio-lua.patch)
 
-    set(CFLAGS ${CMAKE_C_FLAGS})
+    set(CFLAGS "${CMAKE_C_FLAGS} -fno-omit-frame-pointer")
     if (ENABLE_LUA_ASSERT)
         set(CFLAGS "${CFLAGS} -DLUAI_ASSERT")
     endif (ENABLE_LUA_ASSERT)
@@ -28,8 +28,27 @@ macro(build_lua LUA_VERSION)
     endif (ENABLE_ASAN)
 
     if (ENABLE_UBSAN)
-        set(CFLAGS "${CFLAGS} -fsanitize=undefined")
-        set(LDFLAGS "${LDFLAGS} -fsanitize=undefined")
+        string(JOIN "," NO_SANITIZE_FLAGS
+            # lvm.c:luaV_execute()
+            float-divide-by-zero
+            # lgc.c:sweepstep()
+            implicit-integer-sign-change
+            # lvm.c:luaV_execute()
+            integer-divide-by-zero
+            # The object size sanitizer has no effect at -O0.
+            object-size
+            # lstring.c:luaS_hash()
+            shift
+            # lstring.c:luaS_hash()
+            unsigned-integer-overflow
+            # lstring.c:luaS_hash()
+            unsigned-shift-base
+        )
+        set(UBSAN_FLAGS "-fsanitize=undefined")
+        set(UBSAN_FLAGS "-fno-sanitize-recover=undefined")
+        set(UBSAN_FLAGS "-fno-sanitize=${NO_SANITIZE_FLAGS}")
+        set(CFLAGS "${CFLAGS} ${UBSAN_FLAGS}")
+        set(LDFLAGS "${LDFLAGS} ${UBSAN_FLAGS}")
     endif (ENABLE_UBSAN)
 
     if (ENABLE_COV)

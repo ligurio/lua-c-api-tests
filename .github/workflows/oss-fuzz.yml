@@ -8,6 +8,7 @@ on:
       - '.github/workflows/**'
       - 'tests/**'
       - 'cmake/**'
+      - 'CMakeLists.txt'
   pull_request:
     types: [opened, reopened, synchronize, labeled]
 

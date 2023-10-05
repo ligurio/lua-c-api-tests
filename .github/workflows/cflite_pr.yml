@@ -9,6 +9,9 @@ name: Testing in ClusterFuzzLite (PR)
 on:
   pull_request:
     types: [opened, reopened, synchronize, labeled]
+    paths-ignore:
+      - 'cmake/BuildLua.cmake'
+      - 'README.md'
 
 concurrency:
   # Update of a developer branch cancels the previously scheduled workflow

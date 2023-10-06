@@ -6,9 +6,9 @@
 ################################################################################
 
 # Clean up potentially persistent build directory.
-[[ -e $SRC/testdir/build ]] && rm -rf $SRC/testdir/build
+[[ -e $SRC/lua-c-api-tests/build ]] && rm -rf $SRC/lua-c-api-tests/build
 
-cd $SRC/testdir
+cd $SRC/lua-c-api-tests
 
 # Avoid compilation issue due to some undefined references. They are defined in
 # libc++ and used by Centipede so -lc++ needs to come after centipede's lib.
@@ -68,7 +68,7 @@ for f in $(find build/tests/ -name '*_test' -type f);
 do
   name=$(basename $f);
   module=$(echo $name | sed 's/_test//')
-  corpus_dir="corpus_dir/$module"
+  corpus_dir="corpus/$module"
   echo "Copying for $module";
   cp $f $OUT/
   dict_path="corpus_dir/$name.dict"

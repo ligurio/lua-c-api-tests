@@ -52,8 +52,8 @@ macro(build_lua LUA_VERSION)
     endif (ENABLE_UBSAN)
 
     if (ENABLE_COV)
-        set(CFLAGS "${CFLAGS} -fprofile-instr-generate -fcoverage-mapping")
-        set(LDFLAGS "${LDFLAGS} -fprofile-instr-generate -fcoverage-mapping")
+        set(CFLAGS "${CFLAGS} -fprofile-instr-generate  -fprofile-arcs -fcoverage-mapping -ftest-coverage")
+        set(LDFLAGS "${LDFLAGS} -fprofile-instr-generate -fprofile-arcs -fcoverage-mapping -ftest-coverage")
     endif (ENABLE_COV)
 
 
@@ -88,7 +88,6 @@ macro(build_lua LUA_VERSION)
     set(LUA_VERSION_STRING "PUC Rio Lua ${LUA_VERSION}")
     set(LUA_TARGET patched-lua-${LUA_VERSION})
 
-    unset(LUA_SOURCE_DIR)
     unset(LUA_BINARY_DIR)
     unset(LUA_PATCH_PATH)
 endmacro(build_lua)

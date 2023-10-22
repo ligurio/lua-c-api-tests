@@ -65,6 +65,10 @@ endif (NOT Protobuf_FOUND)
 
 SetBuildParallelLevel(CMAKE_BUILD_PARALLEL_LEVEL)
 
+if(ENABLE_COV)
+    include(CodeCoverage)
+endif()
+
 enable_testing()
 
 add_subdirectory(tests)

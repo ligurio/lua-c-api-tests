@@ -67,8 +67,8 @@ macro(build_luajit LJ_VERSION)
     endif (ENABLE_UBSAN)
 
     if (ENABLE_COV)
-        set(CFLAGS "${CFLAGS} -fprofile-instr-generate -fcoverage-mapping")
-        set(LDFLAGS "${LDFLAGS} -fprofile-instr-generate -fcoverage-mapping")
+        set(CFLAGS "${CFLAGS} -fprofile-instr-generate -fprofile-arcs -fcoverage-mapping -ftest-coverage")
+        set(LDFLAGS "${LDFLAGS} -fprofile-instr-generate -fprofile-arcs -fcoverage-mapping -ftest-coverage")
     endif (ENABLE_COV)
 
 
@@ -100,6 +100,7 @@ macro(build_luajit LJ_VERSION)
         BUILD_BYPRODUCTS ${LJ_SOURCE_DIR}/src/libluajit.a
     )
 
+    set(LUA_SOURCE_DIR ${LJ_SOURCE_DIR})
     set(LUA_INCLUDE_DIR ${LJ_SOURCE_DIR}/src/)
     set(LUA_LIBRARIES ${LJ_SOURCE_DIR}/src/libluajit.a)
     set(LUA_VERSION_STRING "LuaJIT ${LJ_VERSION}")

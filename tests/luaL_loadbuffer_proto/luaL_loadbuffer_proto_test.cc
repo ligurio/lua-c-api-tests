@@ -247,6 +247,65 @@ disable_lj_metrics(lua_State *L, struct metrics *metrics)
 	jit_attach(L, (void *)trace_cb, NULL);
 }
 
+struct str_Writer {
+	/* Non-zero when buffer has been initialized. */
+	int init;
+	luaL_Buffer B;
+	size_t bufsize;
+};
+
+static int
+writer(lua_State *L, const void *b, size_t size, void *ud) {
+	struct str_Writer *state = (struct str_Writer *)ud;
+	if (!state->init) {
+		state->init = 1;
+		luaL_buffinit(L, &state->B);
+	}
+	luaL_addlstring(&state->B, (const char *)b, size);
+	state->bufsize += size;
+
+	return 0;
+}
+
+/*
+ * Loads a buffer as a Lua bytecode chunk. This function uses luaL_loadstring
+ * to load the chunk in the buffer pointed to by buff, lua_dump to dump
+ * produced bytecode and luaL_loadbuffer to load produced bytecode to the
+ * stack. This function returns the same results as luaL_loadbuffer.
+ * name is the chunk name, used for debug information and error messages.
+ */
+static int
+luaL_loadbytecode(lua_State *L, const char *buff, size_t sz, const char *name)
+{
+	/* Compile Lua source code to bytecode. */
+	int rc = luaL_loadstring(L, buff);
+	if (rc != 0) {
+		return LUA_ERRSYNTAX;
+	}
+
+	/* Dump a Lua bytecode to a buffer. */
+	struct str_Writer state;
+	state.init = 0;
+#if LUA_VERSION_NUM < 503
+	rc = lua_dump(L, writer, &state);
+#else /* Lua 5.3+ */
+	rc = lua_dump(L, writer, &state, 1);
+#endif /* LUA_VERSION_NUM */
+	if (rc != 0) {
+		return rc;
+	}
+
+	luaL_pushresult(&state.B);
+	const char *bc = lua_tolstring(L, -1, &state.bufsize);
+	/* Load Lua bytecode. */
+	rc = luaL_loadbuffer(L, bc, state.bufsize, "bytecode");
+	if (rc != 0) {
+		return rc;
+	}
+
+	return 0;
+}
+
 DEFINE_PROTO_FUZZER(const lua_grammar::Block &message)
 {
 	lua_State *L = luaL_newstate();
@@ -309,8 +368,21 @@ DEFINE_PROTO_FUZZER(const lua_grammar::Block &message)
 	 * needed to describe Lua semantics for more interesting
 	 * results and fuzzer tests.
 	 */
-	if (lua_pcall(L, 0, 0, 0) != LUA_OK)
+	if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
 		report_error(L, "lua_pcall()");
+		goto end;
+	}
+
+	/*
+	 * With luaL_loadbytecode we build a bytecode from a Lua code and then
+	 * execute produced bytecode chunk.
+	 */
+	if (luaL_loadbytecode(L, code.c_str(), code.size(), "fuzz") != LUA_OK)
+		goto end;
+
+	if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
+		report_error(L, "lua_pcall()");
+	}
 
 end:
 	metrics_increment_num_samples(&metrics);

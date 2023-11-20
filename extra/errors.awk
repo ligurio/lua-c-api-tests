@@ -26,6 +26,10 @@ BEGIN { matched = 0
         err_pat["'then' expected near"] = 0
         err_pat["unable to dump given function"] = 0
         err_pat["unexpected symbol near"] = 0
+        err_pat["stack overflow"] = 0
+        err_pat["'do' expected near ')'"] = 0
+        err_pat["has more than 200 local variables"] = 0
+        err_pat["function arguments expected near 'setmetatable'"] = 0
       }
 
 # String that function report_error() prints with every error message.

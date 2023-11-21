@@ -3,3 +3,4 @@ build
 crash-*
 leak-*
 *.swp
+CMakeUserPresets.json

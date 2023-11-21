@@ -1,0 +1,148 @@
+{
+  "version": 7,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 27,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "configure_default",
+      "displayName": "Default config",
+      "description": "Default build",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": {
+          "type": "BOOL",
+          "value": "TRUE"
+        },
+        "ENABLE_COV": {
+          "type": "BOOL",
+          "value": "TRUE"
+        },
+        "ENABLE_ASAN": {
+          "type": "BOOL",
+          "value": "TRUE"
+        },
+        "ENABLE_LUA_ASSERT": {
+          "type": "BOOL",
+          "value": "TRUE"
+        },
+        "ENABLE_LUA_APICHECK": {
+          "type": "BOOL",
+          "value": "TRUE"
+        },
+        "ENABLE_BUILD_PROTOBUF": {
+          "type": "BOOL",
+          "value": "FALSE"
+        }
+      }
+    },
+    {
+      "name": "configure_lua",
+      "inherits": "configure_default",
+      "displayName": "PUC Rio Lua",
+      "binaryDir": "${sourceDir}/build/lua",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "USE_LUA": {
+          "type": "BOOL",
+          "value": "TRUE"
+        }
+      }
+    },
+    {
+      "name": "configure_luajit",
+      "inherits": "configure_default",
+      "displayName": "LuaJIT",
+      "binaryDir": "${sourceDir}/build/luajit",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "USE_LUAJIT": {
+          "type": "BOOL",
+          "value": "TRUE"
+        }
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "build_default",
+      "configurePreset": "configure_default",
+      "jobs": 10,
+      "verbose": true
+    },
+    {
+      "name": "build_lua",
+      "displayName": "PUC Rio Lua",
+      "configurePreset": "configure_lua",
+      "inherits": "build_default"
+    },
+    {
+      "name": "build_luajit",
+      "displayName": "LuaJIT",
+      "configurePreset": "configure_luajit",
+      "inherits": "build_default"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "test_default",
+      "configurePreset": "configure_default",
+      "output": {"outputOnFailure": true, "verbosity": "verbose"}
+    },
+    {
+      "name": "test_lua",
+      "displayName": "PUC Rio Lua",
+      "configurePreset": "configure_lua",
+      "inherits": "test_default"
+    },
+    {
+      "name": "test_luajit",
+      "displayName": "LuaJIT",
+      "configurePreset": "configure_luajit",
+      "inherits": "test_default"
+    }
+  ],
+  "workflowPresets": [
+    {
+      "name": "lua",
+      "displayName": "PUC Rio Lua",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "configure_lua"
+        },
+        {
+          "type": "build",
+          "name": "build_lua"
+        },
+        {
+          "type": "test",
+          "name": "test_lua"
+        }
+      ]
+    },
+    {
+      "name": "luajit",
+      "displayName": "LuaJIT",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "configure_luajit"
+        },
+        {
+          "type": "build",
+          "name": "build_luajit"
+        },
+        {
+          "type": "test",
+          "name": "test_luajit"
+        }
+      ]
+    }
+  ]
+}

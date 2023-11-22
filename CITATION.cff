@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+authors:
+  - given-names: "Sergey"
+    family-names: "Bronnikov"
+    orcid: https://orcid.org/0009-0003-1545-032X
+    email: estetus@gmail.com
+type: software
+title: "lua-c-api-tests"
+abstract: >-
+  lua-c-api-tests is an open-source project that provides
+  continuous fuzzing for Lua runtimes: PUC Rio Lua and LuaJIT.
+  It aims to make these open-source software more secure and
+  stable by combining modern fuzzing techniques with scalable,
+  distributed execution. As of August 2024, lua-c-api-tests has
+  helped identify and fix 5 bugs in PUC Rio Lua and 15 bugs in
+  LuaJIT.
+type: software
+repository-code: "https://github.com/ligurio/lua-c-api-tests"
+keywords:
+  - fuzzing
+  - lua
+  - luajit
+  - open-source
+  - security
+license: ISC

@@ -1131,6 +1131,32 @@ __lua_setfield(lua_State *L, FuzzedDataProvider *fdp)
 	assert(lua_gettop(L) == top - 1);
 }
 
+/* const void *lua_topointer(lua_State *L, int index); */
+/* [-0, +0, -] */
+static void
+__lua_topointer(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	uint8_t index = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	const void *p = lua_topointer(L, index);
+	/*
+	 * The value can be a userdata, a table, a thread, or a function;
+	 * otherwise, lua_topointer returns NULL.
+	 */
+	int type = lua_type(L, index);
+	if (type == LUA_TUSERDATA  ||
+	    type == LUA_TTHREAD    ||
+	    type == LUA_TTABLE     ||
+#if LUA_VERSION_NUM > 503 || defined(LUAJIT)
+	    type == LUA_TSTRING    ||
+#endif /* LUA_VERSION_NUM */
+	    type == LUA_TFUNCTION)
+		assert(p);
+	else
+		assert(p == NULL);
+	assert(lua_gettop(L) == top);
+}
+
 /* lua_CFunction lua_tocfunction(lua_State *L, int index); */
 /* [-0, +0, -] */
 static void
@@ -1396,6 +1422,7 @@ static lua_func func[] = {
 	&__lua_tointegerx,
 	&__lua_tolstring,
 	&__lua_tonumber,
+	&__lua_topointer,
 	&__lua_tostring,
 	&__lua_tothread,
 	&__lua_touserdata,

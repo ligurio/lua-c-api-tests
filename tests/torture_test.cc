@@ -346,7 +346,8 @@ static void
 __lua_settop(lua_State *L, FuzzedDataProvider *fdp)
 {
 	int top = lua_gettop(L);
-	uint8_t index = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	int grow_slots = 2;
+	uint8_t index = fdp->ConsumeIntegralInRange<uint8_t>(1, top + grow_slots);
 	lua_settop(L, index);
 	assert(lua_gettop(L) == index);
 }

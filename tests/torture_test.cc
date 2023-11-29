@@ -1510,6 +1510,21 @@ __lua_call(lua_State *L, FuzzedDataProvider *fdp)
 	assert(lua_gettop(L) == top + nresults - nargs);
 }
 
+/* int lua_pcall(lua_State *L, int nargs, int nresults, int msgh); */
+/* [-(nargs + 1), +(nresults|1), –] */
+static void
+__lua_pcall(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	/* Function to be called. */
+	lua_pushcfunction(L, cfunction);
+	int nargs = 0;
+	int nresults = 0;
+	int res = lua_pcall(L, nargs, nresults, 0);
+	assert(res == LUA_OK);
+	assert(lua_gettop(L) == top + nresults - nargs);
+}
+
 typedef void
 (*lua_func)(lua_State *L, FuzzedDataProvider *fdp);
 
@@ -1592,6 +1607,7 @@ static lua_func func[] = {
 	&__lua_newthread,
 	&__lua_newuserdata,
 	&__lua_next,
+	&__lua_pcall,
 	&__lua_pop,
 	&__lua_pushboolean,
 	&__lua_pushcclosure,

@@ -40,6 +40,15 @@ cfunction(lua_State *L) {
 	return 0;
 }
 
+#define TYPE_NAME_TORTURE "torture_test"
+#define MT_FUNC_NAME_TORTURE "__torture"
+
+static const luaL_Reg TORTURE_meta[] =
+{
+	{ MT_FUNC_NAME_TORTURE, cfunction },
+	{ 0, 0 }
+};
+
 /* void lua_pushstring(lua_State *L, const char *s); */
 /* [-0, +1, m] */
 static void
@@ -1190,6 +1199,12 @@ lua_pushrandom(lua_State *L, FuzzedDataProvider *fdp)
 {
 	uint8_t idx = fdp->ConsumeIntegralInRange(0, (int)ARRAY_SIZE(push_func) - 1);
 	push_func[idx](L, fdp);
+
+	bool is_set_mt = fdp->ConsumeBool();
+	if (is_set_mt) {
+		luaL_getmetatable(L, TYPE_NAME_TORTURE);
+		lua_setmetatable(L, -2);
+	}
 }
 
 /* void lua_createtable(lua_State *L, int narr, int nrec); */
@@ -1309,6 +1324,13 @@ LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 	lua_State *L = luaL_newstate();
 	if (L == NULL)
 		return 0;
+
+#if LUA_VERSION_NUM == 501
+	luaL_register(L, TYPE_NAME_TORTURE, TORTURE_meta);
+#else
+	luaL_newmetatable(L, TYPE_NAME_TORTURE);
+	luaL_setfuncs(L, TORTURE_meta, 0);
+#endif /* LUA_VERSION_NUM */
 
 	FuzzedDataProvider fdp(data, size);
 	int start_slots = 2;

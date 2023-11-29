@@ -1484,6 +1484,18 @@ __lua_version(lua_State *L, FuzzedDataProvider *fdp)
 }
 #endif /* LUA_VERSION_NUM */
 
+/* int luaL_getmetafield(lua_State *L, int obj, const char *e); */
+/* [-0, +(0|1), e] */
+static void
+__luaL_getmetafield(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	auto obj = fdp->ConsumeIntegralInRange(1, top);
+	const char e[] = "xxx";
+	luaL_getmetafield(L, obj, e);
+	assert(lua_gettop(L) == top || lua_gettop(L) == top + 1);
+}
+
 typedef void
 (*lua_func)(lua_State *L, FuzzedDataProvider *fdp);
 
@@ -1557,6 +1569,7 @@ static lua_func func[] = {
 	&__lua_isthread,
 	&__lua_isuserdata,
 	&__luaL_checkstack,
+	&__luaL_getmetafield,
 	&__luaL_ref,
 	&__luaL_tolstring,
 	&__luaL_traceback,

@@ -1536,6 +1536,17 @@ __luaL_loadstring(lua_State *L, FuzzedDataProvider *fdp)
 	assert(lua_gettop(L) == top + 1);
 }
 
+/* int luaL_callmeta(lua_State *L, int obj, const char *e); */
+/* [-0, +(0|1), e] */
+static void
+__luaL_callmeta(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	auto obj = fdp->ConsumeIntegralInRange(1, top);
+	luaL_callmeta(L, obj, MT_FUNC_NAME_TORTURE);
+	assert(lua_gettop(L) == top || lua_gettop(L) == top + 1);
+}
+
 typedef void
 (*lua_func)(lua_State *L, FuzzedDataProvider *fdp);
 
@@ -1609,6 +1620,7 @@ static lua_func func[] = {
 	&__lua_istable,
 	&__lua_isthread,
 	&__lua_isuserdata,
+	&__luaL_callmeta,
 	&__luaL_checkstack,
 	&__luaL_getmetafield,
 	&__luaL_loadstring,

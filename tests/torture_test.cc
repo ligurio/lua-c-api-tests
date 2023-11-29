@@ -1496,6 +1496,20 @@ __luaL_getmetafield(lua_State *L, FuzzedDataProvider *fdp)
 	assert(lua_gettop(L) == top || lua_gettop(L) == top + 1);
 }
 
+/* void lua_call(lua_State *L, int nargs, int nresults); */
+/* [-(nargs+1), +nresults, e] */
+static void
+__lua_call(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	/* Function to be called. */
+	lua_pushcfunction(L, cfunction);
+	int nargs = 0;
+	int nresults = 0;
+	lua_call(L, nargs, nresults);
+	assert(lua_gettop(L) == top + nresults - nargs);
+}
+
 typedef void
 (*lua_func)(lua_State *L, FuzzedDataProvider *fdp);
 
@@ -1539,6 +1553,7 @@ __lua_createtable(lua_State *L, FuzzedDataProvider *fdp)
 }
 
 static lua_func func[] = {
+	&__lua_call,
 	&__lua_checkstack,
 	&__lua_concat,
 	&__lua_createtable,

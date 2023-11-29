@@ -786,6 +786,22 @@ __lua_rawgeti(lua_State *L, FuzzedDataProvider *fdp)
 	assert(lua_gettop(L) == top + 1);
 }
 
+/* int lua_equal(lua_State *L, int index1, int index2); */
+/* [-0, +0, e] */
+#if LUA_VERSION_NUM == 501
+static void
+__lua_equal(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	if (top < 2)
+		return;
+	uint8_t index1 = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	uint8_t index2 = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	lua_equal(L, index1, index2);
+	assert(lua_gettop(L) == top);
+}
+#endif /* LUA_VERSION_NUM */
+
 /* int lua_lessthan(lua_State *L, int index1, int index2); */
 /* [-0, +0, e] */
 #if LUA_VERSION_NUM == 501
@@ -1345,6 +1361,7 @@ static lua_func func[] = {
 	&__lua_upvalueid,
 #if LUA_VERSION_NUM == 501
 	&__lua_cpcall,
+	&__lua_equal,
 	&__lua_getfenv,
 	&__lua_lessthan,
 	&__lua_objlen,

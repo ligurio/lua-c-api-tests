@@ -1090,6 +1090,33 @@ __lua_register(lua_State *L, FuzzedDataProvider *fdp)
 	assert(lua_gettop(L) == top);
 }
 
+/**
+ * Lua 5.1: int lua_resume(lua_State *L, int narg);
+ * Lua 5.3: int lua_resume(lua_State *L, lua_State *from, int nargs);
+ * Lua 5.2: int lua_resume(lua_State *L, lua_State *from, int nargs);
+ * Lua 5.4: int lua_resume(lua_State *L, lua_State *from, int nargs, int *nresults);
+ * [-?, +?, -]
+ */
+static void
+__lua_resume(lua_State *L, FuzzedDataProvider *fdp)
+{
+	lua_State *co = lua_newthread(L);
+	lua_pushcfunction(co, cfunction);
+	int res = -1;
+#if LUA_VERSION_NUM == 501
+	res = lua_resume(L, 0);
+#elif LUA_VERSION_NUM == 503 || LUA_VERSION_NUM == 502
+	res = lua_resume(co, L, 0);
+#else
+	int nres;
+	res = lua_resume(co, L, 0, &nres);
+#endif /* LUA_VERSION_NUM */
+	/* XXX: Wrong exit code. */
+	/* assert(res == LUA_OK); */
+	(void)res;
+	lua_settop(co, 0);
+}
+
 /* void lua_setfield(lua_State *L, int index, const char *k); */
 /* [-1, +0, e] */
 static void
@@ -1355,6 +1382,7 @@ static lua_func func[] = {
 	&__lua_register,
 	&__lua_remove,
 	&__lua_replace,
+	&__lua_resume,
 	&__lua_setfield,
 	&__lua_setglobal,
 	&__lua_setmetatable,

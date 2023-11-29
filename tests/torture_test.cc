@@ -659,7 +659,21 @@ __lua_gc(lua_State *L, FuzzedDataProvider *fdp)
 {
 	int top = lua_gettop(L);
 	uint8_t idx = fdp->ConsumeIntegralInRange<uint8_t>(0, ARRAY_SIZE(gc_mode) - 1);
+#if LUA_VERSION_NUM > 503
+	if (gc_mode[idx] == LUA_GCGEN) {
+		double minor_mult = 0.1;
+		double major_mult = 0.1;
+		lua_gc(L, LUA_GCGEN, minor_mult, major_mult);
+	} else if (gc_mode[idx] == LUA_GCINC) {
+		double pause = 0.1;
+		double step_mult = 0.1;
+		double step_size = 0.1;
+		lua_gc(L, LUA_GCINC, pause, step_mult, step_size);
+	} else
+		lua_gc(L, gc_mode[idx], 0);
+#else
 	lua_gc(L, gc_mode[idx], 0);
+#endif /* LUA_VERSION_NUM */
 	assert(lua_gettop(L) == top);
 }
 

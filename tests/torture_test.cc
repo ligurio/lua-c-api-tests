@@ -951,6 +951,16 @@ __lua_setmetatable(lua_State *L, FuzzedDataProvider *fdp)
 	assert(lua_gettop(L) == top - 1);
 }
 
+/* void luaL_setmetatable(lua_State *L, const char *tname); */
+/* [-0, +0, –] */
+static void
+__luaL_setmetatable(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	luaL_setmetatable(L, TYPE_NAME_TORTURE);
+	assert(lua_gettop(L) == top);
+}
+
 /* int lua_isyieldable(lua_State *L); */
 /* [-0, +0, –] */
 #if LUA_VERSION_NUM > 502
@@ -1331,6 +1341,7 @@ static lua_func func[] = {
 	&__lua_arith,
 	&__lua_compare,
 	&__luaL_checkversion,
+	&__luaL_setmetatable,
 	&__lua_rawlen,
 	&__lua_tonumberx,
 #endif /* LUA_VERSION_NUM */
@@ -1344,6 +1355,7 @@ static lua_func func[] = {
 	&__lua_copy,
 #endif /* LUA_VERSION_NUM */
 #ifdef LUAJIT
+	&__luaL_setmetatable,
 	&__lua_tonumberx,
 #endif /* LUAJIT */
 };

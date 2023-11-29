@@ -382,6 +382,19 @@ __lua_tointeger(lua_State *L, FuzzedDataProvider *fdp)
 	assert(lua_gettop(L) == top);
 }
 
+/* lua_Integer lua_tointegerx(lua_State *L, int index, int *isnum); */
+/* [-0, +0, –] */
+static void
+__lua_tointegerx(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	uint8_t index = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	int isnum;
+	lua_tointegerx(L, index, &isnum);
+	assert(isnum == 0 || isnum == 1);
+	assert(lua_gettop(L) == top);
+}
+
 /* const char *lua_tolstring(lua_State *L, int index, size_t *len); */
 /* [-0, +0, m] */
 static void
@@ -1321,6 +1334,7 @@ static lua_func func[] = {
 	&__lua_toboolean,
 	&__lua_tocfunction,
 	&__lua_tointeger,
+	&__lua_tointegerx,
 	&__lua_tolstring,
 	&__lua_tonumber,
 	&__lua_tostring,

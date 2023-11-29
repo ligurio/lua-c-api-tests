@@ -1706,6 +1706,7 @@ static lua_func push_func[] = {
 	&__lua_newtable,
 	&__lua_newthread,
 	&__lua_pushboolean,
+	&__lua_pushcfunction,
 	&__lua_pushinteger,
 	&__lua_pushlstring,
 	&__lua_pushnil,

@@ -1430,6 +1430,17 @@ __luaL_len(lua_State *L, FuzzedDataProvider *fdp)
 }
 #endif /* LUA_VERSION_NUM */
 
+/* lua_Alloc lua_getallocf(lua_State *L, void **ud); */
+/* [-0, +0, –] */
+static void
+__lua_getallocf(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	void *state;
+	lua_getallocf(L, &state);
+	assert(lua_gettop(L) == top);
+}
+
 typedef void
 (*lua_func)(lua_State *L, FuzzedDataProvider *fdp);
 
@@ -1477,6 +1488,7 @@ static lua_func func[] = {
 	&__lua_concat,
 	&__lua_createtable,
 	&__lua_gc,
+	&__lua_getallocf,
 	&__lua_getfield,
 	&__lua_getglobal,
 	&__lua_gethook,

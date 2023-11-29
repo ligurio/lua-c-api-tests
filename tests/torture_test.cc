@@ -587,6 +587,7 @@ __lua_pushcclosure(lua_State *L, FuzzedDataProvider *fdp)
 static void
 __lua_pushcfunction(lua_State *L, FuzzedDataProvider *fdp)
 {
+	(void)fdp;
 	int top = lua_gettop(L);
 	lua_pushcfunction(L, cfunction);
 	assert(lua_gettop(L) == top + 1);

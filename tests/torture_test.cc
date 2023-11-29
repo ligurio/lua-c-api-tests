@@ -1454,6 +1454,18 @@ __luaL_ref(lua_State *L, FuzzedDataProvider *fdp)
 	assert(lua_gettop(L) == top - 1);
 }
 
+/* void luaL_checkstack(lua_State *L, int sz, const char *msg); */
+/* [-0, +0, v] */
+static void
+__luaL_checkstack(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	int sz = top + 1;
+	char err_msg[] = "shit happens";
+	luaL_checkstack(L, sz, err_msg);
+	assert(lua_gettop(L) == top);
+}
+
 typedef void
 (*lua_func)(lua_State *L, FuzzedDataProvider *fdp);
 
@@ -1526,6 +1538,7 @@ static lua_func func[] = {
 	&__lua_istable,
 	&__lua_isthread,
 	&__lua_isuserdata,
+	&__luaL_checkstack,
 	&__luaL_ref,
 	&__luaL_tolstring,
 	&__luaL_traceback,

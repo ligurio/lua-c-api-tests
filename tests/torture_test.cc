@@ -1393,6 +1393,22 @@ __lua_rawgetp(lua_State *L, FuzzedDataProvider *fdp)
 }
 #endif /* LUA_VERSION_NUM */
 
+/* void lua_len(lua_State *L, int index); */
+/* [-0, +1, e] */
+#if LUA_VERSION_NUM > 501
+static void
+__lua_len(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	auto idx = fdp->ConsumeIntegralInRange(1, top);
+	if (lua_type(L, idx) != LUA_TTABLE &&
+	    lua_type(L, idx) != LUA_TSTRING)
+		return;
+	lua_len(L, idx);
+	assert(lua_gettop(L) == top + 1);
+}
+#endif /* LUA_VERSION_NUM */
+
 typedef void
 (*lua_func)(lua_State *L, FuzzedDataProvider *fdp);
 
@@ -1525,6 +1541,7 @@ static lua_func func[] = {
 	&__lua_arith,
 	&__lua_compare,
 	&__luaL_checkversion,
+	&__lua_len,
 	&__luaL_setmetatable,
 	&__lua_rawgetp,
 	&__lua_rawlen,

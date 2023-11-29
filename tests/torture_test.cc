@@ -933,7 +933,13 @@ static void
 __lua_absindex(lua_State *L, FuzzedDataProvider *fdp)
 {
 	int top = lua_gettop(L);
-	uint8_t index = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	/*
+	 * One can refer to any element in the stack by using an index:
+	 * A positive index represents an absolute stack position
+	 * (starting at 1); a negative index represents an offset
+	 * relative to the top of the stack.
+	 */
+	int8_t index = fdp->ConsumeIntegralInRange<int8_t>(-top, top);
 	int idx = lua_absindex(L, index);
 	assert(idx > 0);
 	assert(lua_gettop(L) == top);

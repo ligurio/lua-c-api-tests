@@ -1031,6 +1031,21 @@ __lua_gettable(lua_State *L, FuzzedDataProvider *fdp)
 	/* assert(lua_gettop(L) == top); */
 }
 
+/* void lua_rotate(lua_State *L, int idx, int n); */
+/* [-0, +0, –] */
+#if LUA_VERSION_NUM > 502
+static void
+__lua_rotate(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	int min_n = 1;
+	uint8_t idx = fdp->ConsumeIntegralInRange<uint8_t>(1, top - min_n);
+	uint8_t n = fdp->ConsumeIntegralInRange<uint8_t>(1, top - idx);
+	lua_rotate(L, idx, n);
+	assert(lua_gettop(L) == top);
+}
+#endif /* LUA_VERSION_NUM */
+
 /* void lua_seti(lua_State *L, int index, lua_Integer n); */
 /* [-1, +0, e] */
 #if LUA_VERSION_NUM > 502
@@ -1379,6 +1394,7 @@ static lua_func func[] = {
 #if LUA_VERSION_NUM > 502
 	&__lua_geti,
 	&__lua_isyieldable,
+	&__lua_rotate,
 	&__lua_seti,
 	&__lua_stringtonumber,
 #endif /* LUA_VERSION_NUM */

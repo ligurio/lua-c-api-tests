@@ -1106,6 +1106,19 @@ __lua_setuservalue(lua_State *L, FuzzedDataProvider *fdp)
 }
 #endif /* LUA_VERSION_NUM */
 
+/* void lua_xmove(lua_State *from, lua_State *to, int n); */
+/* [-?, +?, -] */
+static void
+__lua_xmove(lua_State *L, FuzzedDataProvider *fdp)
+{
+	lua_State *co1 = lua_newthread(L);
+	lua_State *co2 = lua_newthread(L);
+	__lua_pushnumber(co1, fdp);
+	lua_xmove(co1, co2, 1);
+	lua_settop(co1, 0);
+	lua_settop(co2, 0);
+}
+
 /* void lua_register(lua_State *L, const char *name, lua_CFunction f); */
 /* [-0, +0, e] */
 static void
@@ -1481,6 +1494,7 @@ static lua_func func[] = {
 	&__lua_type,
 	&__lua_typename,
 	&__lua_upvalueid,
+	&__lua_xmove,
 #if LUA_VERSION_NUM == 501
 	&__lua_cpcall,
 	&__lua_equal,

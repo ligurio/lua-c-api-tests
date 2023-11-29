@@ -1206,6 +1206,24 @@ __lua_newuserdata(lua_State *L, FuzzedDataProvider *fdp)
 	lua_newuserdata(L, size);
 }
 
+/* const char *lua_pushfstring(lua_State *L, const char *fmt, ...); */
+/* [-0, +1, m] */
+static void
+__lua_pushfstring(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	auto arg1 = fdp->ConsumeRandomLengthString(max_str_len);
+	auto arg2 = fdp->ConsumeRandomLengthString(max_str_len);
+	auto arg3 = fdp->ConsumeRandomLengthString(max_str_len);
+	auto arg4 = fdp->ConsumeRandomLengthString(max_str_len);
+	auto arg5 = fdp->ConsumeRandomLengthString(max_str_len);
+	char fmt_str[] = "%s %f %p %d %c";
+	lua_pushfstring(L, fmt_str, arg1.c_str(), arg2.c_str(),
+	                            arg3.c_str(), arg4.c_str(),
+	                            arg5.c_str());
+	assert(lua_gettop(L) == top + 1);
+}
+
 /* lua_State *lua_tothread(lua_State *L, int index); */
 /* [-0, +0, -] */
 static void
@@ -1400,6 +1418,7 @@ static lua_func func[] = {
 	&__lua_pushboolean,
 	&__lua_pushcclosure,
 	&__lua_pushcfunction,
+	&__lua_pushfstring,
 	&__lua_pushinteger,
 	&__lua_pushlstring,
 	&__lua_pushnil,

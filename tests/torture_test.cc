@@ -1547,6 +1547,16 @@ __luaL_callmeta(lua_State *L, FuzzedDataProvider *fdp)
 	assert(lua_gettop(L) == top || lua_gettop(L) == top + 1);
 }
 
+/* void luaL_where(lua_State *L, int lvl); */
+/* [-0, +1, m] */
+static void
+__luaL_where(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	luaL_where(L, 1);
+	assert(lua_gettop(L) == top + 1);
+}
+
 typedef void
 (*lua_func)(lua_State *L, FuzzedDataProvider *fdp);
 
@@ -1627,6 +1637,7 @@ static lua_func func[] = {
 	&__luaL_ref,
 	&__luaL_tolstring,
 	&__luaL_traceback,
+	&__luaL_where,
 	&__lua_newtable,
 	&__lua_newthread,
 	&__lua_newuserdata,

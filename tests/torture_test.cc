@@ -1466,6 +1466,24 @@ __luaL_checkstack(lua_State *L, FuzzedDataProvider *fdp)
 	assert(lua_gettop(L) == top);
 }
 
+/* const lua_Number *lua_version(lua_State *L); */
+/* [-0, +0, v] */
+#if LUA_VERSION_NUM > 501 || defined(LUAJIT)
+static void
+__lua_version(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+#if LUA_VERSION_NUM < 504
+	const lua_Number *v = lua_version(L);
+	assert(v);
+#else
+	lua_Number v = lua_version(L);
+	assert(v != 0);
+#endif /* LUA_VERSION_NUM */
+	assert(lua_gettop(L) == top);
+}
+#endif /* LUA_VERSION_NUM */
+
 typedef void
 (*lua_func)(lua_State *L, FuzzedDataProvider *fdp);
 
@@ -1607,6 +1625,7 @@ static lua_func func[] = {
 	&__lua_rawgetp,
 	&__lua_rawlen,
 	&__lua_tonumberx,
+	&__lua_version,
 #endif /* LUA_VERSION_NUM */
 #if LUA_VERSION_NUM > 502
 	&__lua_geti,
@@ -1625,6 +1644,7 @@ static lua_func func[] = {
 #ifdef LUAJIT
 	&__luaL_setmetatable,
 	&__lua_tonumberx,
+	&__lua_version,
 #endif /* LUAJIT */
 };
 

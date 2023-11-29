@@ -552,7 +552,7 @@ __lua_getinfo(lua_State *L, FuzzedDataProvider *fdp)
 	int top = lua_gettop(L);
 	lua_Debug ar;
 	lua_pushcfunction(L, cfunction);
-	const char *what = ">nSltufL";
+	const char *what = ">nSltufLr";
 	lua_getinfo(L, what, &ar);
 	assert(lua_gettop(L) >= top - 1 &&
 	       lua_gettop(L) <= top + 2);

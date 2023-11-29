@@ -104,6 +104,19 @@ __lua_tonumber(lua_State *L, FuzzedDataProvider *fdp)
 	assert(lua_gettop(L) == top);
 }
 
+/* lua_Number lua_tonumberx(lua_State *L, int index, int *isnum); */
+/* [-0, +0, –] */
+static void
+__lua_tonumberx(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	auto index = fdp->ConsumeIntegralInRange(1, top);
+	int isnum;
+	lua_tonumberx(L, index, &isnum);
+	assert(isnum == 0 || isnum == 1);
+	assert(lua_gettop(L) == top);
+}
+
 /* int lua_checkstack(lua_State *L, int extra); */
 /* [-0, +0, m] */
 static void
@@ -1319,6 +1332,7 @@ static lua_func func[] = {
 	&__lua_compare,
 	&__luaL_checkversion,
 	&__lua_rawlen,
+	&__lua_tonumberx,
 #endif /* LUA_VERSION_NUM */
 #if LUA_VERSION_NUM > 502
 	&__lua_geti,
@@ -1329,6 +1343,9 @@ static lua_func func[] = {
 #if LUA_VERSION_NUM > 503
 	&__lua_copy,
 #endif /* LUA_VERSION_NUM */
+#ifdef LUAJIT
+	&__lua_tonumberx,
+#endif /* LUAJIT */
 };
 
 extern "C" int

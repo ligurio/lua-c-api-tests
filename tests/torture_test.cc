@@ -926,6 +926,18 @@ __lua_arith(lua_State *L, FuzzedDataProvider *fdp)
 }
 #endif /* LUA_VERSION_NUM */
 
+/* void lua_setmetatable(lua_State *L, int index); */
+/* [-1, +0, –] */
+static void
+__lua_setmetatable(lua_State *L, FuzzedDataProvider *fdp)
+{
+	luaL_getmetatable(L, TYPE_NAME_TORTURE);
+	int top = lua_gettop(L);
+	uint8_t index = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	lua_setmetatable(L, index);
+	assert(lua_gettop(L) == top - 1);
+}
+
 /* int lua_isyieldable(lua_State *L); */
 /* [-0, +0, –] */
 #if LUA_VERSION_NUM > 502
@@ -1278,6 +1290,7 @@ static lua_func func[] = {
 	&__lua_replace,
 	&__lua_setfield,
 	&__lua_setglobal,
+	&__lua_setmetatable,
 	&__lua_settable,
 	&__lua_settop,
 	&__lua_setupvalue,

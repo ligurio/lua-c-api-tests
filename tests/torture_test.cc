@@ -825,15 +825,18 @@ __lua_lessthan(lua_State *L, FuzzedDataProvider *fdp)
 {
 	int top = lua_gettop(L);
 	uint8_t index1 = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
-	uint8_t index2 = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
-	if ((lua_type(L, index1) != LUA_TNUMBER  ||
-	     lua_type(L, index1) != LUA_TBOOLEAN ||
-	     lua_type(L, index1) != LUA_TSTRING) &&
-	    (lua_type(L, index2) != LUA_TNUMBER  ||
-	     lua_type(L, index2) != LUA_TBOOLEAN ||
-	     lua_type(L, index2) != LUA_TSTRING))
+	int type1 = lua_type(L, index1);
+	switch (type1) {
+	case LUA_TNUMBER:
+		__lua_pushnumber(L, fdp);
+		break;
+	case LUA_TSTRING:
+		__lua_pushstring(L, fdp);
+		break;
+	default:
 		return;
-	int rc = lua_lessthan(L, index1, index2);
+	}
+	int rc = lua_lessthan(L, index1, -1);
 	assert(rc == 0 || rc == 1);
 }
 #endif /* LUA_VERSION_NUM */

@@ -1525,6 +1525,17 @@ __lua_pcall(lua_State *L, FuzzedDataProvider *fdp)
 	assert(lua_gettop(L) == top + nresults - nargs);
 }
 
+/* int luaL_loadstring(lua_State *L, const char *s); */
+/* [-0, +1, m] */
+static void
+__luaL_loadstring(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	int res = luaL_loadstring(L, "a = a + 1");
+	assert(res == LUA_OK);
+	assert(lua_gettop(L) == top + 1);
+}
+
 typedef void
 (*lua_func)(lua_State *L, FuzzedDataProvider *fdp);
 
@@ -1600,6 +1611,7 @@ static lua_func func[] = {
 	&__lua_isuserdata,
 	&__luaL_checkstack,
 	&__luaL_getmetafield,
+	&__luaL_loadstring,
 	&__luaL_ref,
 	&__luaL_tolstring,
 	&__luaL_traceback,

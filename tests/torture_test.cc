@@ -1093,6 +1093,19 @@ __lua_getuservalue(lua_State *L, FuzzedDataProvider *fdp)
 }
 #endif /* LUA_VERSION_NUM */
 
+/* void lua_setuservalue(lua_State *L, int index); */
+/* [-1, +0, –] */
+#if LUA_VERSION_NUM > 501 && LUA_VERSION_NUM < 504
+static void
+__lua_setuservalue(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	uint8_t index = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	lua_setuservalue(L, index);
+	assert(lua_gettop(L) == top);
+}
+#endif /* LUA_VERSION_NUM */
+
 /* void lua_register(lua_State *L, const char *name, lua_CFunction f); */
 /* [-0, +0, e] */
 static void
@@ -1496,6 +1509,7 @@ static lua_func func[] = {
 	&__lua_copy,
 #endif /* LUA_VERSION_NUM */
 #if LUA_VERSION_NUM > 501 && LUA_VERSION_NUM < 504
+	&__lua_setuservalue,
 	&__lua_getuservalue,
 #endif /* LUA_VERSION_NUM */
 #ifdef LUAJIT

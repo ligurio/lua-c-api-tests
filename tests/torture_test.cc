@@ -1016,7 +1016,7 @@ __luaL_setmetatable(lua_State *L, FuzzedDataProvider *fdp)
 
 /* int lua_isyieldable(lua_State *L); */
 /* [-0, +0, –] */
-#if LUA_VERSION_NUM > 502
+#if LUA_VERSION_NUM > 502 || defined(LUAJIT)
 static void
 __lua_isyieldable(lua_State *L, FuzzedDataProvider *fdp)
 {
@@ -1865,6 +1865,7 @@ static lua_func func[] = {
 	&__lua_getuservalue,
 #endif /* LUA_VERSION_NUM */
 #ifdef LUAJIT
+	&__lua_isyieldable,
 	&__luaL_setmetatable,
 	&__lua_tonumberx,
 	&__lua_version,

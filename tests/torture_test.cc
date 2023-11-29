@@ -1441,6 +1441,19 @@ __lua_getallocf(lua_State *L, FuzzedDataProvider *fdp)
 	assert(lua_gettop(L) == top);
 }
 
+/* int luaL_ref(lua_State *L, int t); */
+/* [-1, +0, e] */
+static void
+__luaL_ref(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	auto idx = fdp->ConsumeIntegralInRange(1, top);
+	if (lua_type(L, idx) != LUA_TTABLE)
+		return;
+	luaL_ref(L, idx);
+	assert(lua_gettop(L) == top - 1);
+}
+
 typedef void
 (*lua_func)(lua_State *L, FuzzedDataProvider *fdp);
 
@@ -1513,6 +1526,7 @@ static lua_func func[] = {
 	&__lua_istable,
 	&__lua_isthread,
 	&__lua_isuserdata,
+	&__luaL_ref,
 	&__luaL_tolstring,
 	&__luaL_traceback,
 	&__lua_newtable,

@@ -1173,7 +1173,14 @@ __lua_tocfunction(lua_State *L, FuzzedDataProvider *fdp)
 static void
 __lua_settable(lua_State *L, FuzzedDataProvider *fdp)
 {
-	/* XXX */
+	int top = lua_gettop(L);
+	lua_createtable(L, 0, 1);
+
+	lua_pushstring(L, "language");
+	lua_pushstring(L, "Lua");
+	lua_settable(L, -3);
+
+	assert(lua_gettop(L) == top + 1);
 }
 
 /* void lua_getfield(lua_State *L, int index, const char *k); */

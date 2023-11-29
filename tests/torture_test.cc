@@ -1471,6 +1471,7 @@ __luaL_tolstring(lua_State *L, FuzzedDataProvider *fdp)
 
 /* void lua_copy(lua_State *L, int fromidx, int toidx); */
 /* [-0, +0, –] */
+#if LUA_VERSION_NUM > 501 || defined(LUAJIT)
 static void
 __lua_copy(lua_State *L, FuzzedDataProvider *fdp)
 {
@@ -1482,6 +1483,7 @@ __lua_copy(lua_State *L, FuzzedDataProvider *fdp)
 	lua_copy(L, fromidx, toidx);
 	assert(lua_gettop(L) == top);
 }
+#endif /* LUA_VERSION_NUM */
 
 /* void luaL_checkversion(lua_State *L); */
 /* [-0, +0, v] */
@@ -1839,6 +1841,7 @@ static lua_func func[] = {
 	&__lua_absindex,
 	&__lua_arith,
 	&__lua_compare,
+	&__lua_copy,
 	&__luaL_checkversion,
 	&__lua_len,
 	&__luaL_len,
@@ -1856,7 +1859,6 @@ static lua_func func[] = {
 	&__lua_stringtonumber,
 #endif /* LUA_VERSION_NUM */
 #if LUA_VERSION_NUM > 503
-	&__lua_copy,
 	&__lua_getiuservalue,
 	&__lua_setiuservalue,
 #endif /* LUA_VERSION_NUM */
@@ -1865,6 +1867,7 @@ static lua_func func[] = {
 	&__lua_getuservalue,
 #endif /* LUA_VERSION_NUM */
 #ifdef LUAJIT
+	&__lua_copy,
 	&__lua_isyieldable,
 	&__luaL_setmetatable,
 	&__lua_tonumberx,

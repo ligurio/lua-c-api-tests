@@ -1341,6 +1341,21 @@ __luaL_checktype(lua_State *L, FuzzedDataProvider *fdp)
 	assert(lua_gettop(L) == top);
 }
 
+/* void luaL_checkany(lua_State *L, int arg); */
+/* [-0, +0, v] */
+static void
+__luaL_checkany(lua_State *L, FuzzedDataProvider *fdp)
+{
+	int top = lua_gettop(L);
+	uint8_t arg = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
+	/*
+	 * Functions called luaL_check* always raise an error
+	 * if the check is not satisfied.
+	 */
+	luaL_checkany(L, arg);
+	assert(lua_gettop(L) == top);
+}
+
 /* void *lua_upvalueid(lua_State *L, int funcindex, int n); */
 /* [-0, +0, –] */
 static void
@@ -1698,6 +1713,7 @@ static lua_func func[] = {
 	&__lua_isthread,
 	&__lua_isuserdata,
 	&__luaL_callmeta,
+	&__luaL_checkany,
 	&__luaL_checkinteger,
 	&__luaL_checknumber,
 	&__luaL_checkstack,

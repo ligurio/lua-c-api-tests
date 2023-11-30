@@ -1419,13 +1419,15 @@ __lua_setiuservalue(lua_State *L, FuzzedDataProvider *fdp)
 static void
 __lua_upvalueid(lua_State *L, FuzzedDataProvider *fdp)
 {
-	int top = lua_gettop(L);
-	if (fdp->remaining_bytes() == 0)
-		return;
-	int funcindex = fdp->ConsumeIntegralInRange<uint8_t>(1, top);
-	if (lua_type(L, funcindex) != LUA_TFUNCTION)
-		return;
+	int funcindex = -1;
+	lua_Debug ar;
+	lua_pushcfunction(L, cfunction);
 	int n = fdp->ConsumeIntegral<uint8_t>();
+	lua_setupvalue(L, funcindex, n);
+	assert(lua_getinfo(L, ">u", &ar) == 1);
+	if (ar.nups == 0)
+		return;
+	int top = lua_gettop(L);
 	void *p = lua_upvalueid(L, funcindex, n);
 	assert(p);
 	assert(lua_gettop(L) == top);

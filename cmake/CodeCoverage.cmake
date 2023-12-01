@@ -52,5 +52,20 @@ add_custom_command(TARGET ${target_name}
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )
 
+# The .gcda count data file is generated when a program containing
+# object files built with the GCC -fprofile-arcs option is executed.
+# https://gcc.gnu.org/onlinedocs/gcc/Gcov-Data-Files.html
+set(GCDA_FILES "${LUA_SOURCE_DIR}/*.gcda")
+if(USE_LUAJIT)
+  # Files 'src/host/*.gcda' are not removed, because
+  # CMake cannot remove recursively by globbing.
+  # Files 'src/host/*.gcda' are not used for building coverage report.
+  set(GCDA_FILES "${LUA_SOURCE_DIR}/src/*.gcda")
+endif(USE_LUAJIT)
+add_custom_target(coverage-reset
+  COMMENT "Reset code coverage counters"
+  COMMAND ${CMAKE_COMMAND} -E rm -f ${GCDA_FILES}
+)
+
 message(STATUS "Code coverage HTML report: ${COVERAGE_HTML_REPORT}")
 message(STATUS "Code coverage XML report: ${COVERAGE_XML_REPORT}")

@@ -5,13 +5,14 @@ set(COVERAGE_DIR "${PROJECT_BINARY_DIR}/coverage")
 set(COVERAGE_HTML_REPORT "${COVERAGE_DIR}/report.html")
 set(COVERAGE_XML_REPORT "${COVERAGE_DIR}/report.xml")
 
+set(target_name "coverage-report")
 if(NOT GCOVR OR NOT LLVM_COV)
-  set(MSG "coverage-report is a dummy target")
-  add_custom_target(coverage-report
+  set(MSG "${target_name} is a dummy target")
+  add_custom_target(${target_name}
     COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --red ${MSG}
   )
   message(WARNING "Either `gcovr' or `llvm-cov` not found, "
-                  "so ${PROJECT_NAME}-coverage target is dummy.")
+                  "so ${target_name} target is dummy.")
   return()
 endif()
 
@@ -44,8 +45,8 @@ if(USE_LUAJIT)
 endif (USE_LUAJIT)
 
 file(MAKE_DIRECTORY ${COVERAGE_DIR})
-add_custom_target(coverage-report)
-add_custom_command(TARGET coverage-report
+add_custom_target(${target_name})
+add_custom_command(TARGET ${target_name}
   COMMENT "Building coverage report"
   COMMAND ${GCOVR} ${GCOVR_OPTIONS}
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}

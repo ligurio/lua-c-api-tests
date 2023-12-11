@@ -9,7 +9,7 @@
     {
       "name": "configure_default",
       "displayName": "Default config",
-      "description": "Default build",
+      "description": "Default config",
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
         "CMAKE_C_COMPILER": "clang",

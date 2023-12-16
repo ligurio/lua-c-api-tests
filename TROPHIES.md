@@ -2,9 +2,16 @@
 
 1. "Re: More disciplined use of 'getstr' and 'tsslen'",
    https://marc.info/?l=lua-l&m=169289729129364&w=2#2
+   https://github.com/lua/lua/commit/9b4f39ab14fb2e55345c3d23537d129dac23b091
 1. Stack overflow in `getobjname`,
    https://marc.info/?l=lua-l&m=169867263111530&w=2,
    https://github.com/lua/lua/commit/7923dbbf72da303ca1cca17efd24725668992f15
+1. Heap buffer overflow in `luaC_newobjdt`,
+   https://marc.info/?l=lua-l&m=170274071304413&w=2
+   https://github.com/lua/lua/commit/5853c37a83ec66ccb45094f9aeac23dfdbcde671
+1. "heap-use-after-free" issue in `luaV_finishget`,
+   https://groups.google.com/g/lua-l/c/s2hBcf8aLIU
+   https://github.com/lua/lua/commit/88a50ffa715483e7187c0d7d6caaf708ebacf756
 
 ### LuaJIT
 
@@ -29,6 +36,12 @@
    https://github.com/LuaJIT/LuaJIT/issues/1116
 1. `IR_NEWREF` is missing a NaN check,
    https://github.com/LuaJIT/LuaJIT/issues/1069
+1. Heap-use-after-free in `lj_gc_finalize_cdata` on access to `CTState->finalizer`,
+   https://github.com/LuaJIT/LuaJIT/issues/1168
+1. Down-recursion of a side trace may corrupt the host stack,
+   https://github.com/LuaJIT/LuaJIT/issues/1169
+1. GC64 mode may overflow the `LJ_MAX_JSLOTS` limit for a stitched trace.,
+   https://github.com/LuaJIT/LuaJIT/issues/1173
 
 ### Tarantool
 
@@ -39,3 +52,5 @@
 1. ASSERT: `lj_obj_equal(tv, &tvk)`,
    https://github.com/LuaJIT/LuaJIT/issues/9
    https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=57435
+1. Recording of `__concat` in GC64 mode,
+   https://github.com/LuaJIT/LuaJIT/issues/839

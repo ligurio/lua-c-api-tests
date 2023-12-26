@@ -64,6 +64,7 @@ macro(build_lua LUA_VERSION)
         GIT_TAG ${LUA_VERSION}
         GIT_PROGRESS TRUE
         GIT_SHALLOW FALSE
+        GIT_REMOTE_UPDATE_STRATEGY REBASE
 
         SOURCE_DIR ${LUA_SOURCE_DIR}
         BINARY_DIR ${LUA_BINARY_DIR}
@@ -78,7 +79,6 @@ macro(build_lua LUA_VERSION)
                                                  LDFLAGS=${LDFLAGS}
                                                  a
         INSTALL_COMMAND ""
-        UPDATE_DISCONNECTED ON
 
         BUILD_BYPRODUCTS ${PROJECT_BINARY_DIR}/lua-${LUA_VERSION}/source/liblua.a
     )

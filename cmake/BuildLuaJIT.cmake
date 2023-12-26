@@ -79,6 +79,7 @@ macro(build_luajit LJ_VERSION)
         GIT_TAG ${LJ_VERSION}
         GIT_PROGRESS TRUE
         GIT_SHALLOW FALSE
+        GIT_REMOTE_UPDATE_STRATEGY REBASE
 
         SOURCE_DIR ${LJ_SOURCE_DIR}
         BINARY_DIR ${LJ_BINARY_DIR}/luajit-${LJ_VERSION}
@@ -95,7 +96,6 @@ macro(build_luajit LJ_VERSION)
                                                  -C src
                                                  libluajit.a
         INSTALL_COMMAND ""
-        UPDATE_DISCONNECTED ON
 
         BUILD_BYPRODUCTS ${LJ_SOURCE_DIR}/src/libluajit.a
     )

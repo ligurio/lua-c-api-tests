@@ -121,5 +121,9 @@ foreach(filename ${tests})
               LIBRARIES "")
 endforeach()
 
-include(ProtobufMutator)
-add_subdirectory(luaL_loadbuffer_proto)
+# OSS Fuzz build is broken on aarch64,
+# https://github.com/ligurio/lua-c-api-tests/issues/72
+if (NOT OSS_FUZZ AND NOT HW_ARCH STREQUAL "aarch64")
+  include(ProtobufMutator)
+  add_subdirectory(luaL_loadbuffer_proto)
+endif ()

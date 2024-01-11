@@ -41,7 +41,7 @@
         },
         "ENABLE_BUILD_PROTOBUF": {
           "type": "BOOL",
-          "value": "FALSE"
+          "value": "TRUE"
         }
       }
     },

@@ -55,6 +55,11 @@
 1. stack-buffer-overflow in `narrow_conv_backprop`,
    https://github.com/LuaJIT/LuaJIT/issues/1262,
    https://oss-fuzz.com/testcase?key=6250635821907968
+1. Incorrect recording of `getmetatable()` for IO handlers,
+   https://github.com/LuaJIT/LuaJIT/issues/1279
+1. Uninitialized read in `predict_next()`,
+   https://oss-fuzz.com/testcase-detail/5091141278564352
+   https://github.com/LuaJIT/LuaJIT/issues/1226
 
 ### Tarantool
 
@@ -67,3 +72,9 @@
    https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=57435
 1. Recording of `__concat` in GC64 mode,
    https://github.com/LuaJIT/LuaJIT/issues/839
+
+### Related issues
+
+1. https://www.lua.org/bugs.html
+1. https://github.com/google/oss-fuzz-vulns/tree/main/vulns/lua
+1. https://oss-fuzz.com/testcases?project=lua&open=yes

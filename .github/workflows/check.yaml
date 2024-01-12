@@ -1,0 +1,26 @@
+name: Static analysis
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  cmake-presets:
+    if: |
+      github.event_name == 'push' ||
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name != github.repository
+
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html#schema
+      # A machine-readable JSON schema for the CMakePresets.json format.
+      - run: curl -O https://cmake.org/cmake/help/latest/_downloads/3e2d73bff478d88a7de0de736ba5e361/schema.json
+
+      - run: pip3 install jsonschema
+
+      - name: Check JSON schema of the CMakePresets.json
+        run: jsonschema -i CMakePresets.json schema.json

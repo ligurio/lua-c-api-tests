@@ -75,5 +75,7 @@ do
   if [ -e "$dict_path" ]; then
     cp "$dict_path" $OUT/"$module.dict"
   fi
-  [[ -e $corpus_dir ]] && find "$corpus_dir" -mindepth 1 -maxdepth 1 | zip -@ -j $OUT/"$name"_seed_corpus.zip
+  if [ -e "$corpus_dir" ]; then
+    find "$corpus_dir" -mindepth 1 -maxdepth 1 | zip -@ -j $OUT/"$name"_seed_corpus.zip
+  fi
 done

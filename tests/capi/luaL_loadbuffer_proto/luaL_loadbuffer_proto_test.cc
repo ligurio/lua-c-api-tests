@@ -268,9 +268,16 @@ writer(lua_State *L, const void *b, size_t size, void *ud) {
 		state->init = 1;
 		luaL_buffinit(L, &state->B);
 	}
-	luaL_addlstring(&state->B, (const char *)b, size);
-	state->bufsize += size;
-
+	/* Finishing dump? */
+	if (b == NULL) {
+		luaL_pushresult(&state->B);
+		/* Move result to reserved slot. */
+		lua_replace(L, 1);
+	}
+	else {
+		luaL_addlstring(&state->B, (const char *)b, size);
+		state->bufsize += size;
+	}
 	return 0;
 }
 
@@ -301,7 +308,8 @@ luaL_loadbytecode(lua_State *L, const char *buff, size_t sz, const char *name)
 		return rc;
 	}
 
-	luaL_pushresult(&state.B);
+	/* Leave final result on top. */
+	lua_settop(L, 1);
 	const char *bc = lua_tolstring(L, -1, &state.bufsize);
 	/* Load Lua bytecode. */
 	rc = luaL_loadbuffer(L, bc, state.bufsize, "bytecode");

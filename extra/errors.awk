@@ -29,7 +29,11 @@ BEGIN { matched = 0
         err_pat["stack overflow"] = 0
         err_pat["'do' expected near ')'"] = 0
         err_pat["has more than 200 local variables"] = 0
+        err_pat["too many local variables"] = 0
         err_pat["function arguments expected near 'setmetatable'"] = 0
+        err_pat["'for' step is zero"] = 0
+        err_pat["attempt to assign to const variable"] = 0
+        err_pat["got a non-closable value"] = 0
       }
 
 # String that function report_error() prints with every error message.

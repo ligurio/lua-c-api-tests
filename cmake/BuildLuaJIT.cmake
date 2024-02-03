@@ -90,7 +90,7 @@ macro(build_luajit LJ_VERSION)
         TMP_DIR ${LJ_BINARY_DIR}/tmp
         STAMP_DIR ${LJ_BINARY_DIR}/stamp
 
-        PATCH_COMMAND cd <SOURCE_DIR> && patch -p1 -i ${LUAJIT_PATCH_PATH}
+        PATCH_COMMAND git reset --hard && cd <SOURCE_DIR> && patch -p1 -i ${LUAJIT_PATCH_PATH}
         CONFIGURE_COMMAND ""
         BUILD_COMMAND cd <SOURCE_DIR> && make -j CC=${CMAKE_C_COMPILER}
                                                  CFLAGS=${CFLAGS}

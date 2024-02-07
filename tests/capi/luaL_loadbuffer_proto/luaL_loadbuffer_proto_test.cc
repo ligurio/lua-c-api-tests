@@ -52,6 +52,13 @@ struct metrics {
 
 static struct metrics metrics;
 
+static void
+Hook(lua_State *L, lua_Debug *ar)
+{
+	(void)L;
+	(void)ar;
+}
+
 UNUSED static void
 jit_attach(lua_State *L, void *func, const char *event)
 {
@@ -335,6 +342,11 @@ DEFINE_PROTO_FUZZER(const lua_grammar::Block &message)
 
 	luaL_openlibs(L);
 
+	int flag = LUA_MASKCALL | LUA_MASKRET | LUA_MASKLINE;
+	int count = 0;
+	/* Enable debugging hook. */
+	lua_sethook(L, Hook, flag, count);
+
 #ifdef LUAJIT
 	enable_lj_metrics(L, &metrics);
 
@@ -400,6 +412,8 @@ DEFINE_PROTO_FUZZER(const lua_grammar::Block &message)
 
 end:
 	metrics_increment_num_samples(&metrics);
+	/* Disable debugging hook. */
+	lua_sethook(L, Hook, 0, count);
 #ifdef LUAJIT
 	disable_lj_metrics(L, &metrics);
 	/* Stop profiler. */

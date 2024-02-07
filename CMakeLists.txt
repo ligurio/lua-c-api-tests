@@ -81,3 +81,4 @@ enable_testing()
 
 add_subdirectory(extra)
 add_subdirectory(tests)
+add_subdirectory(libluamut)

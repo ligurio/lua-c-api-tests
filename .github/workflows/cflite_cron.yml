@@ -18,6 +18,8 @@ jobs:
   Coverage:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup
       - name: Build fuzzing tests
         id: build
         uses: google/clusterfuzzlite/actions/build_fuzzers@v1
@@ -46,6 +48,8 @@ jobs:
   Pruning:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup
       - name: Build Fuzzers
         id: build
         uses: google/clusterfuzzlite/actions/build_fuzzers@v1

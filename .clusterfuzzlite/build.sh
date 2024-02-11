@@ -16,7 +16,7 @@ if [[ $FUZZING_ENGINE == centipede ]]
 then
     sed -i \
         '/$ENV{LIB_FUZZING_ENGINE}/a \ \ \ \ \ \ \ \ -lc++' \
-        tests/CMakeLists.txt
+        tests/capi/CMakeLists.txt
 fi
 
 # For some reason the linker will complain if address sanitizer is not used

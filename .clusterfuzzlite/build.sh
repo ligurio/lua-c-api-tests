@@ -63,7 +63,18 @@ git config --global --add safe.directory '*'
 cmake "${cmake_args[@]}" -S . -B build -G Ninja
 cmake --build build --parallel
 
-# Archive and copy to $OUT seed corpus if the build succeeded.
+cp corpus/*.dict corpus/*.options $OUT/
+
+# Copy the fuzzer executables, zip-ed corpora, option and
+# dictionary files to $OUT.
+#
+# If a target program requires any additional runtime
+# dependencies or artifacts such as seed corpus or a dictionary
+# for libFuzzer or AFL, all these files should be placed
+# in the same directory as the target executable and be included
+# in the build archive. See ClusterFuzz documentation [1].
+#
+# 1. https://google.github.io/clusterfuzz/production-setup/build-pipeline/
 for f in $(find build/tests/ -name '*_test' -type f);
 do
   name=$(basename $f);
@@ -71,11 +82,17 @@ do
   corpus_dir="corpus/$module"
   echo "Copying for $module";
   cp $f $OUT/
-  dict_path="corpus_dir/$name.dict"
-  if [ -e "$dict_path" ]; then
-    cp "$dict_path" $OUT/"$module.dict"
-  fi
   if [ -e "$corpus_dir" ]; then
     find "$corpus_dir" -mindepth 1 -maxdepth 1 | zip -@ -j $OUT/"$name"_seed_corpus.zip
+  fi
+
+  dict_path="corpus/$name.dict"
+  if [ -e "$dict_path" ]; then
+    zip -urj $OUT/"$name"_seed_corpus.zip $dict_path
+  fi
+
+  options_path="corpus/$name.options"
+  if [ -e "$options_path" ]; then
+    zip -urj $OUT/"$name"_seed_corpus.zip $options_path
   fi
 done

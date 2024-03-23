@@ -1,6 +1,6 @@
 #
 # SPDX-License-Identifier: ISC
-# Copyright 2023, Sergey Bronnikov.
+# Copyright 2023-2024, Sergey Bronnikov.
 #
 ################################################################################
 
@@ -13,4 +13,5 @@ RUN apt-get update && apt-get install -y \
 COPY . $SRC/lua-c-api-tests
 WORKDIR $SRC/lua-c-api-tests
 RUN git submodule update --init --recursive --force
+RUN cd corpus && git checkout cfl
 COPY .clusterfuzzlite/build.sh $SRC/

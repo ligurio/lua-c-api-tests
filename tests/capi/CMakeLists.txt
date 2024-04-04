@@ -124,9 +124,5 @@ endforeach()
 
 # OSS Fuzz build is broken on aarch64,
 # https://github.com/ligurio/lua-c-api-tests/issues/72
-if (OSS_FUZZ AND HW_ARCH STREQUAL "aarch64")
-  message(STATUS "luaL_loadbuffer_proto_test is disabled (issue #72)")
-else ()
-  include(ProtobufMutator)
-  add_subdirectory(luaL_loadbuffer_proto)
-endif ()
+include(ProtobufMutator)
+add_subdirectory(luaL_loadbuffer_proto)

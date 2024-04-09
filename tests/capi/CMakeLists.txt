@@ -80,7 +80,7 @@ function(create_test)
   add_test(NAME ${test_name}
            COMMAND ${SHELL} -c "$<TARGET_FILE:${test_name}> ${LIBFUZZER_OPTS}"
   )
-  message(STATUS "Creating test ${test_name}")
+  message(STATUS "Creating Lua C API test ${test_name}")
   if (USE_LUA)
     set_tests_properties(${test_name} PROPERTIES
       ENVIRONMENT "ASAN_OPTIONS='detect_invalid_pointer_pairs=2'"

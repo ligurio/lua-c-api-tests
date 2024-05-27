@@ -430,7 +430,6 @@ __lua_type(lua_State *L, FuzzedDataProvider *fdp)
 	       type == LUA_TFUNCTION      ||
 	       type == LUA_TLIGHTUSERDATA ||
 	       type == LUA_TNIL           ||
-	       type == LUA_TNONE          ||
 	       type == LUA_TNUMBER        ||
 	       type == LUA_TSTRING        ||
 	       type == LUA_TTABLE         ||
@@ -749,9 +748,9 @@ __lua_rawget(lua_State *L, FuzzedDataProvider *fdp)
 		return;
 	uint8_t key = fdp->ConsumeIntegral<uint8_t>();
 	lua_pushnumber(L, key);
+	top = lua_gettop(L);
 	lua_rawget(L, index);
-	/* XXX: Wrong number of elements. */
-	/* assert(lua_gettop(L) == top); */
+	assert(lua_gettop(L) == top);
 }
 
 /* void lua_rawset(lua_State *L, int index); */
@@ -769,9 +768,9 @@ __lua_rawset(lua_State *L, FuzzedDataProvider *fdp)
 	uint8_t value = fdp->ConsumeIntegral<uint8_t>();
 	lua_pushnumber(L, value);
 	lua_pushnumber(L, key);
+	top = lua_gettop(L);
 	lua_rawset(L, index);
-	/* XXX: Wrong number of elements. */
-	/* assert(lua_gettop(L) == top - 2); */
+	assert(lua_gettop(L) == top - 2);
 }
 
 /* void lua_rawseti(lua_State *L, int index, lua_Integer i); */
@@ -785,9 +784,9 @@ __lua_rawseti(lua_State *L, FuzzedDataProvider *fdp)
 		return;
 	int n = fdp->ConsumeIntegral<uint8_t>();
 	__lua_pushnumber(L, fdp);
+	top = lua_gettop(L);
 	lua_rawseti(L, index, n);
-	/* XXX: Wrong number of elements. */
-	/* assert(lua_gettop(L) == top - 1); */
+	assert(lua_gettop(L) == top - 1);
 }
 
 /* int lua_rawgeti(lua_State *L, int index, lua_Integer n); */
@@ -990,7 +989,6 @@ __lua_arith(lua_State *L, FuzzedDataProvider *fdp)
 	lua_pop(L, 1);
 
 	lua_arith(L, op);
-	/* XXX: Wrong number of elements. */
 	assert(lua_gettop(L) <= top - 1 + 1);
 }
 #endif /* LUA_VERSION_NUM */
@@ -1054,8 +1052,7 @@ __lua_gettable(lua_State *L, FuzzedDataProvider *fdp)
 	uint8_t key = fdp->ConsumeIntegral<uint8_t>();
 	lua_pushnumber(L, key);
 	lua_gettable(L, index);
-	/* XXX: Wrong number of elements. */
-	/* assert(lua_gettop(L) == top); */
+	assert(lua_gettop(L) == top + 1);
 }
 
 /* void lua_rotate(lua_State *L, int idx, int n); */
@@ -1085,9 +1082,9 @@ __lua_seti(lua_State *L, FuzzedDataProvider *fdp)
 		return;
 	int n = fdp->ConsumeIntegral<uint8_t>();
 	__lua_pushnumber(L, fdp);
+	top = lua_gettop(L);
 	lua_seti(L, index, n);
-	/* XXX: Wrong number of elements. */
-	/* assert(lua_gettop(L) == top - 1); */
+	assert(lua_gettop(L) == top - 1);
 }
 #endif /* LUA_VERSION_NUM */
 
@@ -1177,7 +1174,6 @@ __lua_resume(lua_State *L, FuzzedDataProvider *fdp)
 	int nres;
 	res = lua_resume(co, L, 0, &nres);
 #endif /* LUA_VERSION_NUM */
-	/* XXX: Wrong exit code. */
 	/* assert(res == LUA_OK); */
 	(void)res;
 	lua_settop(co, 0);
@@ -1458,6 +1454,8 @@ __luaL_traceback(lua_State *L, FuzzedDataProvider *fdp)
 	assert(lua_gettop(L) == top + 1);
 }
 
+/* const char *lua_tolstring(lua_State *L, int index, size_t *len); */
+/* [-0, +0, m] */
 /* const char *luaL_tolstring(lua_State *L, int idx, size_t *len); */
 /* [-0, +1, e] */
 static void
@@ -1467,11 +1465,11 @@ __luaL_tolstring(lua_State *L, FuzzedDataProvider *fdp)
 	auto idx = fdp->ConsumeIntegralInRange(1, top);
 #if LUA_VERSION_NUM < 503
 	lua_tolstring(L, idx, NULL);
+	assert(lua_gettop(L) == top);
 #else
 	luaL_tolstring(L, idx, NULL);
+	assert(lua_gettop(L) == top + 1);
 #endif /* LUA_VERSION_NUM */
-	/* XXX: Wrong number of elements. */
-	/* assert(lua_gettop(L) == top + 1); */
 }
 
 /* void lua_copy(lua_State *L, int fromidx, int toidx); */

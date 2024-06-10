@@ -40,6 +40,8 @@ jobs:
         sanitizer: [address, undefined]
 
     steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
       - name: Build fuzzing tests (${{ matrix.sanitizer }})
         id: build
         uses: google/oss-fuzz/infra/cifuzz/actions/build_fuzzers@master

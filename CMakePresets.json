@@ -27,6 +27,10 @@
           "type": "BOOL",
           "value": "TRUE"
         },
+        "ENABLE_UBSAN": {
+          "type": "BOOL",
+          "value": "TRUE"
+        },
         "ENABLE_LUA_ASSERT": {
           "type": "BOOL",
           "value": "TRUE"

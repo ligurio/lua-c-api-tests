@@ -13,7 +13,7 @@ macro(build_luajit LJ_VERSION)
     set(CFLAGS "${CFLAGS} -fsanitize=fuzzer-no-link")
     set(LDFLAGS "-fsanitize=fuzzer-no-link")
 
-    set(LUAJIT_PATCH_PATH ${PROJECT_SOURCE_DIR}/patches/luajit-v2.1.patch)
+    set(LUAJIT_BASEDIR ${PROJECT_SOURCE_DIR}/patches/)
 
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(CFLAGS "${CFLAGS} ${CMAKE_C_FLAGS_DEBUG}")
@@ -99,7 +99,9 @@ macro(build_luajit LJ_VERSION)
         TMP_DIR ${LJ_BINARY_DIR}/tmp
         STAMP_DIR ${LJ_BINARY_DIR}/stamp
 
-        PATCH_COMMAND git reset --hard && cd <SOURCE_DIR> && patch -p1 -i ${LUAJIT_PATCH_PATH}
+        PATCH_COMMAND git reset --hard && cd <SOURCE_DIR> &&
+                      patch -p1 -i ${LUAJIT_BASEDIR}/luajit-v2.1.patch &&
+                      patch -p1 -i ${LUAJIT_BASEDIR}/luajit-dmalloc-asan_instr-v2.1.patch
         CONFIGURE_COMMAND ""
         BUILD_COMMAND cd <SOURCE_DIR> && make -j CC=${CMAKE_C_COMPILER}
                                                  CFLAGS=${CFLAGS}

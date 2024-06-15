@@ -25,12 +25,12 @@ jobs:
       - uses: ./.github/actions/setup
       - name: Build fuzzing tests (${{ matrix.sanitizer }})
         id: build
-        uses: google/clusterfuzzlite/actions/build_fuzzers@v1
+        uses: google/clusterfuzzlite/actions/build_fuzzers@main
         with:
           sanitizer: ${{ matrix.sanitizer }}
       - name: Run fuzzing tests (${{ matrix.sanitizer }})
         id: run
-        uses: google/clusterfuzzlite/actions/run_fuzzers@v1
+        uses: google/clusterfuzzlite/actions/run_fuzzers@main
         with:
           fuzz-seconds: 3600
           github-token: ${{ secrets.GITHUB_TOKEN }}

@@ -45,7 +45,7 @@ jobs:
       - uses: ./.github/actions/setup
       - name: Build fuzzing tests (${{ matrix.sanitizer }})
         id: build
-        uses: google/clusterfuzzlite/actions/build_fuzzers@v1
+        uses: google/clusterfuzzlite/actions/build_fuzzers@main
         with:
           language: c
           sanitizer: ${{ matrix.sanitizer }}
@@ -54,7 +54,7 @@ jobs:
           storage-repo-branch-coverage: gh-pages
       - name: Run fuzzing tests (${{ matrix.sanitizer }})
         id: run
-        uses: google/clusterfuzzlite/actions/run_fuzzers@v1
+        uses: google/clusterfuzzlite/actions/run_fuzzers@main
         with:
           fuzz-seconds: 120
           github-token: ${{ secrets.GITHUB_TOKEN }}

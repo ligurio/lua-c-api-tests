@@ -20,7 +20,7 @@ jobs:
       - uses: ./.github/actions/setup
       - name: Build fuzzing tests (${{ matrix.sanitizer }})
         id: build
-        uses: google/clusterfuzzlite/actions/build_fuzzers@v1
+        uses: google/clusterfuzzlite/actions/build_fuzzers@main
         with:
           language: c
           sanitizer: ${{ matrix.sanitizer }}

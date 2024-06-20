@@ -32,7 +32,7 @@ jobs:
         id: run
         uses: google/clusterfuzzlite/actions/run_fuzzers@main
         with:
-          fuzz-seconds: 3600
+          fuzz-seconds: 7200
           github-token: ${{ secrets.GITHUB_TOKEN }}
           minimize-crashes: true
           report-ooms: false

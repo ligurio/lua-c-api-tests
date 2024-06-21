@@ -1,26 +1,110 @@
 diff --git a/src/host/buildvm.c b/src/host/buildvm.c
-index 9ee47ada..0cb6be1b 100644
+index ec99e501..d23530c4 100644
 --- a/src/host/buildvm.c
 +++ b/src/host/buildvm.c
 @@ -35,6 +35,10 @@
  #include <io.h>
  #endif
- 
+
 +#if LUAJIT_USE_ASAN
 +int __lsan_is_turned_off() { return 1; } /* leaks are ok */
 +#endif
 +
  /* ------------------------------------------------------------------------ */
- 
+
  /* DynASM glue definitions. */
+diff --git a/src/lj_buf.h b/src/lj_buf.h
+index 744e5747..ea299472 100644
+--- a/src/lj_buf.h
++++ b/src/lj_buf.h
+@@ -165,6 +165,13 @@ LJ_FUNC SBuf * LJ_FASTCALL lj_buf_putchar(SBuf *sb, int c);
+ #endif
+ LJ_FUNC SBuf * LJ_FASTCALL lj_buf_putstr(SBuf *sb, GCstr *s);
+
++#if LUAJIT_USE_UBSAN
++/* The `NULL` argument with the zero length, like in the case:
++** | luajit -e 'error("x", 3)'
++*/
++static LJ_AINLINE char *lj_buf_wmem(char *p, const void *q, MSize len)
++  __attribute__((no_sanitize("nonnull-attribute")));
++#endif
+ static LJ_AINLINE char *lj_buf_wmem(char *p, const void *q, MSize len)
+ {
+   return (char *)memcpy(p, q, len) + len;
+diff --git a/src/lj_carith.c b/src/lj_carith.c
+index 9bea0a33..046dea4c 100644
+--- a/src/lj_carith.c
++++ b/src/lj_carith.c
+@@ -159,6 +159,11 @@ static int carith_ptr(lua_State *L, CTState *cts, CDArith *ca, MMS mm)
+ }
+
+ /* 64 bit integer arithmetic. */
++#if LUAJIT_USE_UBSAN
++/* See https://github.com/LuaJIT/LuaJIT/issues/928. */
++static int carith_int64(lua_State *L, CTState *cts, CDArith *ca, MMS mm)
++  __attribute__((no_sanitize("signed-integer-overflow")));
++#endif
+ static int carith_int64(lua_State *L, CTState *cts, CDArith *ca, MMS mm)
+ {
+   if (ctype_isnum(ca->ct[0]->info) && ca->ct[0]->size <= 8 &&
+diff --git a/src/lj_opt_fold.c b/src/lj_opt_fold.c
+index ce78505b..bc9d64f3 100644
+--- a/src/lj_opt_fold.c
++++ b/src/lj_opt_fold.c
+@@ -260,6 +260,11 @@ LJFOLDF(kfold_numcomp)
+
+ /* -- Constant folding for 32 bit integers -------------------------------- */
+
++#if LUAJIT_USE_UBSAN
++/* Cdata arithmetic depends on the interger overflow. */
++static int32_t kfold_intop(int32_t k1, int32_t k2, IROp op)
++  __attribute__((no_sanitize("signed-integer-overflow")));
++#endif
+ static int32_t kfold_intop(int32_t k1, int32_t k2, IROp op)
+ {
+   switch (op) {
+diff --git a/src/lj_parse.c b/src/lj_parse.c
+index 5a44f8db..bfe044a8 100644
+--- a/src/lj_parse.c
++++ b/src/lj_parse.c
+@@ -934,6 +934,11 @@ static void bcemit_binop(FuncState *fs, BinOpr op, ExpDesc *e1, ExpDesc *e2)
+ }
+
+ /* Emit unary operator. */
++#if LUAJIT_USE_UBSAN
++/* See https://github.com/LuaJIT/LuaJIT/issues/928. */
++static void bcemit_unop(FuncState *fs, BCOp op, ExpDesc *e)
++  __attribute__((no_sanitize("signed-integer-overflow")));
++#endif
+ static void bcemit_unop(FuncState *fs, BCOp op, ExpDesc *e)
+ {
+   if (op == BC_NOT) {
+diff --git a/src/lj_snap.c b/src/lj_snap.c
+index 6fda08ba..c7f51d7d 100644
+--- a/src/lj_snap.c
++++ b/src/lj_snap.c
+@@ -763,6 +763,13 @@ static void snap_restoreval(jit_State *J, GCtrace *T, ExitState *ex,
+ }
+
+ #if LJ_HASFFI
++# if LUAJIT_USE_UBSAN
++/* See https://github.com/LuaJIT/LuaJIT/issues/1193. */
++static void snap_restoredata(jit_State *J, GCtrace *T, ExitState *ex,
++			     SnapNo snapno, BloomFilter rfilt,
++			     IRRef ref, void *dst, CTSize sz)
++  __attribute__((no_sanitize("bounds")));
++# endif
+ /* Restore raw data from the trace exit state. */
+ static void snap_restoredata(jit_State *J, GCtrace *T, ExitState *ex,
+			     SnapNo snapno, BloomFilter rfilt,
 diff --git a/src/lj_str.c b/src/lj_str.c
-index a5282da6..f31172bb 100644
+index cfdaec6f..88f9c765 100644
 --- a/src/lj_str.c
 +++ b/src/lj_str.c
 @@ -13,6 +13,15 @@
  #include "lj_char.h"
  #include "lj_prng.h"
- 
+
 +#if LUAJIT_USE_ASAN
 +/* These functions may read past a buffer end, that's ok. */
 +GCstr *lj_str_new(lua_State *L, const char *str, size_t lenx)
@@ -31,5 +115,21 @@ index a5282da6..f31172bb 100644
 +#endif /* LUAJIT_USE_ASAN */
 +
  /* -- String helpers ------------------------------------------------------ */
- 
+
  /* Ordered compare of strings. Assumes string data is 4-byte aligned. */
+diff --git a/src/lj_strfmt.c b/src/lj_strfmt.c
+index 909255db..ef9bd4f9 100644
+--- a/src/lj_strfmt.c
++++ b/src/lj_strfmt.c
+@@ -99,6 +99,11 @@ retlit:
+   { uint32_t d = (x*(((1<<sh)+sc-1)/sc))>>sh; x -= d*sc; *p++ = (char)('0'+d); }
+
+ /* Write integer to buffer. */
++#if LUAJIT_USE_UBSAN
++/* See https://github.com/LuaJIT/LuaJIT/issues/928. */
++char * LJ_FASTCALL lj_strfmt_wint(char *p, int32_t k)
++  __attribute__((no_sanitize("signed-integer-overflow")));
++#endif
+ char * LJ_FASTCALL lj_strfmt_wint(char *p, int32_t k)
+ {
+   uint32_t u = (uint32_t)k;

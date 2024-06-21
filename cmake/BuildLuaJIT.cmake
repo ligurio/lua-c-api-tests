@@ -33,35 +33,44 @@ macro(build_luajit LJ_VERSION)
 
     if (ENABLE_UBSAN)
         string(JOIN "," NO_SANITIZE_FLAGS
-            # lj_str.c
-            implicit-integer-sign-change
-            # lj_opt_fold.c
-            implicit-unsigned-integer-truncation
-            # lj_parse.c
+            # Misaligned pseudo-pointers are used to determine
+            # internal variable names inside the `for` cycle.
             alignment
-            # lj_tab.c
+            # Not interested in float cast overflow errors. These
+            # overflows are handled by special checks after
+            # `lj_num2int()`, etc.
             float-cast-overflow
-            # lj_gc.c
-            function
-            # lj_buf.c
-            shift
-            # lj_obj.h
-            unsigned-integer-overflow
-            # lj_prng.c
-            unsigned-shift-base
-            # lj_parse.c
-            pointer-overflow
-            # The object size sanitizer has no effect at -O0.
-            object-size
-            # lj_parse.c
+            # NULL checking is disabled because this is not a UB
+            # and raises lots of false-positive fails.
             null
-            # lj_vmmath.c
-            float-divide-by-zero
-            integer-divide-by-zero
+            # Not interested in checking arithmetic with NULL.
+            pointer-overflow
+            # Shifts of negative numbers are widely used in
+            # parsing ULEB, cdata arithmetic, vmevent hash
+            # calculation, etc.
+            shift-base
         )
+        # GCC has no "function" UB check.
+        if(NOT CMAKE_C_COMPILER_ID STREQUAL "GNU")
+            string(JOIN "," NO_SANITIZE_FLAGS
+                ${NO_SANITIZE_FLAGS}
+                # Not interested in function type mismatch errors.
+                function
+            )
+        endif()
+        # Enable UndefinedBehaviorSanitizer support.
+        # This flag enables all supported options (the
+        # documentation on site is not correct about that moment,
+        # unfortunately) except float-divide-by-zero. Floating
+        # point division by zero behaviour is defined without
+        # -ffast-math and uses the IEEE 754 standard on which all
+        # NaN tagging is based.
         set(UBSAN_FLAGS "-fsanitize=undefined")
         set(UBSAN_FLAGS "-fno-sanitize-recover=undefined")
+        # XXX: To get nicer stack traces in error messages.
+        set(UBSAN_FLAGS "-fno-omit-frame-pointer")
         set(UBSAN_FLAGS "-fno-sanitize=${NO_SANITIZE_FLAGS}")
+        set(CFLAGS "${CFLAGS} -DLUAJIT_USE_UBSAN")
         set(CFLAGS "${CFLAGS} ${UBSAN_FLAGS}")
         set(LDFLAGS "${LDFLAGS} ${UBSAN_FLAGS}")
     endif (ENABLE_UBSAN)

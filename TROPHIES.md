@@ -12,6 +12,8 @@
 1. "heap-use-after-free" issue in `luaV_finishget`,
    https://groups.google.com/g/lua-l/c/s2hBcf8aLIU
    https://github.com/lua/lua/commit/88a50ffa715483e7187c0d7d6caaf708ebacf756
+1. Assertion in `luaK_codeABCk`,
+   https://groups.google.com/g/lua-l/c/H0Iq-eAig94
 
 ### LuaJIT
 
@@ -42,6 +44,17 @@
    https://github.com/LuaJIT/LuaJIT/issues/1169
 1. GC64 mode may overflow the `LJ_MAX_JSLOTS` limit for a stitched trace.,
    https://github.com/LuaJIT/LuaJIT/issues/1173
+1. State not restored during recording if `__concat` metamethod throws an error,
+   https://github.com/LuaJIT/LuaJIT/issues/1234
+   https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=69897
+1. Uninitialized `cts->L` and error handling issues in `recff_cdata_arith`,
+   https://github.com/LuaJIT/LuaJIT/issues/1224
+1. OOM errors during GC step raising in the context of a JIT trace,
+   https://github.com/LuaJIT/LuaJIT/issues/1247,
+   https://github.com/tarantool/tarantool/issues/10290
+1. stack-buffer-overflow in `narrow_conv_backprop`,
+   https://github.com/LuaJIT/LuaJIT/issues/1262,
+   https://oss-fuzz.com/testcase?key=6250635821907968
 
 ### Tarantool
 

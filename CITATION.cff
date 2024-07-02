@@ -15,7 +15,7 @@ abstract: >-
   It aims to make these open-source software more secure and
   stable by combining modern fuzzing techniques with scalable,
   distributed execution. As of August 2024, lua-c-api-tests has
-  helped identify and fix 5 bugs in PUC Rio Lua and 15 bugs in
+  helped identify and fix 5 bugs in PUC Rio Lua and 16 bugs in
   LuaJIT.
 type: software
 repository-code: "https://github.com/ligurio/lua-c-api-tests"

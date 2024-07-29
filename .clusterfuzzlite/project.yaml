@@ -11,5 +11,6 @@ sanitizers:
   - undefined
 architectures:
   # See https://luajit.org/luajit.html.
+  - aarch64
   - x86_64
 main_repo: "https://github.com/LuaJIT/LuaJIT/"

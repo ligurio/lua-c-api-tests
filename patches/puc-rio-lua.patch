@@ -1,8 +1,8 @@
 diff --git a/makefile b/makefile
-index ee56c67..d43a965 100644
+index b37fdb28..accb2822 100644
 --- a/makefile
 +++ b/makefile
-@@ -41,7 +41,7 @@ CWARNSC= -Wdeclaration-after-statement \
+@@ -40,7 +40,7 @@ CWARNSC= -Wdeclaration-after-statement \
  	-Wold-style-definition \
  
  
@@ -11,12 +11,12 @@ index ee56c67..d43a965 100644
  
  # Some useful compiler options for internal tests:
  # -DLUAI_ASSERT turns on all assertions inside Lua.
-@@ -73,11 +73,11 @@ LOCAL = $(TESTS) $(CWARNS)
+@@ -72,11 +72,11 @@ LOCAL = $(TESTS) $(CWARNS)
  # enable Linux goodies
- MYCFLAGS= $(LOCAL) -std=c99 -DLUA_USE_LINUX -DLUA_USE_READLINE
+ MYCFLAGS= $(LOCAL) -std=c99 -DLUA_USE_LINUX
  MYLDFLAGS= $(LOCAL) -Wl,-E
--MYLIBS= -ldl -lreadline
-+MYLIBS= -ldl -lreadline $(LDFLAGS)
+-MYLIBS= -ldl
++MYLIBS= -ldl $(LDFLAGS)
  
  
 -CC= gcc

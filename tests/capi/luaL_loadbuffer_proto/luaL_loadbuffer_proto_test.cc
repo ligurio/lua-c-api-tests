@@ -305,7 +305,8 @@ luaL_loadbytecode(lua_State *L, const char *buff, size_t sz, const char *name)
 	}
 
 	/* Dump a Lua bytecode to a buffer. */
-	struct str_Writer state = {0};
+	struct str_Writer state;
+	memset(&state, 0, sizeof(struct str_Writer));
 #if LUA_VERSION_NUM < 503
 	rc = lua_dump(L, writer, &state);
 #else /* Lua 5.3+ */

@@ -10,15 +10,6 @@
 
 cd $SRC/lua-c-api-tests
 
-# Avoid compilation issue due to some undefined references. They are defined in
-# libc++ and used by Centipede so -lc++ needs to come after centipede's lib.
-if [[ $FUZZING_ENGINE == centipede ]]
-then
-    sed -i \
-        '/$ENV{LIB_FUZZING_ENGINE}/a \ \ \ \ \ \ \ \ -lc++' \
-        tests/capi/CMakeLists.txt
-fi
-
 # For some reason the linker will complain if address sanitizer is not used
 # in introspector builds.
 if [ "$SANITIZER" == "introspector" ]; then

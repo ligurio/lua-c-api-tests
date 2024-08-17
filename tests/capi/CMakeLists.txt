@@ -11,6 +11,10 @@ target_compile_options(
         ${CXXFLAGS}
         >
 )
+
+# `-lc++` is required by Centipede.
+# Some references are defined in `libc++` and used by Centipede,
+# so -lc++ needs to come after centipede's lib.
 target_link_libraries(
     fuzzer_config
     INTERFACE
@@ -19,6 +23,7 @@ target_link_libraries(
         >
         $<$<BOOL:${OSS_FUZZ}>:
         $ENV{LIB_FUZZING_ENGINE}
+        -lc++
         >
 )
 

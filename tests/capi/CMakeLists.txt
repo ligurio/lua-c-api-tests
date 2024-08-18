@@ -74,6 +74,12 @@ function(create_test)
   add_dependencies(${test_name} ${LUA_TARGET})
   string(REPLACE "_test" "" test_prefix ${test_name})
   set(LIBFUZZER_OPTS "${LIBFUZZER_OPTS} -artifact_prefix=${test_name}_")
+  if (USE_LUAJIT AND (${test_name} STREQUAL "lua_dump_test"))
+    set(LIBFUZZER_OPTS "${LIBFUZZER_OPTS} -only_ascii=1")
+  endif ()
+  if (USE_LUAJIT AND (${test_name} STREQUAL "lua_load_test"))
+    set(LIBFUZZER_OPTS "${LIBFUZZER_OPTS} -only_ascii=1")
+  endif ()
   set(dict_path ${PROJECT_SOURCE_DIR}/corpus/${test_name}.dict)
   set(corpus_path ${PROJECT_SOURCE_DIR}/corpus/${test_prefix})
   if (EXISTS ${dict_path})
@@ -100,18 +106,17 @@ function(create_test)
   endif (USE_LUAJIT)
 endfunction()
 
+# These Lua C functions are unsupported by LuaJIT.
 list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_addgsub_test")
 list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_bufflen_test")
 list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_buffsub_test")
 list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_buffaddr_test")
-list(APPEND LUAJIT_BLACKLIST_TESTS "lua_load_test")
 list(APPEND LUAJIT_BLACKLIST_TESTS "lua_stringtonumber_test")
-
-# https://github.com/ligurio/lua-c-api-tests/issues/19
-list(APPEND BLACKLIST_TESTS "luaL_dostring_test")
-list(APPEND BLACKLIST_TESTS "luaL_loadbuffer_test")
-list(APPEND BLACKLIST_TESTS "luaL_loadstring_test")
-list(APPEND BLACKLIST_TESTS "lua_dump_test")
+# Disabled because assertion is triggered
+# LuaJIT ASSERT lj_bcread.c:123: bcread_byte: buffer read overflow.
+list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_dostring_test")
+list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_loadbuffer_test")
+list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_loadstring_test")
 
 file(GLOB tests LIST_DIRECTORIES false ${CMAKE_CURRENT_SOURCE_DIR} *.c *.cc)
 foreach(filename ${tests})

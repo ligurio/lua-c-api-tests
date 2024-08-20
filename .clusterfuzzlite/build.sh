@@ -29,6 +29,7 @@ esac
 cmake_args=(
     -DUSE_LUAJIT=ON
     -DOSS_FUZZ=ON
+    -DENABLE_BUILD_PROTOBUF=OFF
     $SANITIZERS_ARGS
 
     # C compiler

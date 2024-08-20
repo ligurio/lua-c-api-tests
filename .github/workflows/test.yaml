@@ -59,6 +59,7 @@ jobs:
         run: |
           cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
                 -DUSE_LUA=ON -DENABLE_BUILD_PROTOBUF=OFF \
+                -DENABLE_INTERNAL_TESTS=ON \
                 -G Ninja -S . -B build
         if: ${{ matrix.LUA == 'lua' }}
 
@@ -66,6 +67,7 @@ jobs:
         run: |
           cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
                 -DUSE_LUAJIT=ON -DENABLE_BUILD_PROTOBUF=OFF \
+                -DENABLE_INTERNAL_TESTS=ON \
                 -G Ninja -S . -B build
         if: ${{ matrix.LUA == 'luajit' }}
 

@@ -21,4 +21,6 @@ target_include_directories(${LIB_LUA_CROSSOVER} PRIVATE ${LUA_INCLUDE_DIR})
 target_compile_options(${LIB_LUA_CROSSOVER} PRIVATE ${CFLAGS})
 add_dependencies(${LIB_LUA_CROSSOVER} ${LUA_TARGET})
 
-add_subdirectory(tests)
+if (ENABLE_INTERNAL_TESTS)
+  add_subdirectory(tests)
+endif()

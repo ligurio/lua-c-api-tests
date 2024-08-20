@@ -40,6 +40,7 @@ is LuaJIT-specific.
 - `OSS_FUZZ` enables support of OSS Fuzz.
 - `ENABLE_BUILD_PROTOBUF` enables building Protobuf library, otherwise system
   library is used.
+- `ENABLE_INTERNAL_TESTS` enables internal tests.
 
 ### Running
 

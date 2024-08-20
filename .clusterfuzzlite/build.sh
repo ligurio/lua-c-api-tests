@@ -52,7 +52,7 @@ git config --global --add safe.directory '*'
 
 # Build the project and fuzzers.
 [[ -e build ]] && rm -rf build
-cmake "${cmake_args[@]}" -S . -B build -G Ninja
+cmake "${cmake_args[@]}" -S . -B build
 cmake --build build --parallel
 
 cp corpus/*.dict corpus/*.options $OUT/

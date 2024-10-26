@@ -74,16 +74,16 @@ do
   echo "Copying for $module";
   cp $f $OUT/
   if [ -e "$corpus_dir" ]; then
-    find "$corpus_dir" -mindepth 1 -maxdepth 1 | zip -@ -j $OUT/"$name"_seed_corpus.zip
+    find "$corpus_dir" -mindepth 1 -maxdepth 1 | zip -@ -j --quiet $OUT/"$name"_seed_corpus.zip
   fi
 
   dict_path="corpus/$name.dict"
   if [ -e "$dict_path" ]; then
-    zip -urj $OUT/"$name"_seed_corpus.zip $dict_path
+    zip -urj $OUT/"$name"_seed_corpus.zip "$dict_path"
   fi
 
   options_path="corpus/$name.options"
   if [ -e "$options_path" ]; then
-    zip -urj $OUT/"$name"_seed_corpus.zip $options_path
+    zip -urj $OUT/"$name"_seed_corpus.zip "$options_path"
   fi
 done

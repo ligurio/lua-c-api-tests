@@ -34,7 +34,6 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           minimize-crashes: true
           mode: 'coverage'
-          parallel-fuzzing: true
           report-unreproducible-crashes: true
           storage-repo-branch-coverage: gh-pages
           storage-repo-branch: cfl
@@ -63,7 +62,6 @@ jobs:
           minimize-crashes: true
           mode: 'prune'
           output-sarif: true
-          parallel-fuzzing: true
           report-unreproducible-crashes: true
           storage-repo-branch-coverage: gh-pages
           storage-repo-branch: cfl

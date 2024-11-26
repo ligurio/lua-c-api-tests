@@ -26,6 +26,9 @@ jobs:
         uses: google/clusterfuzzlite/actions/build_fuzzers@main
         with:
           sanitizer: coverage
+      - name: Setup tmate session
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
       - name: Run fuzzing tests
         id: run
         uses: google/clusterfuzzlite/actions/run_fuzzers@main
@@ -38,6 +41,9 @@ jobs:
           storage-repo-branch-coverage: gh-pages
           storage-repo-branch: cfl
           storage-repo: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/ligurio/lua-c-api-corpus
+      - name: Setup tmate session
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
 
 # Corpus Pruning ("prune").
 # Over time, redundant testcases will get introduced into your fuzzer's corpuses
@@ -66,3 +72,6 @@ jobs:
           storage-repo-branch-coverage: gh-pages
           storage-repo-branch: cfl
           storage-repo: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/ligurio/lua-c-api-corpus
+      - name: Setup tmate session
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3

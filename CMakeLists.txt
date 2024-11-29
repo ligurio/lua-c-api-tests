@@ -51,6 +51,19 @@ elseif (USE_LUAJIT)
   include(BuildLuaJIT)
   build_luajit(${LUA_VERSION})
   set(IS_LUAJIT TRUE)
+elseif (LUA_INCLUDE_DIR AND LUA_LIBRARIES AND LUA_EXECUTABLE)
+  message(STATUS "Lua library passed outside:")
+  message(STATUS "LUA_INCLUDE_DIR: ${LUA_INCLUDE_DIR}")
+  message(STATUS "LUA_LIBRARIES: ${LUA_LIBRARIES}")
+  message(STATUS "LUA_EXECUTABLE: ${LUA_EXECUTABLE}")
+
+  # When a path to a Lua library is passed outside, we should
+  # mimic a real CMake library to don't break code that depends on
+  # LUA_LIBRARIES.
+  add_library(bundled-liblua STATIC IMPORTED GLOBAL)
+  set_target_properties(bundled-liblua PROPERTIES
+    IMPORTED_LOCATION ${LUA_LIBRARIES})
+  set(LUA_LIBRARIES bundled-liblua)
 else ()
   message(FATAL_ERROR "No Lua is specified.")
 endif ()

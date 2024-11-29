@@ -19,7 +19,9 @@ LuaJIT).
 ### Building
 
 ```sh
-git clone --jobs $(nproc) --recursive https://github.com/ligurio/lua-c-api-tests
+git clone https://github.com/ligurio/lua-c-api-tests
+cd lua-c-api-tests
+git clone https://github.com/ligurio/lua-c-api-corpus
 CC=clang CXX=clang++ cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DUSE_LUA=ON [-DUSE_LUAJIT=ON]
 cmake --build build --parallel
 ```

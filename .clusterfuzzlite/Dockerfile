@@ -12,6 +12,5 @@ RUN apt-get update && apt-get install -y \
 
 COPY . $SRC/lua-c-api-tests
 WORKDIR $SRC/lua-c-api-tests
-RUN rm -rf corpus
 RUN git clone --depth 1 --branch cfl https://github.com/ligurio/lua-c-api-corpus corpus
 COPY .clusterfuzzlite/build.sh $SRC/

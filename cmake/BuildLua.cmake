@@ -59,7 +59,7 @@ macro(build_lua LUA_VERSION)
 
     include(ExternalProject)
 
-    set(LUA_LIBRARIES ${PROJECT_BINARY_DIR}/lua-${LUA_VERSION}/source/liblua.a)
+    set(LUA_LIBRARY ${PROJECT_BINARY_DIR}/lua-${LUA_VERSION}/source/liblua.a)
     set(LUA_EXECUTABLE ${LUA_SOURCE_DIR}/lua)
 
     ExternalProject_Add(patched-lua-${LUA_VERSION}
@@ -82,12 +82,17 @@ macro(build_lua LUA_VERSION)
                                                  LDFLAGS=${LDFLAGS}
         INSTALL_COMMAND ""
 
-        BUILD_BYPRODUCTS ${LUA_LIBRARIES} ${LUA_EXECUTABLE}
+        BUILD_BYPRODUCTS ${LUA_LIBRARY} ${LUA_EXECUTABLE}
     )
 
+    add_library(bundled-liblua STATIC IMPORTED GLOBAL)
+    set_target_properties(bundled-liblua PROPERTIES
+      IMPORTED_LOCATION ${LUA_LIBRARY})
+    add_dependencies(bundled-liblua patched-lua-${LUA_VERSION})
+
+    set(LUA_LIBRARIES bundled-liblua)
     set(LUA_INCLUDE_DIR ${PROJECT_BINARY_DIR}/lua-${LUA_VERSION}/source/)
     set(LUA_VERSION_STRING "PUC Rio Lua ${LUA_VERSION}")
-    set(LUA_TARGET patched-lua-${LUA_VERSION})
 
     unset(LUA_BINARY_DIR)
     unset(LUA_PATCH_PATH)

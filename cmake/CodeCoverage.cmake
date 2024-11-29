@@ -36,7 +36,7 @@ if(USE_LUA)
   set(GCOVR_OPTIONS ${GCOVR_OPTIONS} --object-directory ${LUA_SOURCE_DIR})
 endif ()
 
-if(USE_LUAJIT)
+if(IS_LUAJIT)
   # Exclude DynASM files, that contain a low-level VM code for CPUs.
   set(GCOVR_OPTIONS ${GCOVR_OPTIONS} --exclude ".*\.dasc")
   # Exclude buildvm source code, it's a project's build infrastructure.
@@ -56,7 +56,7 @@ add_custom_command(TARGET ${target_name}
 # object files built with the GCC -fprofile-arcs option is executed.
 # https://gcc.gnu.org/onlinedocs/gcc/Gcov-Data-Files.html
 set(GCDA_FILES "${LUA_SOURCE_DIR}/*.gcda")
-if(USE_LUAJIT)
+if(IS_LUAJIT)
   # Files 'src/host/*.gcda' are not removed, because
   # CMake cannot remove recursively by globbing.
   # Files 'src/host/*.gcda' are not used for building coverage report.

@@ -32,7 +32,7 @@ set(CMAKE_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_INCLUDE_PATH}
 include(SetBuildParallelLevel)
 include(SetHardwareArch)
 
-if (ENABLE_LUAJIT_RANDOM_RA AND NOT USE_LUAJIT)
+if (ENABLE_LUAJIT_RANDOM_RA AND NOT IS_LUAJIT)
   message(FATAL_ERROR "Option ENABLE_LUAJIT_RANDOM_RA is LuaJIT-specific.")
 endif()
 
@@ -50,6 +50,7 @@ if (USE_LUA)
 elseif (USE_LUAJIT)
   include(BuildLuaJIT)
   build_luajit(${LUA_VERSION})
+  set(IS_LUAJIT TRUE)
 else ()
   message(FATAL_ERROR "No Lua is specified.")
 endif ()

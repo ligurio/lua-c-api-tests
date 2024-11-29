@@ -83,7 +83,7 @@ macro(build_luajit LJ_VERSION)
 
     include(ExternalProject)
 
-    set(LUA_LIBRARIES ${LJ_SOURCE_DIR}/src/libluajit.a)
+    set(LUA_LIBRARY ${LJ_SOURCE_DIR}/src/libluajit.a)
     set(LUA_EXECUTABLE ${LJ_SOURCE_DIR}/src/luajit)
 
     ExternalProject_Add(patched-luajit-${LJ_VERSION}
@@ -110,13 +110,17 @@ macro(build_luajit LJ_VERSION)
                                                  -C src
         INSTALL_COMMAND ""
 
-        BUILD_BYPRODUCTS ${LUA_LIBRARIES} ${LUA_EXECUTABLE}
+        BUILD_BYPRODUCTS ${LUA_LIBRARY} ${LUA_EXECUTABLE}
     )
 
-    set(LUA_SOURCE_DIR ${LJ_SOURCE_DIR})
+    add_library(bundled-liblua STATIC IMPORTED GLOBAL)
+    set_target_properties(bundled-liblua PROPERTIES
+      IMPORTED_LOCATION ${LUA_LIBRARY})
+    add_dependencies(bundled-liblua patched-luajit-${LJ_VERSION})
+
+    set(LUA_LIBRARIES bundled-liblua)
     set(LUA_INCLUDE_DIR ${LJ_SOURCE_DIR}/src/)
     set(LUA_VERSION_STRING "LuaJIT ${LJ_VERSION}")
-    set(LUA_TARGET patched-luajit-${LJ_VERSION})
 
     unset(LJ_SOURCE_DIR)
     unset(LJ_BINARY_DIR)

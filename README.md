@@ -9,6 +9,12 @@
     <td></td>
     <td><a href="https://github.com/ispras/oss-sydr-fuzz/tree/master/projects/luajit"><img src="https://img.shields.io/static/v1?label=oss-sydr-fuzz&message=fuzzing&color=brightgreen"></a></td>
   </tr>
+  <tr>
+    <th>Tarantool</th>
+    <td><a href="https://bugs.chromium.org/p/oss-fuzz/issues/list?sort=-opened&can=1&q=proj:tarantool"><img src="https://oss-fuzz-build-logs.storage.googleapis.com/badges/tarantool.svg"></a></td>
+    <td><a href="https://github.com/ispras/oss-sydr-fuzz/tree/master/projects/tarantool"><img src="https://img.shields.io/static/v1?label=oss-sydr-fuzz&message=fuzzing&color=brightgreen"></a></td>
+  </tr>
+ </tr>
 </table>
 
 # Lua C API tests

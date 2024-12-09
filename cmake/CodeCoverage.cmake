@@ -42,7 +42,7 @@ if(USE_LUAJIT)
   # Exclude buildvm source code, it's a project's build infrastructure.
   set(GCOVR_OPTIONS ${GCOVR_OPTIONS} --exclude ".*/host/")
   set(GCOVR_OPTIONS ${GCOVR_OPTIONS} --object-directory ${LUA_SOURCE_DIR}/src)
-endif (USE_LUAJIT)
+endif ()
 
 file(MAKE_DIRECTORY ${COVERAGE_DIR})
 add_custom_target(${target_name})
@@ -61,7 +61,7 @@ if(USE_LUAJIT)
   # CMake cannot remove recursively by globbing.
   # Files 'src/host/*.gcda' are not used for building coverage report.
   set(GCDA_FILES "${LUA_SOURCE_DIR}/src/*.gcda")
-endif(USE_LUAJIT)
+endif()
 add_custom_target(coverage-reset
   COMMENT "Reset code coverage counters"
   COMMAND ${CMAKE_COMMAND} -E rm -f ${GCDA_FILES}

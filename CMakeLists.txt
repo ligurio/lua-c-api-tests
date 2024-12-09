@@ -56,6 +56,11 @@ elseif (LUA_INCLUDE_DIR AND LUA_LIBRARIES AND LUA_EXECUTABLE AND LUA_VERSION_STR
   message(STATUS "LUA_INCLUDE_DIR: ${LUA_INCLUDE_DIR}")
   message(STATUS "LUA_LIBRARIES: ${LUA_LIBRARIES}")
   message(STATUS "LUA_EXECUTABLE: ${LUA_EXECUTABLE}")
+
+  add_library(bundled-liblua STATIC IMPORTED GLOBAL)
+  set_target_properties(bundled-liblua PROPERTIES
+    IMPORTED_LOCATION ${LUA_LIBRARIES})
+  set(LUA_LIBRARIES bundled-liblua)
 else ()
   message(FATAL_ERROR "No Lua is specified.")
 endif ()

@@ -29,19 +29,19 @@ target_link_libraries(
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(LDFLAGS "${LDFLAGS} ${CMAKE_C_FLAGS_DEBUG}")
-endif (CMAKE_BUILD_TYPE STREQUAL "Debug")
+endif()
 
 if (ENABLE_ASAN)
   set(LDFLAGS "${LDFLAGS} -fsanitize=address")
-endif (ENABLE_ASAN)
+endif()
 
 if (ENABLE_UBSAN)
   set(LDFLAGS "${LDFLAGS} -fsanitize=undefined")
-endif (ENABLE_UBSAN)
+endif()
 
 if (ENABLE_COV)
   set(LDFLAGS "${LDFLAGS} -fprofile-instr-generate -fcoverage-mapping")
-endif (ENABLE_COV)
+endif()
 
 set(DEFAULT_RUNS_NUMBER 5)
 
@@ -96,14 +96,14 @@ function(create_test)
     set_tests_properties(${test_name} PROPERTIES
       ENVIRONMENT "ASAN_OPTIONS='detect_invalid_pointer_pairs=2'"
     )
-  endif (USE_LUA)
+  endif()
   set_tests_properties(${test_name} PROPERTIES
     LABELS capi
   )
 
   if (USE_LUAJIT)
     target_compile_definitions(${test_name} PUBLIC LUAJIT)
-  endif (USE_LUAJIT)
+  endif()
 endfunction()
 
 # These Lua C functions are unsupported by LuaJIT.

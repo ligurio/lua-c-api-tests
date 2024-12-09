@@ -5,7 +5,7 @@ if (ENABLE_COV)
              -fcoverage-mapping -ftest-coverage)
   set(LDFLAGS ${LDFLAGS} -fprofile-instr-generate -fprofile-arcs
               -fcoverage-mapping -ftest-coverage)
-endif (ENABLE_COV)
+endif()
 
 set(LIB_LUA_MUTATE lua_mutate)
 add_library(${LIB_LUA_MUTATE} STATIC mutate.c)

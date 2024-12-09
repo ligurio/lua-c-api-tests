@@ -34,7 +34,7 @@ include(SetHardwareArch)
 
 if (ENABLE_LUAJIT_RANDOM_RA AND NOT USE_LUAJIT)
   message(FATAL_ERROR "Option ENABLE_LUAJIT_RANDOM_RA is LuaJIT-specific.")
-endif (ENABLE_LUAJIT_RANDOM_RA AND NOT USE_LUAJIT)
+endif()
 
 if (USE_LUA AND NOT LUA_VERSION)
   set(LUA_VERSION "master")
@@ -70,7 +70,7 @@ endif()
 find_package(Protobuf)
 if (NOT Protobuf_FOUND)
     set(ENABLE_BUILD_PROTOBUF ON)
-endif (NOT Protobuf_FOUND)
+endif()
 
 SetBuildParallelLevel(CMAKE_BUILD_PARALLEL_LEVEL)
 

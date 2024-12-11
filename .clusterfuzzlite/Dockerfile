@@ -7,7 +7,7 @@
 FROM gcr.io/oss-fuzz-base/base-builder:v1
 
 RUN apt-get update && apt-get install -y \
-	build-essential cmake make \
+	build-essential ninja-build cmake make \
 	libreadline-dev libunwind-dev zlib1g-dev \
 	protobuf-compiler libprotobuf-dev
 

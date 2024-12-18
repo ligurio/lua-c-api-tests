@@ -27,20 +27,29 @@ target_link_libraries(
         >
 )
 
+# The following condition looks unnecessary, it was added to fix
+# an issue for Sydr: in the Lua external project in the build
+# system the explicit build command is used:
+# BUILD_COMMAND cd <SOURCE_DIR> && make -j CC=${CMAKE_C_COMPILER} CFLAGS=${CFLAGS} LDFLAGS=${LDFLAGS},
+# which use only flags for Lua build, which were explicitly
+# declared earlier, so we need to add `-g` to CFLAGS by ourselves.
+# See [1].
+#
+# 1. https://github.com/ligurio/lua-c-api-tests/pull/6#discussion_r1185003511
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-  set(LDFLAGS "${LDFLAGS} ${CMAKE_C_FLAGS_DEBUG}")
+  AppendFlags(LDFLAGS ${CMAKE_C_FLAGS_DEBUG})
 endif()
 
 if (ENABLE_ASAN)
-  set(LDFLAGS "${LDFLAGS} -fsanitize=address")
+  AppendFlags(LDFLAGS -fsanitize=address)
 endif()
 
 if (ENABLE_UBSAN)
-  set(LDFLAGS "${LDFLAGS} -fsanitize=undefined")
+  AppendFlags(LDFLAGS -fsanitize=undefined)
 endif()
 
 if (ENABLE_COV)
-  set(LDFLAGS "${LDFLAGS} -fprofile-instr-generate -fcoverage-mapping")
+  AppendFlags(LDFLAGS -fprofile-instr-generate -fcoverage-mapping)
 endif()
 
 set(DEFAULT_RUNS_NUMBER 5)

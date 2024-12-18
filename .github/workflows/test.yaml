@@ -33,10 +33,15 @@ jobs:
         LUA:
           - "lua"
           - "luajit"
+          - "tarantool"
       fail-fast: false
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          repository: ${{ matrix.LUA == 'tarantool' && 'tarantool/tarantool' || github.repository }}
 
       - name: Setup common packages
         run: |
@@ -50,7 +55,13 @@ jobs:
                               libz-dev \
                               ninja-build \
                               pkg-config \
-                              protobuf-compiler
+                              protobuf-compiler \
+                              build-essential \
+                              liblz4-dev \
+                              autoconf \
+                              automake \
+                              libtool \
+                              util-linux
 
       - name: Running CMake (PUC Rio Lua -current)
         run: |
@@ -68,10 +79,22 @@ jobs:
                 -G Ninja -S . -B build
         if: ${{ matrix.LUA == 'luajit' }}
 
+      - name: Running CMake (Tarantool)
+        run: |
+          cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+                -DCMAKE_BUILD_TYPE=Debug -DENABLE_FUZZER=ON \
+                -G Ninja -S . -B build
+        env:
+          LUA_TESTS_GIT_REF: ${{ github.event.pull_request.head.sha || github.sha }}
+        if: ${{ matrix.LUA == 'tarantool' }}
+
       - name: Building
-        run: cmake --build build --parallel $(nproc)
+        run: |
+          cmake --build build --parallel $(nproc) \
+                --target ${{ matrix.LUA == 'tarantool' && 'lua-tests' || 'all' }}
 
       - name: Testing
         run: cmake --build build --target test
         env:
           CTEST_OUTPUT_ON_FAILURE: 1
+        if: ${{ matrix.LUA != 'tarantool' }}

@@ -1,7 +1,7 @@
-add_library(fuzzer_config INTERFACE)
+add_library(config INTERFACE)
 
 target_compile_options(
-    fuzzer_config
+    config
     INTERFACE
         $<$<NOT:$<BOOL:${OSS_FUZZ}>>:
         -fsanitize=fuzzer
@@ -16,7 +16,7 @@ target_compile_options(
 # Some references are defined in `libc++` and used by Centipede,
 # so -lc++ needs to come after centipede's lib.
 target_link_libraries(
-    fuzzer_config
+    config
     INTERFACE
         $<$<NOT:$<BOOL:${OSS_FUZZ}>>:
         -fsanitize=fuzzer
@@ -77,7 +77,7 @@ function(create_test)
   get_filename_component(test_name ${FUZZ_FILENAME} NAME_WE)
   add_executable(${test_name} ${FUZZ_SOURCES})
 
-  target_link_libraries(${test_name} PUBLIC fuzzer_config ${FUZZ_LIBRARIES} ${LUA_LIBRARIES} ${LDFLAGS})
+  target_link_libraries(${test_name} PUBLIC config ${FUZZ_LIBRARIES} ${LUA_LIBRARIES} ${LDFLAGS})
   target_include_directories(${test_name} PRIVATE ${LUA_INCLUDE_DIR})
   target_compile_options(${test_name} PRIVATE -Wall -Wextra -Wpedantic -Wno-unused-parameter -g)
   add_dependencies(${test_name} ${LUA_LIBRARIES})

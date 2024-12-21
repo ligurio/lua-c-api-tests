@@ -1,7 +1,7 @@
-add_library(fuzzer_config INTERFACE)
+add_library(config INTERFACE)
 
 target_compile_options(
-    fuzzer_config
+    config
     INTERFACE
         $<$<NOT:$<BOOL:${OSS_FUZZ}>>:
         -fsanitize=fuzzer
@@ -16,7 +16,7 @@ target_compile_options(
 # Some references are defined in `libc++` and used by Centipede,
 # so -lc++ needs to come after centipede's lib.
 target_link_libraries(
-    fuzzer_config
+    config
     INTERFACE
         $<$<NOT:$<BOOL:${OSS_FUZZ}>>:
         -fsanitize=fuzzer
@@ -27,21 +27,30 @@ target_link_libraries(
         >
 )
 
+# The following condition looks unnecessary, it was added to fix
+# an issue for Sydr: in the Lua external project in the build
+# system the explicit build command is used:
+# BUILD_COMMAND cd <SOURCE_DIR> && make -j CC=${CMAKE_C_COMPILER} CFLAGS=${CFLAGS} LDFLAGS=${LDFLAGS},
+# which use only flags for Lua build, which were explicitly
+# declared earlier, so we need to add `-g` to CFLAGS by ourselves.
+# See [1].
+#
+# 1. https://github.com/ligurio/lua-c-api-tests/pull/6#discussion_r1185003511
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-  set(LDFLAGS "${LDFLAGS} ${CMAKE_C_FLAGS_DEBUG}")
-endif (CMAKE_BUILD_TYPE STREQUAL "Debug")
+  AppendFlags(LDFLAGS ${CMAKE_C_FLAGS_DEBUG})
+endif()
 
 if (ENABLE_ASAN)
-  set(LDFLAGS "${LDFLAGS} -fsanitize=address")
-endif (ENABLE_ASAN)
+  AppendFlags(LDFLAGS -fsanitize=address)
+endif()
 
 if (ENABLE_UBSAN)
-  set(LDFLAGS "${LDFLAGS} -fsanitize=undefined")
-endif (ENABLE_UBSAN)
+  AppendFlags(LDFLAGS -fsanitize=undefined)
+endif()
 
 if (ENABLE_COV)
-  set(LDFLAGS "${LDFLAGS} -fprofile-instr-generate -fcoverage-mapping")
-endif (ENABLE_COV)
+  AppendFlags(LDFLAGS -fprofile-instr-generate -fcoverage-mapping)
+endif()
 
 set(DEFAULT_RUNS_NUMBER 5)
 
@@ -68,16 +77,16 @@ function(create_test)
   get_filename_component(test_name ${FUZZ_FILENAME} NAME_WE)
   add_executable(${test_name} ${FUZZ_SOURCES})
 
-  target_link_libraries(${test_name} PUBLIC fuzzer_config ${FUZZ_LIBRARIES} ${LUA_LIBRARIES} ${LDFLAGS})
+  target_link_libraries(${test_name} PUBLIC config ${FUZZ_LIBRARIES} ${LUA_LIBRARIES} ${LDFLAGS})
   target_include_directories(${test_name} PRIVATE ${LUA_INCLUDE_DIR})
   target_compile_options(${test_name} PRIVATE -Wall -Wextra -Wpedantic -Wno-unused-parameter -g)
-  add_dependencies(${test_name} ${LUA_TARGET})
+  add_dependencies(${test_name} ${LUA_LIBRARIES})
   string(REPLACE "_test" "" test_prefix ${test_name})
   set(LIBFUZZER_OPTS "${LIBFUZZER_OPTS} -artifact_prefix=${test_name}_")
-  if (USE_LUAJIT AND (${test_name} STREQUAL "lua_dump_test"))
+  if (IS_LUAJIT AND (${test_name} STREQUAL "lua_dump_test"))
     set(LIBFUZZER_OPTS "${LIBFUZZER_OPTS} -only_ascii=1")
   endif ()
-  if (USE_LUAJIT AND (${test_name} STREQUAL "lua_load_test"))
+  if (IS_LUAJIT AND (${test_name} STREQUAL "lua_load_test"))
     set(LIBFUZZER_OPTS "${LIBFUZZER_OPTS} -only_ascii=1")
   endif ()
   set(dict_path ${PROJECT_SOURCE_DIR}/corpus/${test_name}.dict)
@@ -96,14 +105,14 @@ function(create_test)
     set_tests_properties(${test_name} PROPERTIES
       ENVIRONMENT "ASAN_OPTIONS='detect_invalid_pointer_pairs=2'"
     )
-  endif (USE_LUA)
+  endif()
   set_tests_properties(${test_name} PROPERTIES
     LABELS capi
   )
 
-  if (USE_LUAJIT)
+  if (IS_LUAJIT)
     target_compile_definitions(${test_name} PUBLIC LUAJIT)
-  endif (USE_LUAJIT)
+  endif()
 endfunction()
 
 # These Lua C functions are unsupported by LuaJIT.
@@ -121,7 +130,7 @@ list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_loadstring_test")
 file(GLOB tests LIST_DIRECTORIES false ${CMAKE_CURRENT_SOURCE_DIR} *.c *.cc)
 foreach(filename ${tests})
   get_filename_component(test_name ${filename} NAME_WE)
-  if (USE_LUAJIT AND (${test_name} IN_LIST LUAJIT_BLACKLIST_TESTS))
+  if (IS_LUAJIT AND (${test_name} IN_LIST LUAJIT_BLACKLIST_TESTS))
     continue()
   endif ()
   if ((${test_name} IN_LIST BLACKLIST_TESTS))
@@ -134,6 +143,6 @@ endforeach()
 
 include(ProtobufMutator)
 add_subdirectory(luaL_loadbuffer_proto)
-if(USE_LUAJIT)
+if(IS_LUAJIT)
   add_subdirectory(ffi_cdef_proto)
 endif ()

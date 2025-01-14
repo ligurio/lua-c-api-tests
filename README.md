@@ -62,5 +62,5 @@ cd build && RUNS=100000 ctest -R luaL_gsub_test --verbose
 
 ### License
 
-Copyright (C) 2022-2024 [Sergey Bronnikov](https://bronevichok.ru/),
+Copyright (C) 2022-2025 [Sergey Bronnikov](https://bronevichok.ru/),
 released under the ISC license. See a full Copyright Notice in the LICENSE file.

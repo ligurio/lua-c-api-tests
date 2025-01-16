@@ -96,6 +96,15 @@ local function random_locale(fdp)
     return fdp:oneof(locales)
 end
 
+local function random_table(fdp)
+    local max = fdp:consume_integer(0, MAX_INT64)
+    local t = {}
+    for i = 1, max do
+        t[i] = i
+    end
+    return t
+end
+
 return {
     approx_equal = approx_equal,
     bitwise_op = bitwise_op,
@@ -111,4 +120,5 @@ return {
 
     -- FDP.
     random_locale = random_locale,
+    random_table = random_table,
 }

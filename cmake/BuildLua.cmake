@@ -61,6 +61,10 @@ macro(build_lua LUA_VERSION)
     # not be used when making a shared object; recompile with -fPIC".
     set(CFLAGS "${CFLAGS} -fPIC")
 
+    # `io.popen()` is not supported by default, it is enabled
+    # by `LUA_USE_POSIX` flag. Required by a function `random_locale()`.
+    set(CFLAGS "${CFLAGS} -DLUA_USE_POSIX")
+
     include(ExternalProject)
 
     set(LUA_LIBRARY ${PROJECT_BINARY_DIR}/lua-${LUA_VERSION}/source/liblua.a)

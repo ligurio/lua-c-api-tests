@@ -50,6 +50,16 @@ local function bitwise_op(op_name)
     end
 end
 
+local function random_locale(fdp)
+    local locales = {}
+    local locale_it = io.popen("locale -a"):read("*a"):gmatch("([^\n]*)\n?")
+    for locale in locale_it do
+        table.insert(locales, locale)
+    end
+
+    return fdp:oneof(locales)
+end
+
 return {
     lua_version = lua_version,
     bitwise_op = bitwise_op,
@@ -57,4 +67,7 @@ return {
     MIN_INT64 = MIN_INT64,
     MAX_INT = MAX_INT,
     MIN_INT = MIN_INT,
+
+    -- FDP.
+    random_locale = random_locale,
 }

@@ -96,9 +96,19 @@ local function random_locale(fdp)
     return fdp:oneof(locales)
 end
 
+local function luabin(argv)
+    -- arg[-1] is guaranteed to be not nil.
+    local idx = -2
+    while argv[idx] do
+        idx = idx - 1
+    end
+    return argv[idx + 1]
+end
+
 return {
     approx_equal = approx_equal,
     bitwise_op = bitwise_op,
+    luabin = luabin,
     lua_version = lua_version,
     lua_current_version_ge_than = lua_current_version_ge_than,
     lua_current_version_lt_than = lua_current_version_lt_than,

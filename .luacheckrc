@@ -5,3 +5,9 @@ files["tests/capi/luaL_loadbuffer_proto/preamble.lua"] = {
         "211",
     },
 }
+
+globals = {
+    table = {
+        fields = { "create" }
+    }
+}

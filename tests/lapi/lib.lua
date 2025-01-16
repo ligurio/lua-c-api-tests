@@ -7,12 +7,31 @@ Test helpers.
 
 -- The function determines a Lua version.
 local function lua_version()
+    local major, minor = _VERSION:match("([%d]+)%.(%d+)")
+    local version = {
+        major = tonumber(major),
+        minor = tonumber(minor),
+    }
     local is_luajit, _ = pcall(require, "jit")
-    if is_luajit then
-        return "LuaJIT"
-    end
+    local lua_name = is_luajit and "LuaJIT" or "PUC Rio Lua"
+    return lua_name, version
+end
 
-    return _VERSION
+local function version_ge(version1, version2)
+    if version1.major ~= version2.major then
+        return version1.major > version2.major
+    else
+        return version1.minor >= version2.minor
+    end
+end
+
+local function lua_current_version_ge_than(major, minor)
+    local _, current_version = lua_version()
+    return version_ge(current_version, { major = major, minor = minor })
+end
+
+local function lua_current_version_lt_than(major, minor)
+    return not lua_current_version_ge_than(major, minor)
 end
 
 -- By default `lua_Integer` is ptrdiff_t in Lua 5.1 and Lua 5.2
@@ -56,9 +75,22 @@ local function bitwise_op(op_name)
     end
 end
 
+local function math_pow(x, y)
+    return x ^ y
+end
+
+local function approx_equal(a, b, epsilon)
+    local abs = math.abs
+    return abs(a - b) <= ((abs(a) < abs(b) and abs(b) or abs(a)) * epsilon)
+end
+
 return {
-    lua_version = lua_version,
+    approx_equal = approx_equal,
     bitwise_op = bitwise_op,
+    lua_version = lua_version,
+    lua_current_version_ge_than = lua_current_version_ge_than,
+    lua_current_version_lt_than = lua_current_version_lt_than,
+    math_pow = math_pow,
     MAX_INT64 = MAX_INT64,
     MIN_INT64 = MIN_INT64,
     MAX_INT = MAX_INT,

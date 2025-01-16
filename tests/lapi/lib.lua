@@ -96,12 +96,22 @@ local function random_locale(fdp)
     return fdp:oneof(locales)
 end
 
+local function err_handler(ignored_msgs)
+    return function(error_msg)
+        for _, ignored_msg in ipairs(ignored_msgs) do
+            local x, _ = string.find(error_msg, ignored_msg)
+            if x then break end
+        end
+    end
+end
+
 return {
     approx_equal = approx_equal,
     bitwise_op = bitwise_op,
-    lua_version = lua_version,
+    err_handler = err_handler,
     lua_current_version_ge_than = lua_current_version_ge_than,
     lua_current_version_lt_than = lua_current_version_lt_than,
+    lua_version = lua_version,
     math_pow = math_pow,
     MAX_INT64 = MAX_INT64,
     MIN_INT64 = MIN_INT64,

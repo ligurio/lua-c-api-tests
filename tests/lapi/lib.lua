@@ -105,8 +105,23 @@ local function err_handler(ignored_msgs)
     end
 end
 
+local function is_nan(v)
+    return v ~= v
+end
+
+local function arrays_equal(t1, t2)
+    for i = 1, #t1 do
+        if t1[i] ~= t2[i] and
+           not (is_nan(t1[i]) and is_nan(t2[i])) then
+            return false
+        end
+    end
+    return #t1 == #t2
+end
+
 return {
     approx_equal = approx_equal,
+    arrays_equal = arrays_equal,
     bitwise_op = bitwise_op,
     err_handler = err_handler,
     lua_current_version_ge_than = lua_current_version_ge_than,

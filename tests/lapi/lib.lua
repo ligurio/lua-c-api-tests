@@ -55,6 +55,8 @@ local MIN_INT64 = math.mininteger or -0x8000000000000000
 local MAX_INT =  0x7fffffff
 local MIN_INT = -0x80000000
 
+local MAX_STR_LEN = 4096
+
 local function bitwise_op(op_name)
     return function(...)
         local n = select("#", ...)
@@ -84,6 +86,16 @@ local function approx_equal(a, b, epsilon)
     return abs(a - b) <= ((abs(a) < abs(b) and abs(b) or abs(a)) * epsilon)
 end
 
+local function random_locale(fdp)
+    local locales = {}
+    local locale_it = io.popen("locale -a"):read("*a"):gmatch("([^\n]*)\n?")
+    for locale in locale_it do
+        table.insert(locales, locale)
+    end
+
+    return fdp:oneof(locales)
+end
+
 return {
     approx_equal = approx_equal,
     bitwise_op = bitwise_op,
@@ -95,4 +107,8 @@ return {
     MIN_INT64 = MIN_INT64,
     MAX_INT = MAX_INT,
     MIN_INT = MIN_INT,
+    MAX_STR_LEN = MAX_STR_LEN,
+
+    -- FDP.
+    random_locale = random_locale,
 }

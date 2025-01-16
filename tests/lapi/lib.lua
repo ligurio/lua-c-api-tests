@@ -50,9 +50,27 @@ local function bitwise_op(op_name)
     end
 end
 
+local function approx_equal(a, b, epsilon)
+    local abs = math.abs
+    return abs(a - b) <= ((abs(a) < abs(b) and abs(b) or abs(a)) * epsilon)
+end
+
+local function definitely_lt(a, b, epsilon)
+    local abs = math.abs
+    return (b - a) > ((abs(a) < abs(b) and abs(b) or abs(a)) * epsilon)
+end
+
+local function definitely_gt(a, b, epsilon)
+    local abs = math.abs
+    return (a - b) > ((abs(a) < abs(b) and abs(b) or abs(a)) * epsilon)
+end
+
 return {
-    lua_version = lua_version,
+    approx_equal = approx_equal,
     bitwise_op = bitwise_op,
+    definitely_gt = definitely_gt,
+    definitely_lt= definitely_lt,
+    lua_version = lua_version,
     MAX_INT64 = MAX_INT64,
     MIN_INT64 = MIN_INT64,
     MAX_INT = MAX_INT,

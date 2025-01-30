@@ -17,6 +17,9 @@
 
 ### LuaJIT
 
+1. ASSERT: `lj_obj_equal(tv, &tvk)`,
+   https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=57435,
+   https://github.com/LuaJIT/LuaJIT/issues/9
 1. 0th register may be considered as `RID_NONE` in `asm_head_side`,
    https://github.com/LuaJIT/LuaJIT/issues/1016,
    https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=58555
@@ -60,6 +63,15 @@
 1. Uninitialized read in `predict_next()`,
    https://oss-fuzz.com/testcase-detail/5091141278564352
    https://github.com/LuaJIT/LuaJIT/issues/1226
+1. State is not restored during recording `__concat` metamethod in case of the OOM,
+   https://github.com/LuaJIT/LuaJIT/issues/1298,
+   https://issues.oss-fuzz.com/issues/372358472
+1. Unsinking the table with `IRFL_TAB_NOMM` leads to the assertion failure,
+   https://github.com/LuaJIT/LuaJIT/issues/1052
+1. Multi-concat recording doesn't handle vararg/protected frames,
+   https://github.com/LuaJIT/LuaJIT/issues/1164
+1. Incorrect narrowing for huge numbers,
+   https://github.com/LuaJIT/LuaJIT/issues/1236
 
 ### Tarantool
 
@@ -78,3 +90,4 @@
 1. https://www.lua.org/bugs.html
 1. https://github.com/google/oss-fuzz-vulns/tree/main/vulns/lua
 1. https://oss-fuzz.com/testcases?project=lua&open=yes
+1. https://github.com/tarantool/tarantool/wiki/Fuzzing

@@ -76,6 +76,30 @@ local __idiv = load([[
     local v1, v2 = ...
     return always_number(v1) // always_number(v2)
 ]])
+local __band = load([[
+    local v1, v2 = ...
+    return always_number(v1) & always_number(v2)
+]])
+local __bor = load([[
+    local v1, v2 = ...
+    return always_number(v1) | always_number(v2)
+]])
+local __bxor = load([[
+    local v1, v2 = ...
+    return always_number(v1) ~ always_number(v2)
+]])
+local __bnot = load([[
+    local v = ...
+    return ~always_number(v)
+]])
+local __shl = load([[
+    local v1, v2 = ...
+    return always_number(v1) << always_number(v2)
+]])
+local __shr = load([[
+    local v1, v2 = ...
+    return always_number(v1) >> always_number(v2)
+]])
 
 debug.setmetatable('string', {
     __add = __add,
@@ -89,6 +113,12 @@ debug.setmetatable('string', {
     __pow = __pow,
     __sub = __sub,
     __unm = __unm,
+    __band = __band,
+    __bor = __bor,
+    __bxor = __bxor,
+    __bnot = __bnot,
+    __shl = __shl,
+    __shr = __shr,
 })
 debug.setmetatable(0, {
     __add = __add,

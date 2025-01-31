@@ -1185,6 +1185,19 @@ PROTO_TOSTRING(BinaryOperator, op)
 		return "and";
 	case BinopType::kOr:
 		return "or";
+
+#if LUA_VERSION_NUM >= 503
+	case BinopType::kBAnd:
+		return "&";
+	case BinopType::kBOr:
+		return "|";
+	case BinopType::kBXor:
+		return "~";
+	case BinopType::kBShl:
+		return "<<";
+	case BinopType::kBShr:
+		return ">>";
+#endif
 	default:
 		/* Works in most cases. */
 		return "==";
@@ -1201,6 +1214,10 @@ PROTO_TOSTRING(UnaryOperator, op)
 		return "not ";
 	case UnaryopType::kLength:
 		return "#";
+#if LUA_VERSION_NUM >= 503
+	case UnaryopType::kBNot:
+		return "~";
+#endif
 	default:
 		/* Works in most cases. */
 		return "not ";

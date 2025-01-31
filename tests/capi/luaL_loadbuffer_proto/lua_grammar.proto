@@ -386,6 +386,13 @@ message BinaryOperator {
 
         /* Arithmetic operators (5.3+). */
         uint32 idiv = 16;
+
+        /* Bitwise operators (5.3+). */
+        uint32 band = 17;
+        uint32 bor = 18;
+        uint32 bxor = 19;
+        uint32 shl = 20;
+        uint32 shr = 21;
     }
 }
 
@@ -395,6 +402,9 @@ message UnaryOperator {
         uint32 negate = 1;
         uint32 not = 2;
         uint32 length = 3;
+
+        /* Bitwise operators (5.3+). */
+        uint32 bnot = 4;
     }
 }
 

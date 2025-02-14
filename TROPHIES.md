@@ -10,10 +10,16 @@
    https://marc.info/?l=lua-l&m=170274071304413&w=2
    https://github.com/lua/lua/commit/5853c37a83ec66ccb45094f9aeac23dfdbcde671
 1. "heap-use-after-free" issue in `luaV_finishget`,
-   https://groups.google.com/g/lua-l/c/s2hBcf8aLIU
+   https://groups.google.com/g/lua-l/c/s2hBcf8aLIU,
+   https://oss-fuzz.com/testcase-detail/5350818532360192,
    https://github.com/lua/lua/commit/88a50ffa715483e7187c0d7d6caaf708ebacf756
 1. Assertion in `luaK_codeABCk`,
-   https://groups.google.com/g/lua-l/c/H0Iq-eAig94
+   https://groups.google.com/g/lua-l/c/H0Iq-eAig94,
+   https://oss-fuzz.com/testcase-detail/5166379907481600
+1. An assertion is triggered in `lgc.c:freeobj()`,
+   https://groups.google.com/g/lua-l/c/CCpPLX1ug3A,
+   https://oss-fuzz.com/testcase-detail/6073198411579392,
+   https://github.com/lua/lua/commit/f9e35627ed26dff4114a1d01ff113d8b4cc91ab5
 
 ### LuaJIT
 
@@ -72,6 +78,12 @@
    https://github.com/LuaJIT/LuaJIT/issues/1164
 1. Incorrect narrowing for huge numbers,
    https://github.com/LuaJIT/LuaJIT/issues/1236
+1. Assertion failure when flushing already flushed trace,
+   https://github.com/LuaJIT/LuaJIT/issues/1345
+1. Read from already collected string data in case of the error in loadfile,
+   https://github.com/LuaJIT/LuaJIT/issues/1353
+1. JIT slots overflow for side-trace after up-recursion,
+   https://github.com/LuaJIT/LuaJIT/issues/1358
 
 ### Tarantool
 

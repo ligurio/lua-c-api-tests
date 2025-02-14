@@ -14,8 +14,8 @@ abstract: >-
   continuous fuzzing for Lua runtimes: PUC Rio Lua and LuaJIT.
   It aims to make these open-source software more secure and
   stable by combining modern fuzzing techniques with scalable,
-  distributed execution. As of August 2024, lua-c-api-tests has
-  helped identify and fix 5 bugs in PUC Rio Lua, 23 bugs in
+  distributed execution. As of April 2025, the project has
+  helped identify and fix 5 bugs in PUC Rio Lua, 26 bugs in
   LuaJIT, and 4 bugs in Tarantool.
 type: software
 repository-code: "https://github.com/ligurio/lua-c-api-tests"

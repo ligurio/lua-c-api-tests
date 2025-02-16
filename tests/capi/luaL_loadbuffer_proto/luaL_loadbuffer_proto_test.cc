@@ -181,11 +181,10 @@ metrics_increment_num_error_samples(struct metrics *metrics)
 }
 
 UNUSED static void
-profiler_cb(lua_State *L, void *data, size_t *size)
+profiler_cb(lua_State *L, void *data, int samples, int vmstate)
 {
 	(void)L;
 	(void)data;
-	(void)size;
 	/* Do nothing. */
 }
 

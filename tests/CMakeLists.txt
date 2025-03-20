@@ -18,4 +18,6 @@ if(IS_LUAJIT)
 endif()
 
 add_subdirectory(capi)
-add_subdirectory(lapi)
+if(ENABLE_LAPI_TESTS)
+  add_subdirectory(lapi)
+endif()

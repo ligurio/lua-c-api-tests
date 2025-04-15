@@ -16,7 +16,7 @@ jobs:
 # are covered by fuzzing.
 
   Coverage:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
@@ -46,7 +46,7 @@ jobs:
 # code coverage.
 
   Pruning:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup

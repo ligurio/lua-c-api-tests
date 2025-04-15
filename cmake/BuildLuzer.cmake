@@ -12,7 +12,7 @@ get_target_property(LUA_LIBRARIES_LOCATION ${LUA_LIBRARIES} LOCATION)
 
 ExternalProject_Add(bundled-luzer
     GIT_REPOSITORY https://github.com/ligurio/luzer
-    GIT_TAG bc791dc5656b4f7238402155651f6927fae39faa
+    GIT_TAG ligurio/gh-44-fix-arg-order
     GIT_PROGRESS TRUE
     GIT_SHALLOW FALSE
     SOURCE_DIR ${LUZER_DIR}/source

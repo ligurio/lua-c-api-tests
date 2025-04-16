@@ -5,6 +5,7 @@ macro(build_lua LUA_VERSION)
     set(LUA_PATCH_PATH ${PROJECT_SOURCE_DIR}/patches/puc-rio-lua.patch)
 
     set(CFLAGS "${CMAKE_C_FLAGS} -fno-omit-frame-pointer")
+    set(CFLAGS "${CMAKE_C_FLAGS} -DLUA_USE_DLOPEN")
     if (ENABLE_LUA_ASSERT)
         set(CFLAGS "${CFLAGS} -DLUAI_ASSERT")
     endif (ENABLE_LUA_ASSERT)
@@ -56,6 +57,13 @@ macro(build_lua LUA_VERSION)
         set(LDFLAGS "${LDFLAGS} -fprofile-instr-generate -fprofile-arcs -fcoverage-mapping -ftest-coverage")
     endif (ENABLE_COV)
 
+    # "relocation R_X86_64_PC32 against symbol `lua_isnumber' can
+    # not be used when making a shared object; recompile with -fPIC".
+    set(CFLAGS "${CFLAGS} -fPIC")
+
+    # `io.popen()` is not supported by default, it is enabled
+    # by `LUA_USE_POSIX` flag. Required by a function `random_locale()`.
+    set(CFLAGS "${CFLAGS} -DLUA_USE_POSIX")
 
     include(ExternalProject)
 

@@ -66,6 +66,11 @@ string(JOIN " " LIBFUZZER_OPTS
   -use_value_profile=1
 )
 
+set(CORPUS_BASE_PATH ${PROJECT_SOURCE_DIR}/corpus)
+if(USE_LUAJIT)
+  set(CORPUS_BASE_PATH ${CORPUS_BASE_PATH}/corpus)
+endif()
+
 function(create_test)
   cmake_parse_arguments(
     FUZZ
@@ -89,8 +94,11 @@ function(create_test)
   if (IS_LUAJIT AND (${test_name} STREQUAL "lua_load_test"))
     set(LIBFUZZER_OPTS "${LIBFUZZER_OPTS} -only_ascii=1")
   endif ()
-  set(dict_path ${PROJECT_SOURCE_DIR}/corpus/${test_name}.dict)
-  set(corpus_path ${PROJECT_SOURCE_DIR}/corpus/${test_prefix})
+  set(dict_path ${CORPUS_BASE_PATH}/${test_name}.dict)
+  set(corpus_path ${CORPUS_BASE_PATH}/${test_prefix})
+  if(USE_LUAJIT)
+    set(corpus_path ${CORPUS_BASE_PATH}/${test_name})
+  endif()
   if (EXISTS ${dict_path})
     set(LIBFUZZER_OPTS "${LIBFUZZER_OPTS} -dict=${dict_path}")
   endif ()

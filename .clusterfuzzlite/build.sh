@@ -54,7 +54,7 @@ git config --global --add safe.directory '*'
 cmake "${cmake_args[@]}" -S . -B build -G Ninja
 cmake --build build --parallel
 
-cp corpus/*.dict corpus/*.options $OUT/
+cp corpus/corpus/*.dict corpus/corpus/*.options $OUT/
 
 # Copy the fuzzer executables, zip-ed corpora, option and
 # dictionary files to $OUT.
@@ -70,7 +70,7 @@ for f in $(find build/tests/ -name '*_test' -type f);
 do
   name=$(basename $f);
   module=$(echo $name | sed 's/_test//')
-  corpus_dir="corpus/$module"
+  corpus_dir="corpus/corpus/$name"
   echo "Copying for $module";
   cp $f $OUT/
   if [ -e "$corpus_dir" ]; then

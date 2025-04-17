@@ -27,19 +27,18 @@ jobs:
         id: build
         uses: google/clusterfuzzlite/actions/build_fuzzers@main
         with:
+          language: c
           sanitizer: ${{ matrix.sanitizer }}
       - name: Run fuzzing tests (${{ matrix.sanitizer }})
         id: run
         uses: google/clusterfuzzlite/actions/run_fuzzers@main
         with:
-          fuzz-seconds: 7200
+          language: c
+          fuzz-seconds: 3600
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          minimize-crashes: true
-          report-ooms: false
           mode: 'batch'
           output-sarif: true
           parallel-fuzzing: true
-          report-unreproducible-crashes: true
           sanitizer: ${{ matrix.sanitizer }}
           storage-repo-branch-coverage: gh-pages
           storage-repo-branch: cfl

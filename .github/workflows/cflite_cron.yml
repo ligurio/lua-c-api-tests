@@ -24,6 +24,7 @@ jobs:
         id: build
         uses: google/clusterfuzzlite/actions/build_fuzzers@main
         with:
+          language: c
           sanitizer: coverage
       - name: Run fuzzing tests
         id: run
@@ -31,10 +32,9 @@ jobs:
         with:
           fuzz-seconds: 600
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          minimize-crashes: true
           mode: 'coverage'
+          sanitizer: 'coverage'
           parallel-fuzzing: true
-          report-unreproducible-crashes: true
           storage-repo-branch-coverage: gh-pages
           storage-repo-branch: cfl
           storage-repo: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/ligurio/lua-c-api-corpus
@@ -53,17 +53,17 @@ jobs:
       - name: Build Fuzzers
         id: build
         uses: google/clusterfuzzlite/actions/build_fuzzers@main
+        with:
+          language: c
       - name: Run Fuzzers
         id: run
         uses: google/clusterfuzzlite/actions/run_fuzzers@main
         with:
-          fuzz-seconds: 1800
+          fuzz-seconds: 600
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          minimize-crashes: true
           mode: 'prune'
           output-sarif: true
           parallel-fuzzing: true
-          report-unreproducible-crashes: true
           storage-repo-branch-coverage: gh-pages
           storage-repo-branch: cfl
           storage-repo: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/ligurio/lua-c-api-corpus

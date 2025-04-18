@@ -80,6 +80,9 @@ macro(build_luajit LJ_VERSION)
         set(LDFLAGS "${LDFLAGS} -fprofile-instr-generate -fprofile-arcs -fcoverage-mapping -ftest-coverage")
     endif (ENABLE_COV)
 
+    # "relocation R_X86_64_PC32 against symbol `lua_isnumber' can
+    # not be used when making a shared object; recompile with -fPIC".
+    set(CFLAGS "${CFLAGS} -fPIC")
 
     include(ExternalProject)
 

@@ -96,6 +96,12 @@
    https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=57435
 1. Recording of `__concat` in GC64 mode,
    https://github.com/LuaJIT/LuaJIT/issues/839
+1. Heap buffer overflow in the `lj_strfmt_pushvf` on stack overflow,
+   https://issues.oss-fuzz.com/issues/394126186,
+   https://github.com/tarantool/security/issues/143
+1. `IR_NEWREF` is missing a NaN check,
+   https://issues.oss-fuzz.com/issues/42529868
+   https://github.com/LuaJIT/LuaJIT/issues/1069
 
 ### Related issues
 

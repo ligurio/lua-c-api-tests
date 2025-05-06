@@ -80,10 +80,10 @@ limitations in LuaJIT and PUC Rio Lua:
    a part of the LuaJIT itself. Memory leaks are suppressed in
    AddressSanitizer with a function `__lsan_is_turned_off()` that
    disallows leak checking for the program it is linked into.
-1. In LuaJIT a function `lj_str_new()` may read past a buffer end
-   (so-called "dirty" read) and that's ok. Suppressed in
+1. In LuaJIT, a function `lj_str_new()` may read past a buffer end
+   (so-called "dirty" read), and that's ok. Suppressed in
    AddressSanitizer with `__attribute__((no_sanitize_address))`.
-1. In LuaJIT, bytecode input is unsafe, see [LuaJIT#847][LuaJIT#847]
+1. In LuaJIT, bytecode input is unsafe; see [LuaJIT#847][LuaJIT#847]
    and [LuaJIT FAQ][LuaJIT FAQ]. The string "mode" controls
    whether the chunk can be text or binary (that is, a precompiled
    chunk). It may be the string "b" (only binary chunks),
@@ -100,12 +100,16 @@ limitations in LuaJIT and PUC Rio Lua:
    violate basic assumptions about Lua code and therefore can
    compromise otherwise secure code. See [LuaJIT#1264][LuaJIT#1264]
    and [Lua 5.4 Reference Manual][refmanual54]. The `debug`
-   functions is not a subject of testing and these functions are
+   functions are not a subject of testing, and these functions are
    used carefully.
-1. In LuaJIT there are a number of places with undefined behavior
+1. In LuaJIT, there are a number of places with undefined behavior
    ("nonnull-attribute", "signed-integer-overflow", "bounds").
    These problems remain unfixed and suppressed in
    UndefinedBehavior Sanitizer.
+1. In LuaJIT, there is a minimal C declaration parser, and it is not
+   a validating C parser: "The parser ought to return correct
+   results for properly formed C declarations, but it may accept
+   some invalid declarations, too (and return nonsense)".
 
 [LuaJIT#847]: https://github.com/LuaJIT/LuaJIT/issues/847
 [LuaJIT#1264]: https://github.com/LuaJIT/LuaJIT/issues/1264

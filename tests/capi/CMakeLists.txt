@@ -27,6 +27,8 @@ target_link_libraries(
         >
 )
 
+message(STATUS "Add Lua C API test suite")
+
 # The following condition looks unnecessary, it was added to fix
 # an issue for Sydr: in the Lua external project in the build
 # system the explicit build command is used:
@@ -50,25 +52,6 @@ endif()
 
 if (ENABLE_COV)
   AppendFlags(LDFLAGS -fprofile-instr-generate -fcoverage-mapping)
-endif()
-
-set(DEFAULT_RUNS_NUMBER 5)
-
-string(JOIN " " LIBFUZZER_OPTS
-  -mutate_depth=20
-  -print_final_stats=1
-  -print_pcs=1
-  -reduce_inputs=1
-  -reload=1
-  -report_slow_units=5
-  -workers=${CMAKE_BUILD_PARALLEL_LEVEL}
-  -runs=$\{RUNS:-${DEFAULT_RUNS_NUMBER}\}
-  -use_value_profile=1
-)
-
-set(CORPUS_BASE_PATH ${PROJECT_SOURCE_DIR}/corpus)
-if(USE_LUAJIT)
-  set(CORPUS_BASE_PATH ${CORPUS_BASE_PATH}/corpus)
 endif()
 
 function(create_test)
@@ -96,7 +79,7 @@ function(create_test)
   endif ()
   set(dict_path ${CORPUS_BASE_PATH}/${test_name}.dict)
   set(corpus_path ${CORPUS_BASE_PATH}/${test_prefix})
-  if(USE_LUAJIT)
+  if(IS_LUAJIT)
     set(corpus_path ${CORPUS_BASE_PATH}/${test_name})
   endif()
   if (EXISTS ${dict_path})
@@ -108,7 +91,6 @@ function(create_test)
   add_test(NAME ${test_name}
            COMMAND ${SHELL} -c "$<TARGET_FILE:${test_name}> ${LIBFUZZER_OPTS}"
   )
-  message(STATUS "Creating Lua C API test ${test_name}")
   if (USE_LUA)
     set_tests_properties(${test_name} PROPERTIES
       ENVIRONMENT "ASAN_OPTIONS='detect_invalid_pointer_pairs=2'"

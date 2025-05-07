@@ -49,6 +49,7 @@ is LuaJIT-specific.
 - `ENABLE_BUILD_PROTOBUF` enables building Protobuf library, otherwise system
   library is used.
 - `ENABLE_INTERNAL_TESTS` enables internal tests.
+- `ENABLE_LAPI_TESTS` enables Lua API tests.
 
 ### Running
 

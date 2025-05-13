@@ -1717,7 +1717,8 @@ static lua_func push_func[] = {
 static void
 lua_pushrandom(lua_State *L, FuzzedDataProvider *fdp)
 {
-	uint8_t idx = fdp->ConsumeIntegralInRange(0, (int)ARRAY_SIZE(push_func) - 1);
+	uint8_t idx = fdp->ConsumeIntegralInRange<uint8_t>(0, ARRAY_SIZE(push_func) - 1);
+
 	push_func[idx](L, fdp);
 
 	bool is_set_mt = fdp->ConsumeBool();
@@ -1903,7 +1904,7 @@ LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 	    fdp.remaining_bytes() != 0) {
 		__lua_gc(L, &fdp);
 		__lua_sethook(L, &fdp);
-		uint8_t idx = fdp.ConsumeIntegralInRange<uint8_t>(0, (int)ARRAY_SIZE(func) - 1);
+		uint8_t idx = fdp.ConsumeIntegralInRange<uint8_t>(0, ARRAY_SIZE(func) - 1);
 		func[idx](L, &fdp);
 	}
 

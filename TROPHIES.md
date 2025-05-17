@@ -20,6 +20,10 @@
    https://groups.google.com/g/lua-l/c/CCpPLX1ug3A,
    https://oss-fuzz.com/testcase-detail/6073198411579392,
    https://github.com/lua/lua/commit/f9e35627ed26dff4114a1d01ff113d8b4cc91ab5
+1. UBsan: member access within null pointer of type 'struct TString',
+   https://groups.google.com/g/lua-l/c/Kng6FGlPjmc,
+   https://github.com/lua/lua/commit/6d53701c7a0dc4736d824fd891ee6f22265d0d68,
+   https://oss-fuzz.com/testcase-detail/5557969930747904
 
 ### LuaJIT
 
@@ -81,9 +85,16 @@
 1. Assertion failure when flushing already flushed trace,
    https://github.com/LuaJIT/LuaJIT/issues/1345
 1. Read from already collected string data in case of the error in loadfile,
-   https://github.com/LuaJIT/LuaJIT/issues/1353
+   https://github.com/LuaJIT/LuaJIT/issues/1353,
+   https://github.com/tarantool/security/issues/144,
+   https://issues.oss-fuzz.com/issues/407592872
 1. JIT slots overflow for side-trace after up-recursion,
-   https://github.com/LuaJIT/LuaJIT/issues/1358
+   https://github.com/LuaJIT/LuaJIT/issues/1358,
+   https://github.com/tarantool/security/issues/145
+1. Stack overflow in error handler during stack overflow,
+   https://github.com/LuaJIT/LuaJIT/issues/1152,
+   https://issues.oss-fuzz.com/issues/394126186,
+   https://github.com/tarantool/security/issues/143
 
 ### Tarantool
 

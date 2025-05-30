@@ -16,6 +16,13 @@ lapi_tests_make_lua_path(LUA_PATH
   ${CMAKE_CURRENT_SOURCE_DIR}/?.lua
 )
 
+list(APPEND TEST_ENV
+  "LUA_PATH=${LUA_PATH}"
+  "LUA_CPATH=${LUA_CPATH}"
+  ASAN_OPTIONS=detect_odr_violation=0
+  LD_DYNAMIC_WEAK=1
+)
+
 function(create_test)
   cmake_parse_arguments(
     FUZZ
@@ -45,7 +52,7 @@ function(create_test)
   )
   set_tests_properties(${test_name} PROPERTIES
     LABELS "lapi"
-    ENVIRONMENT "LUA_PATH=${LUA_PATH};LUA_CPATH=${LUA_CPATH};ASAN_OPTIONS=detect_odr_violation=0;LD_DYNAMIC_WEAK=1"
+    ENVIRONMENT "${TEST_ENV}"
     DEPENDS ${LUA_EXECUTABLE} ${LUZER_LIBRARY}
   )
 endfunction()

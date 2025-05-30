@@ -16,11 +16,20 @@ lapi_tests_make_lua_path(LUA_PATH
   ${CMAKE_CURRENT_SOURCE_DIR}/?.lua
 )
 
+set(DSO_SANITIZER_PATH "${PROJECT_BINARY_DIR}/luzer/build/luzer")
+set(DSO_ASAN_PATH "${DSO_SANITIZER_PATH}/asan_with_fuzzer.so")
+set(DSO_UBSAN_PATH "${DSO_SANITIZER_PATH}/ubsan_with_fuzzer.so")
+
+if(ENABLE_ASAN OR ENABLE_UBSAN)
+  set(LD_PRELOAD_LIBS "${DSO_ASAN_PATH}:${DSO_UBSAN_PATH}")
+endif()
+
 list(APPEND TEST_ENV
   "LUA_PATH=${LUA_PATH};"
   "LUA_CPATH=${LUA_CPATH};"
   "ASAN_OPTIONS=detect_odr_violation=0;"
   "LD_DYNAMIC_WEAK=1;"
+  "LD_PRELOAD=${LD_PRELOAD_LIBS};"
 )
 
 function(create_test)

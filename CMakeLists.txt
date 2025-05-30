@@ -33,6 +33,12 @@ set(CMAKE_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_INCLUDE_PATH}
 include(SetBuildParallelLevel)
 include(SetHardwareArch)
 
+if (ENABLE_LAPI_TESTS)
+  include(LibFuzzer)
+  SetLibFuzzerPath(FUZZER_NO_MAIN_LIBRARY)
+  SetLibFuzzerObjDir(LibFuzzerObjDir)
+endif()
+
 if (USE_LUA AND NOT LUA_VERSION)
   set(LUA_VERSION "master")
 endif()

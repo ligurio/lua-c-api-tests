@@ -88,6 +88,7 @@ macro(build_luajit LJ_VERSION)
         # CMake option LUAJIT_FRIENDLY_MODE in luzer requires
         # LUAJIT_ENABLE_CHECKHOOK.
         set(CFLAGS "${CFLAGS} -DLUAJIT_ENABLE_CHECKHOOK")
+        set(LDFLAGS "${LDFLAGS} -lstdc++")
     endif()
 
     include(ExternalProject)
@@ -116,6 +117,7 @@ macro(build_luajit LJ_VERSION)
                                                  CFLAGS=${CFLAGS}
                                                  LDFLAGS=${LDFLAGS}
                                                  HOST_CFLAGS=-fno-sanitize=undefined
+                                                 LF_PATH=${LibFuzzerObjDir}
                                                  -C src
         INSTALL_COMMAND ""
 

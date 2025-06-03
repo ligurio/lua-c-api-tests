@@ -70,6 +70,27 @@ end
 local __unm = function(v)
     return - always_number(v)
 end
+local __idiv = function(v1, v2)
+    return always_number(v1) // always_number(v2)
+end
+local __band = function(v1, v2)
+    return always_number(v1) & always_number(v2)
+end
+local __bor = function(v1, v2)
+    return always_number(v1) | always_number(v2)
+end
+local __bxor = function(v1, v2)
+    return always_number(v1) ~ always_number(v2)
+end
+local __bnot = function(v)
+    return ~always_number(v)
+end
+local __shl = function(v1, v2)
+    return always_number(v1) << always_number(v2)
+end
+local __shr = function(v1, v2)
+    return always_number(v1) >> always_number(v2)
+end
 
 debug.setmetatable('string', {
     __add = __add,
@@ -82,6 +103,13 @@ debug.setmetatable('string', {
     __pow = __pow,
     __sub = __sub,
     __unm = __unm,
+    __idiv = __idiv,
+    __band = __band,
+    __bor= __bor,
+    __bxor = __bxor,
+    __bnot = __bnot,
+    __shl = __shl,
+    __shr = __shr,
 })
 debug.setmetatable(0, {
     __add = __add,

@@ -383,6 +383,17 @@ message BinaryOperator {
         uint32 notEqual = 13;
         uint32 and = 14;
         uint32 or = 15;
+
+        /* Arithmetic operators (5.3+). */
+        uint32 idiv = 16;
+
+        /* Bitwise operators (5.3+). */
+        uint32 bor = 17;
+        uint32 band = 18;
+        uint32 bxor = 19;
+        uint32 bnot = 20;
+        uint32 shl = 21;
+        uint32 shr = 22;
     }
 }
 
@@ -392,6 +403,9 @@ message UnaryOperator {
         uint32 negate = 1;
         uint32 not = 2;
         uint32 length = 3;
+
+        /* Bitwise operators (5.3+). */
+        uint32 bnot = 4;
     }
 }
 

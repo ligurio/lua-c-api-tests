@@ -34,6 +34,8 @@ BEGIN { matched = 0
         err_pat["'for' step is zero"] = 0
         err_pat["attempt to assign to const variable"] = 0
         err_pat["got a non-closable value"] = 0
+        err_pat["unfinished string near"] = 0
+        err_pat["syntax error near"] = 0
       }
 
 # String that function report_error() prints with every error message.

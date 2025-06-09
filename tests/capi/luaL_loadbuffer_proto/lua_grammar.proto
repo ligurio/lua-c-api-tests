@@ -383,6 +383,9 @@ message BinaryOperator {
         uint32 notEqual = 13;
         uint32 and = 14;
         uint32 or = 15;
+
+        /* Arithmetic operators (5.3+). */
+        uint32 idiv = 16;
     }
 }
 

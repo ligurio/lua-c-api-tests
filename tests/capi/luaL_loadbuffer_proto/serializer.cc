@@ -1157,6 +1157,10 @@ PROTO_TOSTRING(BinaryOperator, op)
 		return "*";
 	case BinopType::kDiv:
 		return "/";
+#if LUA_VERSION_NUM >= 503
+	case BinopType::kIDiv:
+		return "//";
+#endif
 	case BinopType::kExp:
 		return "^";
 	case BinopType::kMod:

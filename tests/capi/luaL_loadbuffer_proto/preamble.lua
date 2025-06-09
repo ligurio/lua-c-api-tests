@@ -70,11 +70,18 @@ end
 local __unm = function(v)
     return - always_number(v)
 end
+local __idiv = function(v1, v2)
+    -- `//` breaks parsing in PUC Rio Lua 5.1 and 5.1:
+    -- `unexpected symbol near '/'`.
+    local chunk = ('%d // %d'):format(always_number(v1), always_number(v2))
+    return assert(loadstring(chunk))()
+end
 
 debug.setmetatable('string', {
     __add = __add,
     __call = __call,
     __div = __div,
+    __idiv = __idiv,
     __index = __index,
     __mod = __mod,
     __mul = __mul,
@@ -88,6 +95,7 @@ debug.setmetatable(0, {
     __call = __call,
     __concat = __concat,
     __div = __div,
+    __idiv = __idiv,
     __index = __index,
     __len = __len,
     __newindex = __newindex,
@@ -97,6 +105,7 @@ debug.setmetatable(nil, {
     __call = __call,
     __concat = __concat,
     __div = __div,
+    __idiv = __idiv,
     __index = __index,
     __le = __le,
     __len = __len,
@@ -112,6 +121,7 @@ debug.setmetatable(function() end, {
     __add = __add,
     __concat = __concat,
     __div = __div,
+    __idiv = __idiv,
     __index = __index,
     __le = __le,
     __len = __len,
@@ -128,6 +138,7 @@ debug.setmetatable(true, {
     __call = __call,
     __concat = __concat,
     __div = __div,
+    __idiv = __idiv,
     __index = __index,
     __le = __le,
     __len = __len,
@@ -144,6 +155,7 @@ local table_mt = {
     __call = __call,
     __concat = __concat,
     __div = __div,
+    __idiv = __idiv,
     __le = __le,
     __len = __len,
     __lt = __lt,

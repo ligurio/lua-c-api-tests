@@ -20,9 +20,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 	if (L == NULL)
 		return 0;
 
-	if (size > LUAI_MAXSTACK)
-		return -1;
-
 	luaL_Buffer buf;
 	char *s = luaL_buffinitsize(L, &buf, size);
 	memcpy(s, data, size);

@@ -20,7 +20,7 @@ end
 local function TestOneInput(buf, _size)
     local fdp = luzer.FuzzedDataProvider(buf)
     os.setlocale(test_lib.random_locale(fdp), "all")
-    local fmt_str = fdp:consume_string(0, test_lib.MAX_INT)
+    local fmt_str = fdp:consume_string(test_lib.MAX_STR_LEN)
     if fdp:remaining_bytes() == 0 then
         return -1
     end

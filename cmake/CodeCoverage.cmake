@@ -18,7 +18,7 @@ endif()
 
 # See https://gcovr.com/en/stable/manpage.html.
 set(GCOVR_OPTIONS
-  --branches
+  --txt-metric branch
   --cobertura ${COVERAGE_XML_REPORT}
   --decisions
   --gcov-executable "llvm-cov gcov"
@@ -29,7 +29,7 @@ set(GCOVR_OPTIONS
   --output ${COVERAGE_HTML_REPORT}
   --print-summary
   --root ${LUA_SOURCE_DIR}
-  --sort-percentage
+  --sort-key uncovered-percent
 )
 
 if(USE_LUA)

@@ -17,6 +17,14 @@ list(APPEND LUZER_CMAKE_FLAGS
     "-DLUA_INCLUDE_DIR=${LUA_INCLUDE_DIR}"
     "-DLUA_LIBRARIES=${LUA_LIBRARIES_LOCATION}"
 )
+# Prevents an error on loading `luzer_impl.so` due to undefined
+# symbol `llvm_gcda_summary_info`.
+if(ENABLE_COV)
+  list(APPEND LUZER_CMAKE_FLAGS
+      -DCMAKE_C_FLAGS=-fprofile-instr-generate
+      -DCMAKE_CXX_FLAGS=-fprofile-instr-generate
+  )
+endif()
 if(USE_LUAJIT)
     list(APPEND LUZER_CMAKE_FLAGS
         "-DLUAJIT_FRIENDLY_MODE=ON"

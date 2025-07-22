@@ -12,7 +12,11 @@ Synopsis: io.read(...)
 local luzer = require("luzer")
 local test_lib = require("lib")
 
-local READ_MODE = { "*n", "*a", "*l" }
+local READ_MODE = {
+    "*a",
+    "*l",
+    "*n",
+}
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)

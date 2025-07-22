@@ -21,7 +21,7 @@ local test_lib = require("lib")
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
     local str = fdp:consume_string(test_lib.MAX_STR_LEN)
-    local lua_chunk = ("io.write([[%s]])"):format(str)
+    local lua_chunk = ("io.write('%s')"):format(str)
     local lua_cmd = ("%s -e '%s'"):format(test_lib.luabin(arg), lua_chunk)
     local fh = assert(io.popen(lua_cmd))
     fh:lines("*all")
@@ -31,5 +31,6 @@ end
 
 local args = {
     artifact_prefix = "io_lines_",
+    only_ascii = 1,
 }
 luzer.Fuzz(TestOneInput, nil, args)

@@ -130,6 +130,7 @@ macro(build_luajit LJ_VERSION)
     set(LUA_LIBRARIES bundled-liblua)
     set(LUA_INCLUDE_DIR ${LJ_SOURCE_DIR}/src/)
     set(LUA_VERSION_STRING "LuaJIT ${LJ_VERSION}")
+    set(LUA_SOURCE_DIR ${LJ_SOURCE_DIR})
 
     unset(LJ_SOURCE_DIR)
     unset(LJ_BINARY_DIR)

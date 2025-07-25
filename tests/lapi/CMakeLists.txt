@@ -55,3 +55,11 @@ file(GLOB tests LIST_DIRECTORIES false ${CMAKE_CURRENT_SOURCE_DIR}/*_test.lua)
 foreach(filename ${tests})
   create_test(FILENAME ${filename})
 endforeach()
+
+if (NOT OSS_FUZZ)
+  # The test `package_require_test` is dangerous, because it
+  # modifies paths used by `require` to search for loaders.
+  set_tests_properties(package_require_test PROPERTIES
+    DISABLED TRUE
+  )
+endif()

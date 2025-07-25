@@ -8,6 +8,26 @@ local not_nan_and_nil = function(val)
     return (val ~= val or val == nil) and DEFAULT_NUMBER or val
 end
 
+local function bitwise_op(op_name)
+    return function(...)
+        local n = select('#', ...)
+        local chunk
+        -- Bitwise exclusive OR and bitwise NOT have the same
+        -- operator.
+        if (op_name == '&' or op_name == '|') then
+            assert(n > 1)
+        end
+        if n == 1 then
+            local x = ...
+            chunk = ('return %s %d'):format(op_name, x)
+        else
+            local op_name_ws = (' %s '):format(op_name)
+            chunk = 'return ' .. table.concat({...}, op_name_ws)
+        end
+        return assert(load(chunk))()
+    end
+end
+
 local __add = function(v1, v2)
     return always_number(v1) + always_number(v2)
 end
@@ -70,11 +90,42 @@ end
 local __unm = function(v)
     return - always_number(v)
 end
+local __idiv = function(v1, v2)
+    -- `//` breaks parsing in PUC Rio Lua 5.1 and 5.1:
+    -- `unexpected symbol near '/'`.
+    local chunk = ('%d // %d'):format(always_number(v1), always_number(v2))
+    return assert(loadstring(chunk))()
+end
+local __band = function(v1, v2)
+    local band = bitwise_op('&')
+    return band(always_number(v1), always_number(v2))
+end
+local __bor = function(v1, v2)
+    local bor = bitwise_op('|')
+    return bor(always_number(v1), always_number(v2))
+end
+local __bxor = function(v1, v2)
+    local bxor = bitwise_op('~')
+    return bxor(always_number(v1), always_number(v2))
+end
+local __bnot = function(v)
+    local bnot = bitwise_op('~')
+    return bnot(always_number(v))
+end
+local __shl = function(v1, v2)
+    local shl = bitwise_op('<<')
+    return shl(always_number(v1), always_number(v2))
+end
+local __shr = function(v1, v2)
+    local shr = bitwise_op('>>')
+    return shr(always_number(v1), always_number(v2))
+end
 
 debug.setmetatable('string', {
     __add = __add,
     __call = __call,
     __div = __div,
+    __idiv = __idiv,
     __index = __index,
     __mod = __mod,
     __mul = __mul,
@@ -82,12 +133,19 @@ debug.setmetatable('string', {
     __pow = __pow,
     __sub = __sub,
     __unm = __unm,
+    __band = __band,
+    __bor= __bor,
+    __bxor = __bxor,
+    __bnot = __bnot,
+    __shl = __shl,
+    __shr = __shr,
 })
 debug.setmetatable(0, {
     __add = __add,
     __call = __call,
     __concat = __concat,
     __div = __div,
+    __idiv = __idiv,
     __index = __index,
     __len = __len,
     __newindex = __newindex,
@@ -97,6 +155,7 @@ debug.setmetatable(nil, {
     __call = __call,
     __concat = __concat,
     __div = __div,
+    __idiv = __idiv,
     __index = __index,
     __le = __le,
     __len = __len,
@@ -112,6 +171,7 @@ debug.setmetatable(function() end, {
     __add = __add,
     __concat = __concat,
     __div = __div,
+    __idiv = __idiv,
     __index = __index,
     __le = __le,
     __len = __len,
@@ -128,6 +188,7 @@ debug.setmetatable(true, {
     __call = __call,
     __concat = __concat,
     __div = __div,
+    __idiv = __idiv,
     __index = __index,
     __le = __le,
     __len = __len,
@@ -144,6 +205,7 @@ local table_mt = {
     __call = __call,
     __concat = __concat,
     __div = __div,
+    __idiv = __idiv,
     __le = __le,
     __len = __len,
     __lt = __lt,

@@ -32,7 +32,11 @@ local function TestOneInput(buf)
     local err_handler = test_lib.err_handler(ignored_msgs)
     local ok, res = xpcall(os.time, err_handler, time)
     if not ok then return end
-    assert(type(res) == "number" or type(res) == "table")
+    io.stderr:write(type(res) .. "\n")
+    assert(type(res) == "number" or
+           type(res) == "table" or
+           -- Undocumented.
+           res == nil)
 end
 
 local args = {

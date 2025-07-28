@@ -171,7 +171,8 @@ local function TestOneInput(buf)
     local n_hook_mask = fdp:consume_integer(0, #hook_mask)
     local mask = {}
     for _ = 0, n_hook_mask do
-        table.insert(mask, fdp:oneof(hook_mask))
+        local m = fdp:oneof(hook_mask)
+        table.insert(mask, m)
     end
 
     -- Turn on the hook.

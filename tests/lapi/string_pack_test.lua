@@ -17,6 +17,10 @@ if not test_lib.lua_current_version_ge_than(5, 3) then
     os.exit(0)
 end
 
+local ignored_msgs = {
+    "invalid format option",
+}
+
 local function TestOneInput(buf, _size)
     local fdp = luzer.FuzzedDataProvider(buf)
     os.setlocale(test_lib.random_locale(fdp), "all")
@@ -26,7 +30,10 @@ local function TestOneInput(buf, _size)
     end
     local n = fdp:consume_integer(1, test_lib.MAX_INT)
     local values = fdp:consume_strings(test_lib.MAX_STR_LEN,  n)
-    string.pack(fmt_str, table.unpack(values))
+    local err_handler = test_lib.err_handler(ignored_msgs)
+    local ok, _ = xpcall(string.pack, err_handler, fmt_str,
+                         table.unpack(values))
+    if not ok then return end
 end
 
 local args = {

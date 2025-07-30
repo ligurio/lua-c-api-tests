@@ -52,13 +52,6 @@ struct metrics {
 
 static struct metrics metrics;
 
-static void
-Hook(lua_State *L, lua_Debug *ar)
-{
-	(void)L;
-	(void)ar;
-}
-
 UNUSED static void
 jit_attach(lua_State *L, void *func, const char *event)
 {
@@ -260,73 +253,6 @@ disable_lj_metrics(lua_State *L, struct metrics *metrics)
 	jit_attach(L, (void *)trace_cb, NULL);
 }
 
-struct str_Writer {
-	/* Non-zero when buffer has been initialized. */
-	int init;
-	luaL_Buffer B;
-	size_t bufsize;
-};
-
-static int
-writer(lua_State *L, const void *b, size_t size, void *ud) {
-	struct str_Writer *state = (struct str_Writer *)ud;
-	if (!state->init) {
-		state->init = 1;
-		luaL_buffinit(L, &state->B);
-	}
-	/* Finishing dump? */
-	if (b == NULL) {
-		luaL_pushresult(&state->B);
-		/* Move result to reserved slot. */
-		lua_replace(L, 1);
-	}
-	else {
-		luaL_addlstring(&state->B, (const char *)b, size);
-		state->bufsize += size;
-	}
-	return 0;
-}
-
-/*
- * Loads a buffer as a Lua bytecode chunk. This function uses luaL_loadstring
- * to load the chunk in the buffer pointed to by buff, lua_dump to dump
- * produced bytecode and luaL_loadbuffer to load produced bytecode to the
- * stack. This function returns the same results as luaL_loadbuffer.
- * name is the chunk name, used for debug information and error messages.
- */
-static int
-luaL_loadbytecode(lua_State *L, const char *buff, size_t sz, const char *name)
-{
-	/* Compile Lua source code to bytecode. */
-	int rc = luaL_loadstring(L, buff);
-	if (rc != 0) {
-		return LUA_ERRSYNTAX;
-	}
-
-	/* Dump a Lua bytecode to a buffer. */
-	struct str_Writer state;
-	memset(&state, 0, sizeof(struct str_Writer));
-#if LUA_VERSION_NUM < 503
-	rc = lua_dump(L, writer, &state);
-#else /* Lua 5.3+ */
-	rc = lua_dump(L, writer, &state, 0);
-#endif /* LUA_VERSION_NUM */
-	if (rc != 0) {
-		return rc;
-	}
-
-	/* Leave final result on top. */
-	lua_settop(L, 1);
-	const char *bc = lua_tolstring(L, -1, &state.bufsize);
-	/* Load Lua bytecode. */
-	rc = luaL_loadbuffer(L, bc, state.bufsize, "bytecode");
-	if (rc != 0) {
-		return rc;
-	}
-
-	return 0;
-}
-
 DEFINE_PROTO_FUZZER(const lua_grammar::Block &message)
 {
 	lua_State *L = luaL_newstate();
@@ -341,11 +267,6 @@ DEFINE_PROTO_FUZZER(const lua_grammar::Block &message)
 	}
 
 	luaL_openlibs(L);
-
-	int flag = LUA_MASKCALL | LUA_MASKRET | LUA_MASKLINE;
-	int count = 0;
-	/* Enable debugging hook. */
-	lua_sethook(L, Hook, flag, count);
 
 #ifdef LUAJIT
 	enable_lj_metrics(L, &metrics);
@@ -399,21 +320,9 @@ DEFINE_PROTO_FUZZER(const lua_grammar::Block &message)
 		goto end;
 	}
 
-	/*
-	 * With luaL_loadbytecode we build a bytecode from a Lua code and then
-	 * execute produced bytecode chunk.
-	 */
-	if (luaL_loadbytecode(L, code.c_str(), code.size(), "fuzz") != LUA_OK)
-		goto end;
-
-	if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
-		report_error(L, "lua_pcall()");
-	}
-
 end:
 	metrics_increment_num_samples(&metrics);
 	/* Disable debugging hook. */
-	lua_sethook(L, Hook, 0, count);
 #ifdef LUAJIT
 	disable_lj_metrics(L, &metrics);
 	/* Stop profiler. */

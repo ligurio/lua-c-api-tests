@@ -119,11 +119,21 @@ local function arrays_equal(t1, t2)
     return #t1 == #t2
 end
 
+local function luabin(argv)
+    -- arg[-1] is guaranteed to be not nil.
+    local idx = -2
+    while argv[idx] do
+        idx = idx - 1
+    end
+    return argv[idx + 1]
+end
+
 return {
     approx_equal = approx_equal,
     arrays_equal = arrays_equal,
     bitwise_op = bitwise_op,
     err_handler = err_handler,
+    luabin = luabin,
     lua_current_version_ge_than = lua_current_version_ge_than,
     lua_current_version_lt_than = lua_current_version_lt_than,
     lua_version = lua_version,

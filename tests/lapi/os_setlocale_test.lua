@@ -19,7 +19,7 @@ local function TestOneInput(buf)
     })
     local locale_string = os.setlocale(locale, category)
     assert(type(locale_string) == "string" or
-	       locale_string == nil)
+           locale_string == nil)
 end
 
 local args = {

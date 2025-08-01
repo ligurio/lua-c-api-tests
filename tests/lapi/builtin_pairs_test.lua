@@ -28,7 +28,7 @@ local function TestOneInput(buf)
     local MAX_N = 1000
     local count = fdp:consume_integer(0, MAX_N)
     local tbl = fdp:consume_integers(test_lib.MIN_INT, test_lib.MAX_INT, count)
-	-- Use string keys to activate hash part of the table.
+    -- Use string keys to activate hash part of the table.
     tbl.a = fdp:consume_string(test_lib.MAX_STR_LEN)
     tbl.b = fdp:consume_string(test_lib.MAX_STR_LEN)
     for key, value in pairs(tbl) do

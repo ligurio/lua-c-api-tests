@@ -24,6 +24,13 @@
    https://groups.google.com/g/lua-l/c/Kng6FGlPjmc,
    https://github.com/lua/lua/commit/6d53701c7a0dc4736d824fd891ee6f22265d0d68,
    https://oss-fuzz.com/testcase-detail/5557969930747904
+1. Assertion failure of `A <= ((1<<8)-1) && B <= ((1<<8)-1) && C <= ((1<<8)-1) && (k & ~1) == 0`,
+   https://groups.google.com/g/lua-l/c/F132crJ2D_8
+   https://github.com/ligurio/lua-c-api-tests/issues/155
+1. An assertion is triggered in `luaK_storevar`,
+   https://groups.google.com/g/lua-l/c/Cfb5Yn0aJEU
+   https://issues.oss-fuzz.com/issues/455148340,
+   https://oss-fuzz.com/testcase-detail/5818389013790720
 
 ### LuaJIT
 

@@ -86,9 +86,14 @@ local function approx_equal(a, b, epsilon)
     return abs(a - b) <= ((abs(a) < abs(b) and abs(b) or abs(a)) * epsilon)
 end
 
+local locales
+
 local function random_locale(fdp)
-    local locales = {}
+    if locales then
+        return fdp:oneof(locales)
+    end
     local locale_it = io.popen("locale -a"):read("*a"):gmatch("([^\n]*)\n?")
+    locales = {}
     for locale in locale_it do
         table.insert(locales, locale)
     end

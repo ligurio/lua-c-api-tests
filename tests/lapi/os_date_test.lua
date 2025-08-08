@@ -32,11 +32,12 @@ local function TestOneInput(buf)
     local err_handler = test_lib.err_handler(ignored_msgs)
     local ok, res = xpcall(os.date, err_handler, format, time)
     if not ok then return end
-    assert(type(res) == "string" or
-           type(res) == "table" or
-           -- Undocumented.
-           type(res) == "number" or
-           res == nil)
+    local type_check = type(res) == "string" or type(res) == "table"
+    if test_lib.lua_version() == "LuaJIT" then
+        assert(type_check or type(res) == "number" or res == nil)
+    else
+        assert(type_check)
+    end
 end
 
 local args = {

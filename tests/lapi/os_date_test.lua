@@ -32,11 +32,9 @@ local function TestOneInput(buf)
     local err_handler = test_lib.err_handler(ignored_msgs)
     local ok, res = xpcall(os.date, err_handler, format, time)
     if not ok then return end
-    assert(type(res) == "string" or
-           type(res) == "table" or
-           -- Undocumented.
-           type(res) == "number" or
-           res == nil)
+    local type_check = type(res) == "string" or type(res) == "table"
+    local undocumented_type_check = type(res) == "number" or res == nil
+    assert(type_check or undocumented_type_check)
 end
 
 local args = {

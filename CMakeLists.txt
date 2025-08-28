@@ -33,10 +33,6 @@ set(CMAKE_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_INCLUDE_PATH}
 include(SetBuildParallelLevel)
 include(SetHardwareArch)
 
-if (ENABLE_LUAJIT_RANDOM_RA AND NOT IS_LUAJIT)
-  message(FATAL_ERROR "Option ENABLE_LUAJIT_RANDOM_RA is LuaJIT-specific.")
-endif()
-
 if (USE_LUA AND NOT LUA_VERSION)
   set(LUA_VERSION "master")
 endif()
@@ -70,6 +66,10 @@ else ()
 endif ()
 
 message(STATUS "Found ${LUA_VERSION_STRING}")
+
+if (ENABLE_LUAJIT_RANDOM_RA AND NOT IS_LUAJIT)
+  message(FATAL_ERROR "Option ENABLE_LUAJIT_RANDOM_RA is LuaJIT-specific.")
+endif()
 
 if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
    NOT CMAKE_C_COMPILER_ID STREQUAL "Clang")

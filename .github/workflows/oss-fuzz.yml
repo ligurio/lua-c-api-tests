@@ -6,7 +6,9 @@ on:
       - 'master'
     paths:
       - '.github/workflows/**'
-      - 'tests/**'
+      # Lua is not supported by OSS Fuzz,
+      # https://github.com/google/oss-fuzz/issues/13782.
+      - 'tests/capi/**'
       - 'cmake/**'
       - 'CMakeLists.txt'
   pull_request:

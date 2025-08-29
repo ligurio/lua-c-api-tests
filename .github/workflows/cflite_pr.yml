@@ -7,8 +7,11 @@
 name: Testing in ClusterFuzzLite (PR)
 
 on:
+  push:
+    branches:
+      - 'master'
   pull_request:
-    types: [opened, reopened, synchronize, labeled]
+    types: [opened, reopened, synchronize]
     paths-ignore:
       - 'cmake/BuildLua.cmake'
       - 'README.md'

@@ -62,11 +62,10 @@ macro(build_lua LUA_VERSION)
         # with -fPIC".
         set(CFLAGS "${CFLAGS} -fPIC")
         set(CFLAGS "${CFLAGS} -DLUA_USE_DLOPEN")
+        # `io.popen()` is not supported by default, it is enabled
+        # by `LUA_USE_POSIX` flag. Required by a function `random_locale()`.
+        set(CFLAGS "${CFLAGS} -DLUA_USE_POSIX")
     endif()
-
-    # `io.popen()` is not supported by default, it is enabled
-    # by `LUA_USE_POSIX` flag. Required by a function `random_locale()`.
-    set(CFLAGS "${CFLAGS} -DLUA_USE_POSIX")
 
     include(ExternalProject)
 

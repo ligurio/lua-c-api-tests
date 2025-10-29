@@ -24,6 +24,8 @@ local test_lib = require("lib")
 -- The maximum file size is 1Mb (1000 * 1000).
 local MAX_N = 1e3
 
+local unpack = unpack or table.unpack
+
 local function io_seek(self)
     local SEEK_MODE = {
         "set", -- Base is position 0 (beginning of the file).

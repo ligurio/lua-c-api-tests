@@ -1,5 +1,5 @@
 diff --git a/makefile b/makefile
-index 8674519f..17dabfa8 100644
+index 8674519f..1773b0eb 100644
 --- a/makefile
 +++ b/makefile
 @@ -39,7 +39,7 @@ CWARNSC= -Wdeclaration-after-statement \
@@ -26,3 +26,17 @@ index 8674519f..17dabfa8 100644
  AR= ar rc
  RANLIB= ranlib
  RM= rm -f
+@@ -96,9 +96,12 @@ CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o \
+ AUX_O=	lauxlib.o
+ LIB_O=	lbaselib.o ldblib.o liolib.o lmathlib.o loslib.o ltablib.o lstrlib.o \
+	lutf8lib.o loadlib.o lcorolib.o linit.o
++ifneq ($(LF_PATH),)
++LF_O= $(shell find $(LF_PATH) -maxdepth 1 -name '*.o')
++endif
+
+ LUA_T=	lua
+-LUA_O=	lua.o
++LUA_O=	lua.o $(LF_O)
+
+
+ ALL_T= $(CORE_T) $(LUA_T)

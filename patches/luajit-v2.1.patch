@@ -1,5 +1,32 @@
+diff --git a/src/Makefile b/src/Makefile
+index 969bf289..23c4264b 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -514,6 +514,10 @@ LJLIB_O= lib_base.o lib_math.o lib_bit.o lib_string.o lib_table.o \
+	 lib_buffer.o
+ LJLIB_C= $(LJLIB_O:.o=.c)
+
++ifneq ($(LF_PATH),)
++LIBFUZZER_O= $(shell find $(LF_PATH) -maxdepth 1 -name '*.o')
++endif
++
+ LJCORE_O= lj_assert.o lj_gc.o lj_err.o lj_char.o lj_bc.o lj_obj.o lj_buf.o \
+	  lj_str.o lj_tab.o lj_func.o lj_udata.o lj_meta.o lj_debug.o \
+	  lj_prng.o lj_state.o lj_dispatch.o lj_vmevent.o lj_vmmath.o \
+@@ -748,9 +752,9 @@ $(LUAJIT_SO): $(LJVMCORE_O)
+	$(Q)$(TARGET_LD) $(TARGET_ASHLDFLAGS) -o $@ $(LJVMCORE_DYNO) $(TARGET_ALIBS)
+	$(Q)$(TARGET_STRIP) $@
+
+-$(LUAJIT_T): $(TARGET_O) $(LUAJIT_O) $(TARGET_DEP)
++$(LUAJIT_T): $(TARGET_O) $(LUAJIT_O) $(TARGET_DEP) $(LIBFUZZER_O)
+	$(E) "LINK      $@"
+-	$(Q)$(TARGET_LD) $(TARGET_ALDFLAGS) -o $@ $(LUAJIT_O) $(TARGET_O) $(TARGET_ALIBS)
++	$(Q)$(TARGET_LD) $(TARGET_ALDFLAGS) -o $@ $(LUAJIT_O) $(TARGET_O) $(TARGET_ALIBS) $(LIBFUZZER_O)
+	$(Q)$(TARGET_STRIP) $@
+	$(E) "OK        Successfully built LuaJIT"
+
 diff --git a/src/host/buildvm.c b/src/host/buildvm.c
-index ec99e501..d23530c4 100644
+index 24db75f4..021e7dbe 100644
 --- a/src/host/buildvm.c
 +++ b/src/host/buildvm.c
 @@ -35,6 +35,10 @@
@@ -14,7 +41,7 @@ index ec99e501..d23530c4 100644
 
  /* DynASM glue definitions. */
 diff --git a/src/lj_buf.h b/src/lj_buf.h
-index 744e5747..ea299472 100644
+index 15a04250..ef701256 100644
 --- a/src/lj_buf.h
 +++ b/src/lj_buf.h
 @@ -165,6 +165,13 @@ LJ_FUNC SBuf * LJ_FASTCALL lj_buf_putchar(SBuf *sb, int c);
@@ -32,7 +59,7 @@ index 744e5747..ea299472 100644
  {
    return (char *)memcpy(p, q, len) + len;
 diff --git a/src/lj_carith.c b/src/lj_carith.c
-index 9bea0a33..046dea4c 100644
+index b09812c6..98128daa 100644
 --- a/src/lj_carith.c
 +++ b/src/lj_carith.c
 @@ -159,6 +159,11 @@ static int carith_ptr(lua_State *L, CTState *cts, CDArith *ca, MMS mm)
@@ -48,7 +75,7 @@ index 9bea0a33..046dea4c 100644
  {
    if (ctype_isnum(ca->ct[0]->info) && ca->ct[0]->size <= 8 &&
 diff --git a/src/lj_opt_fold.c b/src/lj_opt_fold.c
-index ce78505b..bc9d64f3 100644
+index 456c04b2..4edfa742 100644
 --- a/src/lj_opt_fold.c
 +++ b/src/lj_opt_fold.c
 @@ -260,6 +260,11 @@ LJFOLDF(kfold_numcomp)
@@ -64,10 +91,10 @@ index ce78505b..bc9d64f3 100644
  {
    switch (op) {
 diff --git a/src/lj_parse.c b/src/lj_parse.c
-index 5a44f8db..bfe044a8 100644
+index 832f6bf4..7d0390e4 100644
 --- a/src/lj_parse.c
 +++ b/src/lj_parse.c
-@@ -934,6 +934,11 @@ static void bcemit_binop(FuncState *fs, BinOpr op, ExpDesc *e1, ExpDesc *e2)
+@@ -935,6 +935,11 @@ static void bcemit_binop(FuncState *fs, BinOpr op, ExpDesc *e1, ExpDesc *e2)
  }
 
  /* Emit unary operator. */
@@ -80,7 +107,7 @@ index 5a44f8db..bfe044a8 100644
  {
    if (op == BC_NOT) {
 diff --git a/src/lj_snap.c b/src/lj_snap.c
-index 6fda08ba..c7f51d7d 100644
+index d0d28c81..c8d5ffcc 100644
 --- a/src/lj_snap.c
 +++ b/src/lj_snap.c
 @@ -763,6 +763,13 @@ static void snap_restoreval(jit_State *J, GCtrace *T, ExitState *ex,
@@ -98,7 +125,7 @@ index 6fda08ba..c7f51d7d 100644
  static void snap_restoredata(jit_State *J, GCtrace *T, ExitState *ex,
 			     SnapNo snapno, BloomFilter rfilt,
 diff --git a/src/lj_str.c b/src/lj_str.c
-index cfdaec6f..88f9c765 100644
+index f34d6d95..806c67db 100644
 --- a/src/lj_str.c
 +++ b/src/lj_str.c
 @@ -13,6 +13,15 @@
@@ -118,7 +145,7 @@ index cfdaec6f..88f9c765 100644
 
  /* Ordered compare of strings. Assumes string data is 4-byte aligned. */
 diff --git a/src/lj_strfmt.c b/src/lj_strfmt.c
-index 909255db..ef9bd4f9 100644
+index 0936298d..32e93c42 100644
 --- a/src/lj_strfmt.c
 +++ b/src/lj_strfmt.c
 @@ -99,6 +99,11 @@ retlit:

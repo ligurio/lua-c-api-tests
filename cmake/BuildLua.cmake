@@ -65,6 +65,7 @@ macro(build_lua LUA_VERSION)
         # `io.popen()` is not supported by default, it is enabled
         # by `LUA_USE_POSIX` flag. Required by a function `random_locale()`.
         set(CFLAGS "${CFLAGS} -DLUA_USE_POSIX")
+        set(LDFLAGS "${LDFLAGS} -lstdc++")
     endif()
 
     include(ExternalProject)
@@ -90,6 +91,7 @@ macro(build_lua LUA_VERSION)
         BUILD_COMMAND cd <SOURCE_DIR> && make -j CC=${CMAKE_C_COMPILER}
                                                  CFLAGS=${CFLAGS}
                                                  LDFLAGS=${LDFLAGS}
+                                                 LF_PATH=${LibFuzzerObjDir}
         INSTALL_COMMAND ""
 
         BUILD_BYPRODUCTS ${LUA_LIBRARY} ${LUA_EXECUTABLE}

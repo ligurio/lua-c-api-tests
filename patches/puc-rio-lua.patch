@@ -1,31 +1,7 @@
 diff --git a/makefile b/makefile
-index 8674519f..1773b0eb 100644
+index 8674519f..dd0fb23e 100644
 --- a/makefile
 +++ b/makefile
-@@ -39,7 +39,7 @@ CWARNSC= -Wdeclaration-after-statement \
- 	-Wold-style-definition \
- 
- 
--CWARNS= $(CWARNSCPP) $(CWARNSC) $(CWARNGCC)
-+CWARNS= $(CWARNSCPP) $(CWARNSC)
- 
- # Some useful compiler options for internal tests:
- # -DLUAI_ASSERT turns on all assertions inside Lua.
-@@ -73,11 +73,11 @@ LOCAL = $(TESTS) $(CWARNS)
- # Note that Linux/Posix options are not compatible with C89
- MYCFLAGS= $(LOCAL) -std=c99 -DLUA_USE_LINUX
- MYLDFLAGS= -Wl,-E
--MYLIBS= -ldl
-+MYLIBS= -ldl $(LDFLAGS)
- 
- 
--CC= gcc
--CFLAGS= -Wall -O2 $(MYCFLAGS) -fno-stack-protector -fno-common -march=native
-+CC?= gcc
-+CFLAGS+= -Wall -O2 $(MYCFLAGS) -fno-stack-protector -fno-common -march=native
- AR= ar rc
- RANLIB= ranlib
- RM= rm -f
 @@ -96,9 +96,12 @@ CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o \
  AUX_O=	lauxlib.o
  LIB_O=	lbaselib.o ldblib.o liolib.o lmathlib.o loslib.o ltablib.o lstrlib.o \

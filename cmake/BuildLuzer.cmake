@@ -34,7 +34,7 @@ endif()
 
 ExternalProject_Add(bundled-luzer
     GIT_REPOSITORY https://github.com/ligurio/luzer
-    GIT_TAG e4624477735961457f562423ef2ba9afa51ba170
+    GIT_TAG f009fbd06f2090b061a1ff5e5e6006d5db1670a7
     GIT_PROGRESS TRUE
     GIT_SHALLOW FALSE
     SOURCE_DIR ${LUZER_DIR}/source

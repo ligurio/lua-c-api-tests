@@ -61,7 +61,7 @@ macro(build_lua LUA_VERSION)
         # can not be used when making a shared object; recompile
         # with -fPIC".
         set(CFLAGS "${CFLAGS} -fPIC")
-        set(CFLAGS "${CFLAGS} -DLUA_USE_DLOPEN")
+        #set(CFLAGS "${CFLAGS} -DLUA_USE_DLOPEN")
         # `io.popen()` is not supported by default, it is enabled
         # by `LUA_USE_POSIX` flag. Required by a function `random_locale()`.
         set(CFLAGS "${CFLAGS} -DLUA_USE_POSIX")

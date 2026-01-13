@@ -40,6 +40,23 @@
    https://oss-fuzz.com/testcase-detail/6260291328606208
    https://issues.oss-fuzz.com/issues/466669138
    https://groups.google.com/g/lua-l/c/WWVjDfGeyvs
+   https://github.com/lua/lua/commit/632a71b24d8661228a726deb5e1698e9638f96d8
+   https://www.lua.org/bugs.html#5.5.0-1
+1. Undefined behavior in `utf8_decode()`,
+   https://groups.google.com/g/lua-l/c/5TqwqKe1MF8
+   https://github.com/lua/lua/commit/10eb89d1141dc528806b32401e408e36fb2f3bf5
+   https://www.lua.org/bugs.html#5.5.0-3
+1. An assertion is triggered in the `luaG_runerror()`,
+   https://groups.google.com/g/lua-l/c/GCgcboFoDf8
+   https://issues.oss-fuzz.com/issues/511579745
+   https://oss-fuzz.com/testcase-detail/6530878632427520
+   https://github.com/lua/lua/commit/0465c23b3ee214ea3a117ab9d69a83cf85e7a82f
+1. A heap-use-after-free is triggered in the `insertkey()`,
+   https://groups.google.com/g/lua-l/c/K2mvG0mjwow
+   https://issues.oss-fuzz.com/issues/508107730
+   https://oss-fuzz.com/testcase-detail/6274756486955008
+   https://www.lua.org/bugs.html#5.5.0-8
+   https://github.com/lua/lua/commit/b996f8fd1be7fb711cc6f754a31a1c87d2c2fd9b
 
 ### LuaJIT
 
@@ -113,8 +130,38 @@
    https://github.com/tarantool/security/issues/143
 1. Missed type conversion for already existent slots in DUALNUM mode,
    https://github.com/LuaJIT/LuaJIT/issues/1413
+1. AddressSanitizer: heap-buffer-overflow in `blacklist_pc()`,
+   https://github.com/tarantool/security/issues/139
+   https://github.com/LuaJIT/LuaJIT/issues/1403
 1. Duality of 0 in `DUALNUM` build and `BC_UNM`,
    https://github.com/LuaJIT/LuaJIT/issues/1422
+1. `lj_record.c`:164: `rec_check_slots`: slot 25 type mismatch: stack type 13 vs IR type 0
+   https://github.com/tarantool/security/issues/154
+   https://oss-fuzz.com/testcase-detail/4952098017181696
+1. Incorrect -0 direction for JITed loop,
+   https://github.com/LuaJIT/LuaJIT/issues/1432
+1. UBSan warning for too big indices in `unpack()`,
+   https://github.com/LuaJIT/LuaJIT/issues/1450
+1. pcall as metamethod can overflow stack,
+   https://github.com/LuaJIT/LuaJIT/issues/1048,
+   https://github.com/tarantool/security/issues/147
+   https://issues.oss-fuzz.com/issues/435479026
+   https://oss-fuzz.com/testcase-detail/6399895872536576
+1. UBSan warning for too small month and year values in `os.time()`,
+   https://github.com/LuaJIT/LuaJIT/issues/1454
+1. UBSan warning for too big hash size in `table.new()`,
+   https://github.com/LuaJIT/LuaJIT/issues/1458
+1. UBSan warning in `carith_ptr()`,
+   https://github.com/LuaJIT/LuaJIT/issues/1459
+   https://github.com/tarantool/security/issues/142
+   https://issues.oss-fuzz.com/issues/393404275
+1. Heap overflow of Lua stack after relimiting,
+   https://github.com/LuaJIT/LuaJIT/issues/1471
+   https://issues.oss-fuzz.com/issues/507646002
+1. Narrowing of unary minus operation for number 0 in DUALNUM mode,
+   https://github.com/LuaJIT/LuaJIT/issues/1418
+1. Incorrect -0 direction for JITed loop,
+   https://github.com/LuaJIT/LuaJIT/issues/1432
 
 ### Tarantool
 
@@ -133,6 +180,9 @@
 1. `IR_NEWREF` is missing a NaN check,
    https://issues.oss-fuzz.com/issues/42529868
    https://github.com/LuaJIT/LuaJIT/issues/1069
+1. Heap-buffer overflow in `lex_string()`,
+   https://github.com/tarantool/security/issues/153
+   https://github.com/tarantool/tarantool/commit/ea71e2c3be2f5271e0cfd86ff63d36f97d484c7f
 
 ### Related issues
 

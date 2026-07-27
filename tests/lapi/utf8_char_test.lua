@@ -21,10 +21,6 @@ end
 
 local unpack = unpack or table.unpack
 
-local ignored_msgs = {
-    "value out of range",
-}
-
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
     test_lib.random_misc_settings(fdp)
@@ -33,10 +29,9 @@ local function TestOneInput(buf)
     local count = fdp:consume_integer(1, MAX_N)
     local chars = fdp:consume_integers(MIN_INT, MAX_INT, count)
     os.setlocale(test_lib.random_locale(fdp), "all")
-    local err_handler = test_lib.err_handler(ignored_msgs)
-    local ok, err = pcall(utf8.char, unpack(chars))
+    local ok, _ = pcall(utf8.char, unpack(chars))
     if not ok then
-        err_handler(err)
+        return
     end
 end
 

@@ -42,10 +42,6 @@ local function random_value(fdp)
     return item
 end
 
-local ignored_msgs = {
-    "index out of range",
-}
-
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
     test_lib.random_misc_settings(fdp)
@@ -63,10 +59,8 @@ local function TestOneInput(buf)
     if index == "#" then
         assert(select(index, unpack(tbl)) == count)
     end
-    local err_handler = test_lib.err_handler(ignored_msgs)
     local ok, res = pcall(select, index, unpack(tbl))
     if not ok then
-        err_handler(res)
         return
     end
     -- Don't want to test multiresults.

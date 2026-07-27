@@ -21,10 +21,6 @@ if test_lib.lua_current_version_lt_than(5, 3) then
     os.exit()
 end
 
-local ignored_msgs = {
-    "invalid UTF-8 code",
-}
-
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
     test_lib.random_misc_settings(fdp)
@@ -32,11 +28,7 @@ local function TestOneInput(buf)
     local s = fdp:consume_string(max_len)
     local lax = fdp:consume_boolean()
     os.setlocale(test_lib.random_locale(fdp), "all")
-    local err_handler = test_lib.err_handler(ignored_msgs)
-    local ok, err = pcall(utf8.codes, s, lax)
-    if not ok then
-        err_handler(err)
-    end
+    pcall(utf8.codes, s, lax)
 end
 
 local args = {

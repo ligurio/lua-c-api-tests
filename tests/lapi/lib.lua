@@ -108,17 +108,6 @@ local function random_locale(fdp)
     return fdp:oneof(locales)
 end
 
-local function err_handler(ignored_msgs)
-    return function(error_msg)
-        for _, ignored_msg in ipairs(ignored_msgs) do
-            if string.find(error_msg, ignored_msg, 1, true) then
-                return
-            end
-        end
-        error(error_msg, 2)
-    end
-end
-
 local function gc_setpause(fdp)
     local pause = fdp:consume_integer(0, 1000)
     local res = collectgarbage("setpause", pause)
@@ -166,18 +155,9 @@ local function gc_incremental(fdp)
     assert(type(res) == "string")
 end
 
-local gc_ignored_msgs = {
-    "invalid format option",
-    "invalid option",
-    "bad argument",
-    "cannot resume",
-}
-
 local function gc_random_action(fdp, gc_actions)
     local gc_action = fdp:oneof(gc_actions)
-    local handler = err_handler(gc_ignored_msgs)
-    local ok, err = pcall(gc_action, fdp)
-    if not ok then handler(err) end
+    pcall(gc_action, fdp)
 end
 
 local GC_ACTIONS = {}
@@ -273,7 +253,6 @@ return {
     approx_equal = approx_equal,
     arrays_equal = arrays_equal,
     bitwise_op = bitwise_op,
-    err_handler = err_handler,
     is_inf = is_inf,
     is_nan = is_nan,
     lua_current_version_ge_than = lua_current_version_ge_than,

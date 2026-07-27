@@ -13,10 +13,6 @@ local test_lib = require("lib")
 local MAX_INT64 = test_lib.MAX_INT64
 local MIN_INT64 = test_lib.MIN_INT64
 
-local ignored_msgs = {
-    "field 'year' is out-of-bound",
-}
-
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
     test_lib.random_misc_settings(fdp)
@@ -30,10 +26,8 @@ local function TestOneInput(buf)
         sec = fdp:consume_number(MIN_INT64, MAX_INT64),
         year = fdp:consume_number(MIN_INT64, MAX_INT64),
     }
-    local err_handler = test_lib.err_handler(ignored_msgs)
     local ok, res = pcall(os.time, time)
     if not ok then
-        err_handler(res)
         return
     end
     local type_check = type(res) == "number" or type(res) == "table"

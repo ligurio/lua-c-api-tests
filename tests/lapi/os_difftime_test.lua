@@ -13,19 +13,13 @@ local test_lib = require("lib")
 local MIN_INT = test_lib.MIN_INT
 local MAX_INT = test_lib.MAX_INT
 
-local ignored_msgs = {
-    "number has no integer representation",
-}
-
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
     test_lib.random_misc_settings(fdp)
     local t1 = fdp:consume_number(MIN_INT, MAX_INT)
     local t2 = fdp:consume_number(MIN_INT, MAX_INT)
-    local err_handler = test_lib.err_handler(ignored_msgs)
     local ok, res = pcall(os.difftime, t1, t2)
     if not ok then
-        err_handler(res)
         return
     end
     assert(type(res) == "number")

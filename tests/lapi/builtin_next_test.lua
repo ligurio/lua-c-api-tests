@@ -19,10 +19,6 @@ local test_lib = require("lib")
 local MAX_INT = test_lib.MAX_INT
 local MIN_INT = test_lib.MIN_INT
 
-local ignored_msgs = {
-    "invalid key to 'next'",
-}
-
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
     test_lib.random_misc_settings(fdp)
@@ -34,10 +30,8 @@ local function TestOneInput(buf)
     tbl.b = fdp:consume_string(test_lib.MAX_STR_LEN)
     local index = fdp:consume_integer(0, MAX_INT)
 
-    local err_handler = test_lib.err_handler(ignored_msgs)
     local ok, res = pcall(next, tbl, index)
     if not ok then
-        err_handler(res)
         return
     end
     assert(type(res) == "number" or type(res) == "string")

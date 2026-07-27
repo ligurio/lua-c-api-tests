@@ -72,8 +72,14 @@ local function TestOneInput(buf, _size)
     assert(test_lib.approx_equal(math.log(b, b), 1, eps))
     -- Change of base formula.
     local log_b_y = math.log(b, y)
-    if log_b_y ~= 0 then
-        assert(test_lib.approx_equal(math.log(x, b), math.log(x, y) / log_b_y, eps))
+    if log_b_y ~= 0 and
+       not test_lib.is_inf(log_b_y) and
+       not test_lib.is_nan(log_b_y) then
+        local change_base = math.log(x, y) / log_b_y
+        if not test_lib.is_inf(change_base) and
+           not test_lib.is_nan(change_base) then
+            assert(test_lib.approx_equal(math.log(x, b), change_base, eps))
+        end
     end
 end
 

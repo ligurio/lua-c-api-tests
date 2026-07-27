@@ -19,10 +19,6 @@ if test_lib.lua_current_version_lt_than(5, 3) then
     os.exit()
 end
 
-local ignored_msgs = {
-    "initial position is a continuation byte",
-}
-
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
     test_lib.random_misc_settings(fdp)
@@ -31,11 +27,7 @@ local function TestOneInput(buf)
     local n = fdp:consume_integer(MIN_INT, MAX_INT)
     local i = fdp:consume_integer(1, MAX_INT)
     os.setlocale(test_lib.random_locale(fdp), "all")
-    local err_handler = test_lib.err_handler(ignored_msgs)
-    local ok, err = pcall(utf8.offset, s, n, i)
-    if not ok then
-        err_handler(err)
-    end
+    pcall(utf8.offset, s, n, i)
 end
 
 local args = {

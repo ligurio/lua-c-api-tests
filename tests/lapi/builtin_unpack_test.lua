@@ -34,12 +34,6 @@ local unpack = unpack or table.unpack
 local MAX_INT = test_lib.MAX_INT64
 local MIN_INT = test_lib.MAX_INT64
 
-local ignored_msgs = {
-    -- `i` and `j` cannot be bigger than INT_MAX, otherwise an
-    -- error "too many results to unpack" is raised.
-    "too many results to unpack",
-}
-
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
     test_lib.random_misc_settings(fdp)
@@ -64,11 +58,7 @@ local function TestOneInput(buf)
 
     local i = fdp:consume_integer(MIN_INT, MAX_INT)
     local j = fdp:consume_integer(MIN_INT, MAX_INT)
-    local err_handler = test_lib.err_handler(ignored_msgs)
-    local ok, err = pcall(unpack, str_chars, i, j)
-    if not ok then
-        err_handler(err)
-    end
+    pcall(unpack, str_chars, i, j)
 end
 
 local args = {

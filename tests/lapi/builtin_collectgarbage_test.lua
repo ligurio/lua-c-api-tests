@@ -11,6 +11,9 @@ Synopsis: collectgarbage([opt [, arg]])
 local luzer = require("luzer")
 local test_lib = require("lib")
 
+-- `newproxy` is available in LuaJIT and PUC Rio Lua <= 5.3.
+local has_newproxy = type(newproxy) == "function"
+
 local MAX_INT = test_lib.MAX_INT
 
 local WEAK_MODES = { "k", "v", "kv" }
@@ -105,6 +108,9 @@ end
 -- When the finalizer runs during GC sweep, it triggers
 -- another GC step. This can collide with table rehashing.
 local function workload_finalizer_rehash(fdp)
+    if not has_newproxy then
+        return
+    end
     --- @type userdata?
     local fin = newproxy(true) -- luacheck: no unused
     local fin_called = false

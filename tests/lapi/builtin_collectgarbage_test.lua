@@ -38,7 +38,7 @@ end
 
 local function gc_step(fdp)
     local step_size = 0
-    local set_step_size = fdp:boolean()
+    local set_step_size = fdp:consume_boolean()
     if set_step_size then
         step_size = fdp:consume_integer(0, 1000)
     end

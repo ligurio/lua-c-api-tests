@@ -1,10 +1,12 @@
 name: Testing in ClusterFuzzLite (CI)
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - master
+  # The workflow is failed because limits for launching have been
+  # exhausted, and the job has been interrupted.
+  # workflow_dispatch:
+  # push:
+  #   branches:
+  #     - master
 
 permissions: read-all
 

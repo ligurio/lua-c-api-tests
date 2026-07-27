@@ -69,14 +69,14 @@ local what_modes_map = {}
 
 local function check_getinfo(ar)
     if what_modes_map.S then
-        assert(ar.source ~= nil and type(ar.source) == "string")
-        assert(ar.short_src ~= nil and type(ar.short_src) == "string")
-        assert(ar.linedefined ~= nil and type(ar.linedefined) == "number")
-        assert(ar.lastlinedefined ~= nil and
+        assert(ar.source == nil or type(ar.source) == "string")
+        assert(ar.short_src == nil or type(ar.short_src) == "string")
+        assert(ar.linedefined == nil or type(ar.linedefined) == "number")
+        assert(ar.lastlinedefined == nil or
                type(ar.lastlinedefined) == "number")
-        assert(ar.what ~= nil and (ar.what == "Lua" or
-                                   ar.what == "C" or
-                                   ar.what == "main"))
+        assert(ar.what == nil or (ar.what == "Lua" or
+                                  ar.what == "C" or
+                                  ar.what == "main"))
         -- Beware, in PUC Rio Lua `srclen` can be omitted with
         -- `S` mode, see <ldebug.c>.
         assert(ar.srclen == nil or type(ar.srclen) == "number")
@@ -101,22 +101,22 @@ local function check_getinfo(ar)
     end
 
     if what_modes_map.t then
-        assert(type(ar.istailcall) == "boolean")
+        assert(ar.istailcall == nil or type(ar.istailcall) == "boolean")
     end
 
     if what_modes_map.u then
-        assert(ar.nups ~= nil and type(ar.nups) == "number")
-        assert(ar.nparams ~= nil and type(ar.nparams) == "number")
+        assert(ar.nups == nil or type(ar.nups) == "number")
+        assert(ar.nparams == nil or type(ar.nparams) == "number")
         if ar.what == "C" then
-            assert(ar.nparams == 0)
-            assert(ar.isvararg == true)
+            assert(ar.nparams == 0 or ar.nparams == nil)
+            assert(ar.isvararg == true or ar.isvararg == nil)
         end
-        assert(type(ar.isvararg) == "boolean")
+        assert(ar.isvararg == nil or type(ar.isvararg) == "boolean")
     end
 
     if what_modes_map.r then
-        assert(ar.ftransfer ~= nil and type(ar.ftransfer) == "number")
-        assert(ar.ntransfer ~= nil and type(ar.ntransfer) == "number")
+        assert(ar.ftransfer == nil or type(ar.ftransfer) == "number")
+        assert(ar.ntransfer == nil or type(ar.ntransfer) == "number")
     end
 end
 

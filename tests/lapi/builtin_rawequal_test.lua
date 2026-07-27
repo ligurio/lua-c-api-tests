@@ -15,55 +15,86 @@ local MAX_INT = test_lib.MAX_INT
 local MIN_INT = test_lib.MIN_INT
 local MAX_STR_LEN = test_lib.MAX_STR_LEN
 
--- "A metamethod only is selected when both objects being compared
--- have the same type and the same metamethod for the selected
--- operation.", https://www.lua.org/manual/5.1/manual.html#2.8.
-local function random_pair_values(fdp)
-    local item_type = fdp:oneof({
-        "boolean",
-        "integer",
-        "number",
-        "string",
-        "table",
-    })
-    local item1, item2
-    if item_type == "string" then
-        item1 = fdp:consume_string(MAX_STR_LEN)
-        item2 = fdp:consume_string(MAX_STR_LEN)
-    elseif item_type == "boolean" then
-        item1 = fdp:consume_boolean()
-        item2 = fdp:consume_boolean()
-    elseif item_type == "integer" then
-        item1 = fdp:consume_integer(MIN_INT, MAX_INT)
-        item2 = fdp:consume_integer(MIN_INT, MAX_INT)
-    elseif item_type == "number" then
-        item1 = fdp:consume_number(MIN_INT, MAX_INT)
-        item2 = fdp:consume_number(MIN_INT, MAX_INT)
-    elseif item_type == "table" then
-        item1 = fdp:consume_numbers(MIN_INT, MAX_INT, 10)
-        item2 = fdp:consume_numbers(MIN_INT, MAX_INT, 10)
-    else
-        error("Unsupported type")
+local LUA_TYPES = {
+    "boolean",
+    "function",
+    "integer",
+    "nil",
+    "number",
+    "string",
+    "table",
+    "thread",
+}
+
+local function random_value(fdp, typ)
+    if typ == "nil" then
+        return nil
+    elseif typ == "boolean" then
+        return fdp:consume_boolean()
+    elseif typ == "integer" then
+        return fdp:consume_integer(MIN_INT, MAX_INT)
+    elseif typ == "number" then
+        return fdp:consume_number(MIN_INT, MAX_INT)
+    elseif typ == "string" then
+        return fdp:consume_string(MAX_STR_LEN)
+    elseif typ == "table" then
+        return fdp:consume_numbers(MIN_INT, MAX_INT, 10)
+    elseif typ == "function" then
+        return function() end
+    elseif typ == "thread" then
+        return coroutine.create(function() end)
     end
-    return item1, item2
+end
+
+local function check_rawequal(v1, v2)
+    local result = rawequal(v1, v2)
+    assert(type(result) == "boolean")
+
+    if type(v1) ~= type(v2) then
+        assert(result == false)
+    end
 end
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
     test_lib.random_misc_settings(fdp)
-    local v1, v2 = random_pair_values(fdp)
-    local comp1 = rawequal(v1, v2)
-    assert(type(comp1) == "boolean")
-    local mt = {
-        __eq = function(_op1, _op2)
-            error("assertion is not reachable")
-        end,
-    }
-    debug.setmetatable(v1, mt)
-    debug.setmetatable(v2, mt)
-    local comp2 = rawequal(v1, v2)
-    assert(type(comp2) == "boolean")
-    assert(comp1 == comp2)
+
+    local same = fdp:consume_boolean()
+    local type_1 = fdp:oneof(LUA_TYPES)
+    local type_2 = same and type_1 or fdp:oneof(LUA_TYPES)
+
+    local v1 = random_value(fdp, type_1)
+    local v2 = random_value(fdp, type_2)
+
+    if (type_1 == "table" or
+        type_1 == "function" or
+        type_1 == "thread")
+        and fdp:consume_boolean() then
+        v2 = v1
+    end
+
+    check_rawequal(v1, v2)
+
+    if type(v1) == "table" then
+        local mt = {
+            __eq = function()
+                error("unreachable")
+            end,
+        }
+        pcall(debug.setmetatable, v1, mt)
+        if type(v2) == "table" then
+            pcall(debug.setmetatable, v2, mt)
+        end
+        local after = rawequal(v1, v2)
+        assert(type(after) == "boolean")
+    end
+
+    local nan = 0.0 / 0.0
+    assert(rawequal(nan, nan) == false)
+    assert(rawequal(nan, 0) == false)
+    assert(rawequal(0, 0) == true)
+    assert(rawequal(math.huge, math.huge) == true)
+    assert(rawequal(-math.huge, -math.huge) == true)
 end
 
 local args = {

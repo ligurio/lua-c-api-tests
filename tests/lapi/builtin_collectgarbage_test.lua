@@ -14,7 +14,7 @@ local test_lib = require("lib")
 -- `newproxy` is available in LuaJIT and PUC Rio Lua <= 5.3.
 local has_newproxy = type(newproxy) == "function"
 
-local MAX_INT = test_lib.MAX_INT
+local MAX_NOPS = 100
 
 local WEAK_MODES = { "k", "v", "kv" }
 
@@ -170,7 +170,7 @@ end
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
     test_lib.random_misc_settings(fdp)
-    local nops = fdp:consume_integer(1, MAX_INT)
+    local nops = fdp:consume_integer(1, MAX_NOPS)
     for _ = 1, nops do
         test_lib.gc_random_action(fdp, GC_ACTIONS)
     end

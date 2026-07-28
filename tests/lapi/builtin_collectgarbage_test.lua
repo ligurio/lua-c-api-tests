@@ -93,7 +93,7 @@ local function workload_weak_clear(fdp)
     for i = 1, n do
         keys[i] = nil
     end
-    gc_step(fdp)
+    collectgarbage("collect")
     -- After GC with weak mode 'k', keys should be gone.
     if mode == "k" or mode == "kv" then
         local count = 0

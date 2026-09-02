@@ -1,4 +1,4 @@
---[[
+--[=[
 SPDX-License-Identifier: ISC
 Copyright (c) 2023-2026, Sergey Bronnikov.
 
@@ -13,7 +13,7 @@ the one that created it,
 https://www.lua.org/bugs.html#5.3.2-3
 
 Synopsis: string.gmatch(s, pattern [, init])
-]]
+]=]
 
 local luzer = require("luzer")
 local test_lib = require("lib")
@@ -25,7 +25,28 @@ local function TestOneInput(buf, _size)
     local s = fdp:consume_string(test_lib.MAX_STR_LEN)
     local pattern = fdp:consume_string(test_lib.MAX_STR_LEN)
     local init = fdp:consume_integer(0, test_lib.MAX_INT)
-    string.gmatch(s, pattern, init)
+
+    -- Avoid errors like "malformed pattern (ends with '%')".
+    local ok, it = pcall(string.gmatch, s, pattern, init)
+    if not ok then
+        return
+    end
+
+    -- Exercise the iterator by collecting all matches. Crashes
+    -- during iteration propagate to the test.
+    local matches = {}
+    for match in it do
+        table.insert(matches, match)
+    end
+
+    -- Metamorphic: first gmatch match equals string.match()
+    -- result.
+    local _, match_result = pcall(string.match, s, pattern, init)
+    if #matches > 0 then
+        assert(matches[1] == match_result)
+    else
+        assert(match_result == nil)
+    end
 end
 
 local args = {

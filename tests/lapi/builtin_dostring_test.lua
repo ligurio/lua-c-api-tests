@@ -10,12 +10,25 @@ local luzer = require("luzer")
 local test_lib = require("lib")
 local MAX_INT = test_lib.MAX_INT
 
+-- loadstring() is removed in Lua 5.2+; use load() with a string chunk.
+local load_string = type(loadstring) == "function" and loadstring or load
+
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
     test_lib.random_misc_settings(fdp)
     local max_len = fdp:consume_integer(0, MAX_INT)
     local str = fdp:consume_string(max_len)
-    pcall(loadstring, str)
+    pcall(function()
+        local fn, err = load_string(str)
+        if fn ~= nil then
+            -- The compiled chunk must be a function; execute it.
+            assert(type(fn) == "function")
+            pcall(fn)
+        else
+            -- On failure the compiler returns a string error message.
+            assert(type(err) == "string")
+        end
+    end)
 end
 
 local args = {
